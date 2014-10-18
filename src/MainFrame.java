@@ -7,7 +7,7 @@ import java.awt.*;
 public class MainFrame extends JFrame {
 
     public void createGUI() {
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JPanel panel = new JPanel();
         panel.setSize(350, 150);
         panel.setLayout(new FlowLayout());
@@ -16,11 +16,13 @@ public class MainFrame extends JFrame {
         panel.add(infolabel);
 
         getContentPane().add(panel);
+
     }
 
     public MainFrame() {
         super("Crypto App");
         createGUI();
+        setSize(640,480);
     }
 
     public static void main(String[] args) {
@@ -29,7 +31,8 @@ public class MainFrame extends JFrame {
             public void run() {
                 JFrame.setDefaultLookAndFeelDecorated(true);
                 MainFrame mainFrame = new MainFrame();
-                mainFrame.pack();
+                //mainFrame.pack();
+                //mainFrame.setSize(640,480);
                 mainFrame.setVisible(true);
             }
         });

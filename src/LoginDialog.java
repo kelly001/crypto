@@ -13,19 +13,21 @@ public class LoginDialog extends JDialog{
     private JLabel lbPassword;
     private JButton btnLogin;
     private JButton btnCancel;
-    private boolean succeeded;
+    private boolean succeeded = false;
 
 
 
     public LoginDialog(Frame parent) {
         super(parent, "Login", true);
 
+        succeeded = false;
+
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
                 //this.refreshMainView();
-                System.out.println("closed");
-                System.out.println(succeeded);
+                System.out.println("closed dialog");
+                //System.out.println(succeeded);
                 dispose();
             }
         });

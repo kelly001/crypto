@@ -14,47 +14,65 @@ import java.awt.event.ActionListener;
 import javax.swing.JFrame;
 
 public class LoginFrame extends JFrame{
-    public static void main(String[] args) {
-        final JFrame frame = new JFrame("Login Window");
-        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        final JLabel infolabel = new JLabel("Hello");
 
+    private JFrame frame;
+    private JLabel infolabel;
+    public LoginDialog dialog;
 
-        final LoginDialog loginDlg = new LoginDialog(frame);
-        loginDlg.setVisible(true);
+    public LoginFrame(String name) {
+        super(name);
+        //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
 
-        // if logon successfully
-        System.out.println(loginDlg.isSucceeded());
-        if(loginDlg.isSucceeded()){
-            infolabel.setText("Hi " + loginDlg.getUsername() + "!\n\r");
-            frame.setVisible(false);
-            frame.dispose();
-
-            MainFrame new_frame = new MainFrame();
-            new_frame.pack();
-            new_frame.setVisible(true);
-        }
-
-        /*loginDlg.addWindowListener(new WindowAdapter() {
+        addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                infolabel.setText("action");
-                if(loginDlg.isSucceeded()){
-                    infolabel.setText("Hi " + loginDlg.getUsername() + "!\n\r");
-                    //frame.setVisible(false);
-                    //frame.dispose();
+                System.out.println("WindowListener method called: windowClosed custom.");
+                dispose();
+            }
+        });
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowActivated(WindowEvent e) {
+                System.out.println("WindowListener method called: windowActivated custom.");
 
-                    /*MainFrame new_frame = new MainFrame();
-                    new_frame.pack();
+                if(dialog.isSucceeded()) {
+                    infolabel.setText("Hi " + dialog.getUsername() + "!\n\r");
+                    MainFrame new_frame = new MainFrame();
                     new_frame.setVisible(true);
+                    dispose();
                 }
             }
-        });*/
-        frame.setSize(350, 150);
-        frame.setLayout(new FlowLayout());
-        frame.getContentPane().add(infolabel);
-        frame.setVisible(true);
+        });
 
+        infolabel = new JLabel("Hello");
+
+        dialog = new LoginDialog(frame);
+        dialog.setVisible(true);
+        System.out.println(dialog.isSucceeded()?"true":"false");
+
+        getContentPane().add(infolabel);
+        setSize(350, 150);
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new LoginFrame("Login Window");
+        frame.setVisible(true);
+    }
+
+
+    public void windowActivated(WindowEvent e) {
+        System.out.println("WindowListener method called: windowActivated.");
+        System.out.println();
+    }
+
+    public void windowClosed(WindowEvent e) {
+        //This will only be seen on standard output.
+        System.out.println("WindowListener method called: windowClosed.");
+    }
+
+    public void windowOpened(WindowEvent e) {
+        System.out.println("WindowListener method called: windowOpened.");
     }
 
 }
