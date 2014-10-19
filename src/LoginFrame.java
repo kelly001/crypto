@@ -56,6 +56,7 @@ public class LoginFrame extends JFrame{
     }
 
     public static void main(String[] args) {
+
         JFrame frame = new LoginFrame("Login Window");
         frame.setVisible(true);
     }
