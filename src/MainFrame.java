@@ -1,27 +1,27 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 
 /**
  * Created by new_name on 14.10.2014.
  */
-public class MainFrame extends JFrame {
+public class MainFrame extends JFrame implements ActionListener, ItemListener{
     private JMenuBar menuBar;
     private JMenu menu, submenu;
     private JMenuItem menuItem;
 
-    private void addMenu(String name, ActionListener action) {
+    private void addMenu(String name, ActionListener action, String id) {
 
         //a group of JMenuItems
         menuItem = new JMenuItem(name,
                 KeyEvent.VK_T);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_1, ActionEvent.ALT_MASK));
+        //menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
         menuItem.getAccessibleContext().setAccessibleDescription(
                 "This doesn't really do anything");
+
+        menuItem.setActionCommand(id);
         menuItem.addActionListener(action);
+        menuItem.addItemListener(this);
         menu.add(menuItem);
     }
 
@@ -46,10 +46,10 @@ public class MainFrame extends JFrame {
         menuBar.add(menu);
 
 
-        addMenu("Сертификат", new MenuActionListener());
-        addMenu("Организация", new MenuActionListener());
-        addMenu("Ключи", new MenuActionListener());
-        addMenu("Хеш", new MenuActionListener());
+        addMenu("Сертификат", this, "sert");
+        addMenu("Организация", this, "org");
+        addMenu("Ключи", this,"key");
+        addMenu("Хеш", this, "hash");
         setJMenuBar(menuBar);
         getContentPane().add(panel);
     }
@@ -77,6 +77,35 @@ public class MainFrame extends JFrame {
     {
         public void actionPerformed(ActionEvent e) {
               System.out.println("Menu item action");
+            System.out.println(menuBar.getComponent().getName());
         }
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        //...Get information from the action event...
+        //...Display it in the text area...
+        System.out.println("Menu item action default");
+        System.out.println(e.getActionCommand());
+    }
+
+    //TODO
+    public void itemStateChanged(ItemEvent e) {
+        //...Get information from the item event...
+        //...Display it in the text area...
+        MenuSelectionManager msm = (MenuSelectionManager) e.getSource();
+        MenuElement[] path = msm.getSelectedPath();
+        if (path.length == 0) {
+            System.out.println("No menus are opened or menu items selected");
+        }
+        for(MenuElement el: path) {
+            Component c = el.getComponent();
+
+            if (c instanceof JMenuItem) {
+                JMenuItem mi = (JMenuItem) c;
+                String label = mi.getText();
+                System.out.println(label);
+            }
+        }
+        MenuSelectionManager.defaultManager().clearSelectedPath();
     }
 }
