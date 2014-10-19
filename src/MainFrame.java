@@ -28,7 +28,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     public void createGUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JPanel panel = new JPanel();
-        panel.setSize(350, 150);
+        //panel.setSize(350, 150);
         panel.setLayout(new FlowLayout());
 
         final JLabel infolabel = new JLabel("Информация");
@@ -46,7 +46,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         menuBar.add(menu);
 
 
-        addMenu("Сертификат", this, "sert");
+        addMenu("Сертификат", this, "cert");
         addMenu("Организация", this, "org");
         addMenu("Ключи", this,"key");
         addMenu("Хеш", this, "hash");
@@ -66,8 +66,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
             public void run() {
                 JFrame.setDefaultLookAndFeelDecorated(true);
                 MainFrame mainFrame = new MainFrame();
-                //mainFrame.pack();
-                //mainFrame.setSize(640,480);
                 mainFrame.setVisible(true);
             }
         });
@@ -76,8 +74,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     public class MenuActionListener implements ActionListener
     {
         public void actionPerformed(ActionEvent e) {
-              System.out.println("Menu item action");
-            System.out.println(menuBar.getComponent().getName());
+            System.out.println("Menu item action default custom");
+            System.out.println(e.getActionCommand());
         }
     }
 
@@ -86,6 +84,29 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         //...Display it in the text area...
         System.out.println("Menu item action default");
         System.out.println(e.getActionCommand());
+        Object item = e.getSource();
+        if (item instanceof Component) {
+            Window w = findWindow((Component) item);
+            createFrame((JFrame) w);
+            w.dispose();
+        } else {
+            System.out.println("source is not a Component");
+        }
+    }
+
+    public static Window findWindow(Component c) {
+        System.out.println(c.getClass().getName());
+        if (c instanceof Window) {
+            return (Window) c;
+        }else if( c instanceof  JFrame) {
+            return (JFrame) c;
+        } else if (c instanceof JPopupMenu) {
+            JPopupMenu pop = (JPopupMenu) c;
+            return findWindow(pop.getInvoker());
+        } else {
+            Container parent = c.getParent();
+            return parent == null ? null : findWindow(parent);
+        }
     }
 
     //TODO
@@ -107,5 +128,15 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
             }
         }
         MenuSelectionManager.defaultManager().clearSelectedPath();
+    }
+
+    protected static void createFrame(Frame desktop) {
+        CertificateFrame frame = new CertificateFrame();
+
+        desktop.add(frame);
+        frame.setVisible(true);
+        try {
+            frame.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {}
     }
 }
