@@ -7,12 +7,12 @@ import javax.swing.JInternalFrame;
 public class CertificateFrame extends JInternalFrame {
     static int openFrameCount = 0;
     static final int xOffset = 30, yOffset = 30;
-    Dimension size = new Dimension(600,400);
+    Dimension size = new Dimension(200,100);
     private JLabel lbUsername;
     private JTextField tfUsername;
 
-    public CertificateFrame() {
-        super("Certificates",
+    public CertificateFrame(String name) {
+        super(name,
                 true, //resizable
                 true, //closable
                 true, //maximizable
@@ -26,6 +26,12 @@ public class CertificateFrame extends JInternalFrame {
 
     public void createGUI() {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        /*JPanel panel = new JPanel(new FlowLayout());
+        final JLabel infolabel = new JLabel("atata");
+        panel.add(infolabel);
+        panel.setSize(size);
+        getContentPane().add(panel,  BorderLayout.CENTER);
+        */
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints cs = new GridBagConstraints();
 
@@ -45,6 +51,7 @@ public class CertificateFrame extends JInternalFrame {
 
         panel.setSize(size);
         getContentPane().add(panel,  BorderLayout.CENTER);
+        pack();
     }
 
 }

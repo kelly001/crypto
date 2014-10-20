@@ -7,7 +7,7 @@ import java.awt.event.*;
  */
 public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
-    static int openFrameCount = 1;
+    static int openFrameCount = 0;
     static final int xOffset = 30, yOffset = 30;
     Dimension size = new Dimension(1000,800);
 
@@ -157,16 +157,17 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     }
 
     protected static void createFrame(JFrame desktop) {
-        System.out.println(desktop.toString());
-        CertificateFrame frame = new CertificateFrame();
-        frame.setSize(desktop.getSize());
-        frame.setLocation(xOffset*openFrameCount, yOffset*openFrameCount);
-        frame.setVisible(true);
+        CertificateFrame certificate_frame = new CertificateFrame("Frame #" + (openFrameCount+1));
+        //certificate_frame.setSize(desktop.getSize());
+        certificate_frame.setLocation(xOffset*openFrameCount, yOffset*openFrameCount);
+        certificate_frame.setVisible(true);
         //desktop.getContentPane().add(frame);
-        desktop.add(frame);
+        desktop.add(certificate_frame);
         try {
-            frame.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {}
+            certificate_frame.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {
+            System.out.println( e.getLocalizedMessage());
+        }
         openFrameCount +=1;
     }
 }
