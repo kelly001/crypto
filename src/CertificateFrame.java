@@ -7,6 +7,7 @@ import javax.swing.JInternalFrame;
 public class CertificateFrame extends JInternalFrame {
     static int openFrameCount = 0;
     static final int xOffset = 30, yOffset = 30;
+    Dimension size = new Dimension(600,400);
     private JLabel lbUsername;
     private JTextField tfUsername;
 
@@ -20,8 +21,7 @@ public class CertificateFrame extends JInternalFrame {
         //...Then set the window size or call pack...
         //Set the window's location.
         createGUI();
-        setSize(640,480);
-        setLocation(xOffset*openFrameCount, yOffset*openFrameCount);
+        //setLocation(xOffset*openFrameCount, yOffset*openFrameCount);
     }
 
     public void createGUI() {
@@ -43,6 +43,7 @@ public class CertificateFrame extends JInternalFrame {
         cs.gridwidth = 2;
         panel.add(tfUsername, cs);
 
+        panel.setSize(size);
         getContentPane().add(panel,  BorderLayout.CENTER);
     }
 

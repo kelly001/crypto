@@ -6,6 +6,11 @@ import java.awt.event.*;
  * Created by new_name on 14.10.2014.
  */
 public class MainFrame extends JFrame implements ActionListener, ItemListener{
+
+    static int openFrameCount = 1;
+    static final int xOffset = 30, yOffset = 30;
+    Dimension size = new Dimension(1000,800);
+
     private JMenuBar menuBar;
     private JMenu menu, submenu;
     private JMenuItem menuItem;
@@ -50,14 +55,18 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         addMenu("Организация", this, "org");
         addMenu("Ключи", this,"key");
         addMenu("Хеш", this, "hash");
+        addMenu("Сменить пользователя", this, "logout");
+        addMenu("Выход", this, "exit");
         setJMenuBar(menuBar);
+        //panel.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
         getContentPane().add(panel);
     }
 
     public MainFrame() {
         super("Crypto App");
         createGUI();
-        setSize(640,480);
+        setSize(size);
+        setVisible(true);
     }
 
     public static void main(String[] args) {
@@ -84,13 +93,32 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         //...Display it in the text area...
         System.out.println("Menu item action default");
         System.out.println(e.getActionCommand());
-        Object item = e.getSource();
-        if (item instanceof Component) {
-            Window w = findWindow((Component) item);
-            createFrame((JFrame) w);
-            w.dispose();
-        } else {
-            System.out.println("source is not a Component");
+
+        //check menu id
+        if (e.getActionCommand().equals("exit")) {
+            System.exit(1);
+        } else if (e.getActionCommand().equals("logout")) {
+            // start login frame
+            LoginFrame new_frame = new LoginFrame("Авторизация");
+            new_frame.setVisible(true);
+            //find main frame
+            Object item = e.getSource();
+            if (item instanceof Component) {
+                Window w = findWindow((Component) item);
+                w.dispose();
+            } else {
+                System.out.println("source is not a Component");
+            }
+        } else if (e.getActionCommand().equals("cert")) {
+            // create new InternalFrame with generation Form
+            //find main frame
+            Object item = e.getSource();
+            if (item instanceof Component) {
+                Window w = findWindow((Component) item);
+                createFrame((JFrame) w);
+            } else {
+                System.out.println("source is not a Component");
+            }
         }
     }
 
@@ -98,8 +126,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         System.out.println(c.getClass().getName());
         if (c instanceof Window) {
             return (Window) c;
-        }else if( c instanceof  JFrame) {
-            return (JFrame) c;
         } else if (c instanceof JPopupMenu) {
             JPopupMenu pop = (JPopupMenu) c;
             return findWindow(pop.getInvoker());
@@ -130,13 +156,17 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         MenuSelectionManager.defaultManager().clearSelectedPath();
     }
 
-    protected static void createFrame(Frame desktop) {
+    protected static void createFrame(JFrame desktop) {
+        System.out.println(desktop.toString());
         CertificateFrame frame = new CertificateFrame();
-
-        desktop.add(frame);
+        frame.setSize(desktop.getSize());
+        frame.setLocation(xOffset*openFrameCount, yOffset*openFrameCount);
         frame.setVisible(true);
+        //desktop.getContentPane().add(frame);
+        desktop.add(frame);
         try {
             frame.setSelected(true);
         } catch (java.beans.PropertyVetoException e) {}
+        openFrameCount +=1;
     }
 }
