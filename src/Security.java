@@ -1,39 +1,76 @@
-/**
- * Created by Julia on 21.10.2014.
- */
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
-import java.util.Date;
-
-import org.bouncycastle.asn1.x509.CRLReason;
-import org.bouncycastle.asn1.x509.CRLNumber;
-import org.bouncycastle.asn1.x509.X509Extensions;
-import org.bouncycastle.x509.X509V2CRLGenerator;
+import java.io.*;
+import java.security.*;
 
 class Security {
 
-        X509V2CRLGenerator   crlGen = new X509V2CRLGenerator();
-        Date now = new Date();
-        Date                 nextUpdate = ...;
-        X509Certificate      caCrlCert = ...;
-        PrivateKey           caCrlPrivateKey = ...;
+    public Signature dsa;
+    public PublicKey pub;
 
-        crlGen.setIssuerDN(new X500Principal("CN=Test CA"));
-
-
-        crlGen.setThisUpdate(now);
-        crlGen.setNextUpdate(nextUpdate);
-        crlGen.setSignatureAlgorithm(signatureAlgorithm);
-
-
-        crlGen.addCRLEntry(BigInteger.ONE, now, CRLReason.privilegeWithdrawn);
-
-
-        crlGen.addExtension(X509Extensions.AuthorityKeyIdentifier,
-        false, new AuthorityKeyIdentifierStructure(caCrlCert));
-        crlGen.addExtension(X509Extensions.CRLNumber,
-        false, new CRLNumber(crlNumber));
-
-
-        X509CRL    crl = crlGen.generateX509CRL(caCrlPrivateKey, "BC");
+    public void GenSig (String filename) {
+        /* Generate a DSA signature */
+        if (!(filename.length()>0)) {
+            System.out.println("Usage: GenSig nameOfFileToSign");
         }
+        else try {
+
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA", "BC");
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "BC");
+            keyGen.initialize(1024, random);
+
+            KeyPair pair = keyGen.generateKeyPair();
+            PrivateKey priv = pair.getPrivate();
+            pub = pair.getPublic();
+
+            dsa = Signature.getInstance("SHA1withDSA", "SUN");
+            dsa.initSign(priv);
+        } catch (Exception e) {
+            System.err.println("Caught exception " + e.toString());
+        }
+    }
+
+    public void main(String[] args) {
+        if (args.length!=1) {
+            System.out.println("Usage: GenSig nameOfFileToSign");
+        }
+        else try {
+            GenSig(args[1]);
+
+            byte[] realSig = readFile(args[1]);
+            byte[] key = pub.getEncoded();
+
+            writeFile("Signature", realSig);
+            writeFile("Key", key);
+
+        } catch (Exception e) {
+            System.err.println("Caught exception " + e.toString());
+        }
+    }
+
+    private byte[] readFile (String name) {
+        byte[] sign;
+        try {
+            FileInputStream fis = new FileInputStream(name);
+            BufferedInputStream bufin = new BufferedInputStream(fis);
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = bufin.read(buffer)) >= 0) {
+                dsa.update(buffer, 0, len);
+            }
+            bufin.close();
+            return dsa.sign();
+        } catch (Exception e) {
+            e.getLocalizedMessage();
+        }
+        return null;
+    }
+
+    private void writeFile (String name,byte[] key) {
+        try {
+            FileOutputStream keyfos = new FileOutputStream(name);
+            keyfos.write(key);
+            keyfos.close();
+        }catch (Exception e) {
+            e.getLocalizedMessage();
+        }
+    }
+}
