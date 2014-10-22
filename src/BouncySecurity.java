@@ -23,7 +23,7 @@ class BouncySecurity {
     AlgorithmIdentifier sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder().find("SHA1withRSA");
     AlgorithmIdentifier digAlgId = new DefaultDigestAlgorithmIdentifierFinder().find(sigAlgId);
 
-
+    /* Создание сертификатов алгоритмом ECSDA библиотекой Баунси
     ContentSigner sigGen = new BcRSAContentSignerBuilder(sigAlgId, digAlgId).build(lwPrivKey);
     SubjectPublicKeyInfo subPubKeyInfo;
 
@@ -38,4 +38,5 @@ class BouncySecurity {
             subPubKeyInfo);
 
     X509CertificateHolder certHolder = v1CertGen.build(sigGen);
+    */
 }

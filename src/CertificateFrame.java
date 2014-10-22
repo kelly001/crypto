@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.security.*;
 import javax.swing.*;
 
 import javax.swing.JInternalFrame;
@@ -10,6 +11,7 @@ public class CertificateFrame extends JInternalFrame {
     Dimension size = new Dimension(200,100);
     private JLabel lbUsername;
     private JTextField tfUsername;
+    private JButton btnCert;
 
     public CertificateFrame(String name) {
         super(name,
@@ -37,7 +39,7 @@ public class CertificateFrame extends JInternalFrame {
 
         cs.fill = GridBagConstraints.HORIZONTAL;
 
-        lbUsername = new JLabel("Имя пользователя: ");
+        lbUsername = new JLabel("Имя: ");
         cs.gridx = 0;
         cs.gridy = 0;
         cs.gridwidth = 1;
@@ -46,8 +48,22 @@ public class CertificateFrame extends JInternalFrame {
         tfUsername = new JTextField(20);
         cs.gridx = 1;
         cs.gridy = 0;
-        cs.gridwidth = 2;
+        cs.gridwidth = 1;
         panel.add(tfUsername, cs);
+
+        btnCert = new JButton("Certificate");
+        btnCert.setActionCommand("Cert");
+        btnCert.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String name = tfUsername.getText();
+                System.out.println(name);
+                Security certificate = new Security(name);
+            }
+        });
+        cs.gridx = 1;
+        cs.gridy = 1;
+        panel.add(btnCert,cs);
 
         panel.setSize(size);
         getContentPane().add(panel,  BorderLayout.CENTER);

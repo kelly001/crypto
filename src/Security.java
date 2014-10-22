@@ -1,30 +1,24 @@
 import java.io.*;
 import java.security.*;
 
+/*
+ Класс для создания сертификатов. Используется провайдер (бибилиотека) BouncyCastle
+ Подключение: security.provider.11=org.bouncycastle.jce.provider.BouncyCastleProvider
+ */
 class Security {
 
     public Signature dsa;
     public PublicKey pub;
+    private byte[] realSig;
+    private byte[] key;
 
-    public void GenSig (String filename) {
-        /* Generate a DSA signature */
-        if (!(filename.length()>0)) {
+    public Security(String name) {
+        if (!(name.length()>0)) {
             System.out.println("Usage: GenSig nameOfFileToSign");
-        }
-        else try {
-
-            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA", "BC");
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "BC");
-            keyGen.initialize(1024, random);
-
-            KeyPair pair = keyGen.generateKeyPair();
-            PrivateKey priv = pair.getPrivate();
-            pub = pair.getPublic();
-
-            dsa = Signature.getInstance("SHA1withDSA", "SUN");
-            dsa.initSign(priv);
-        } catch (Exception e) {
-            System.err.println("Caught exception " + e.toString());
+        } else {
+            System.out.println("Cert gen class");
+            GenSig();
+            saveSert(name);
         }
     }
 
@@ -33,7 +27,7 @@ class Security {
             System.out.println("Usage: GenSig nameOfFileToSign");
         }
         else try {
-            GenSig(args[1]);
+            GenSig();
 
             byte[] realSig = readFile(args[1]);
             byte[] key = pub.getEncoded();
@@ -44,6 +38,35 @@ class Security {
         } catch (Exception e) {
             System.err.println("Caught exception " + e.toString());
         }
+    }
+
+    private void GenSig () {
+        /* Generate a DSA signature */
+         try {
+
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA", "BC");
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+            keyGen.initialize(1024, random);
+
+            KeyPair pair = keyGen.generateKeyPair();
+            PrivateKey priv = pair.getPrivate();
+            pub = pair.getPublic();
+
+            dsa = Signature.getInstance("SHA1withDSA", "BC");
+            dsa.initSign(priv);
+        } catch (Exception e) {
+            System.err.println("Caught exception " + e.toString());
+        }
+    }
+
+    private void saveSert(String filename) {
+        byte[] realSig = readFile(filename);
+        //System.out.println(realSig.toString());
+        byte[] key = pub.getEncoded();
+        //System.out.println(key.toString());
+
+        writeFile(filename + "-signature", realSig);
+        writeFile(filename + "-key.pem", key);
     }
 
     private byte[] readFile (String name) {
