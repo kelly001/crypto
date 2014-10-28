@@ -11,8 +11,9 @@ import com.teacode.swing.dialog.OkCancelDialog;
 import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.exception.WWRuntimeException;
 
-public class CertificateDialog extends OkCancelDialog {
+public abstract class CertificateDialog extends OkCancelDialog {
 
+    private Dimension size = new Dimension();
     protected CertificateDialog(Frame parent, String title) {
         super(parent, title, title);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -43,4 +44,32 @@ public class CertificateDialog extends OkCancelDialog {
 
     public abstract boolean hasChanged();
 
+    public static boolean showCertificateDialog(Frame frame, String title) throws Exception
+    {
+        final JPanel panel = new JPanel();
+        CertificateDialog dialog = new CertificateDialog (frame, title);
+        {
+            public boolean hasChanged()
+            {
+                return panel.hasChanged();
+            }
+        };
+        dialog.setMainPanel(panel);
+        dialog.setSize(size);
+        dialog.setVisible(true);
+        if (dialog.isOkPressed())
+        {
+            panel.save();
+            try
+            {
+                dialog.saveSize(prop);
+            }
+            catch (Exception ex)
+            {
+                //ex.printStackTrace();
+            }
+        }
+        //logger.log(Level.FINE, String.valueOf(dialog.isOkPressed()));
+        return dialog.isOkPressed();
+    }
 }
