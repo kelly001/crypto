@@ -7,7 +7,7 @@ import java.security.*;
  */
 class Security {
 
-    public Signature dsa;
+    public Signature dsa; // подписываемые данные
     public PublicKey pub;
     private byte[] realSig;
     private byte[] key;
@@ -18,7 +18,8 @@ class Security {
         } else {
             System.out.println("Cert gen class");
             GenSig();
-            saveSert(name);
+            saveKey(name);
+            writeFile("Signature",readFile(name));
         }
     }
 
@@ -33,7 +34,7 @@ class Security {
             byte[] key = pub.getEncoded();
 
             writeFile("Signature", realSig);
-            writeFile("Key", key);
+            writeFile("Key.pem", key);
 
         } catch (Exception e) {
             System.err.println("Caught exception " + e.toString());
@@ -52,6 +53,7 @@ class Security {
             PrivateKey priv = pair.getPrivate();
             pub = pair.getPublic();
 
+             // объект для подписываемых данных
             dsa = Signature.getInstance("SHA1withDSA", "BC");
             dsa.initSign(priv);
         } catch (Exception e) {
@@ -59,16 +61,23 @@ class Security {
         }
     }
 
-    private void saveSert(String filename) {
-        byte[] realSig = readFile(filename);
-        //System.out.println(realSig.toString());
-        byte[] key = pub.getEncoded();
-        //System.out.println(key.toString());
+    private void saveKey(String filename) {
+        try {
+            byte[] key = pub.getEncoded();
+            //System.out.println(key.toString());
+            FileOutputStream keyfos = new FileOutputStream(filename + "-key.pem");
+            keyfos.write(key);
+            keyfos.close();
+            //writeFile(filename + "-key.pem", key);
+        } catch (Exception e) {
+            e.getLocalizedMessage();
+        }
+        writeFile(filename, realSig);
 
-        writeFile(filename + "-signature", realSig);
-        writeFile(filename + "-key.pem", key);
     }
 
+    // подпись данных приватным ключом
+    // возвращает подписанные данные
     private byte[] readFile (String name) {
         byte[] sign;
         try {
@@ -87,10 +96,10 @@ class Security {
         return null;
     }
 
-    private void writeFile (String name,byte[] key) {
+    private void writeFile (String name, byte[] data) {
         try {
             FileOutputStream keyfos = new FileOutputStream(name);
-            keyfos.write(key);
+            keyfos.write(data);
             keyfos.close();
         }catch (Exception e) {
             e.getLocalizedMessage();

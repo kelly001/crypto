@@ -1,6 +1,9 @@
+import com.teacode.swing.dialog.OkCancelDialog;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+
 
 /**
  * Created by new_name on 14.10.2014.
@@ -115,7 +118,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
             Object item = e.getSource();
             if (item instanceof Component) {
                 Window w = findWindow((Component) item);
-                createFrame((JFrame) w);
+                createDialog((JFrame) w);
             } else {
                 System.out.println("source is not a Component");
             }
@@ -169,5 +172,11 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
             System.out.println( e.getLocalizedMessage());
         }
         openFrameCount +=1;
+    }
+
+    protected void createDialog(JFrame frame) {
+        OkCancelDialog dialog = new OkCancelDialog(frame, "Сертификаты","Сертификаты");
+        dialog.setVisible(true);
+        //System.out.println(dialog?"true":"false");
     }
 }
