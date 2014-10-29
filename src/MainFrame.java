@@ -175,7 +175,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     }
 
     protected void createDialog(JFrame frame) {
-        OkCancelDialog dialog = new OkCancelDialog(frame, "Сертификаты","Сертификаты");
+        OkCancelDialog dialog = new OkCancelDialog(frame, "Сертификаты","Save&Generate");
+
         dialog.setVisible(true);
         //System.out.println(dialog?"true":"false");
     }

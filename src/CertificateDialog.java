@@ -9,14 +9,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
-import com.teacode.swing.dialog.OkCancelDialog;
+import com.teacode.swing.dialog
+        .OkCancelDialog;
 import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.exception.WWRuntimeException;
 
 public abstract class CertificateDialog extends OkCancelDialog {
 
     static Logger logger = Logger.getLogger("CertificateDialog log");
-    public static Dimension size = new Dimension(240,240);
+    public static Dimension size = new Dimension(500,500);
     public boolean succeeded;
     private JTextField tfName;
     private JButton btnCert;
@@ -28,9 +29,10 @@ public abstract class CertificateDialog extends OkCancelDialog {
         final OkCancelDialog dialog = this;
         final FieldPanel panel = new FieldPanel();
 
-        createControls(panel);
+        this.createControls(panel);
         dialog.setMainPanel(panel);
         dialog.setSize(size);
+        dialog.setLocationRelativeTo(frame);
         dialog.setVisible(true);
         logger.log(Level.FINE, String.valueOf(dialog.isOkPressed()));
         /*addWindowListener(new WindowAdapter()
@@ -97,9 +99,10 @@ public abstract class CertificateDialog extends OkCancelDialog {
         return dialog.isOkPressed();
     }
 
+    //create new certfificate manage dialog
     protected void createControls(FieldPanel panel) throws Exception {
         tfName = new JTextField(20);
-        panel.addField("File Name", "Имя файла", tfName, true);
+        panel.addField("File Name", "Имя файла", tfName, false);
 
         btnCert = new JButton("Generate");
         panel.addField("Genarete Keys", "Создание ключей, подпись файла", btnCert,false);
@@ -112,7 +115,10 @@ public abstract class CertificateDialog extends OkCancelDialog {
             }
         });
 
+        logger.log(Level.FINE, "create Controls");
+        System.out.print("controls");
         panel.addGlue();
+
     }
 
     public boolean isSucceeded() {
