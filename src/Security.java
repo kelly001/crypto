@@ -65,7 +65,7 @@ class Security {
         try {
             byte[] key = pub.getEncoded();
             //System.out.println(key.toString());
-            FileOutputStream keyfos = new FileOutputStream(filename + "-key.pem");
+            FileOutputStream keyfos = new FileOutputStream(filename + "-key");
             keyfos.write(key);
             keyfos.close();
             //writeFile(filename + "-key.pem", key);
