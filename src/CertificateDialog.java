@@ -14,7 +14,7 @@ import com.teacode.swing.dialog
 import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.exception.WWRuntimeException;
 
-public abstract class CertificateDialog extends OkCancelDialog {
+public class CertificateDialog extends OkCancelDialog {
 
     static Logger logger = Logger.getLogger("CertificateDialog log");
     public static Dimension size = new Dimension(500,500);
@@ -22,43 +22,41 @@ public abstract class CertificateDialog extends OkCancelDialog {
     private JTextField tfName;
     private JButton btnCert;
 
-    protected CertificateDialog(Frame parent, String title) throws Exception{
+    public CertificateDialog(Frame parent, String title) throws Exception{
         super(parent, title, title);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         succeeded = false;
         final OkCancelDialog dialog = this;
         final FieldPanel panel = new FieldPanel();
 
-        this.createControls(panel);
-        dialog.setMainPanel(panel);
-        dialog.setSize(size);
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
-        logger.log(Level.FINE, String.valueOf(dialog.isOkPressed()));
-        /*addWindowListener(new WindowAdapter()
+        System.out.println("constructor");
+        this.addWindowListener(new WindowAdapter()
         {
-            public void windowClosing(WindowEvent we)
+            public void windowClosed(WindowEvent we)
             {
-                if (hasChanged())
+                System.out.println("event");
+                if (isOkPressed())
                 {
-                    int ret = JOptionPane.showConfirmDialog(dialog, "Есть несохраненные данные. Сохранить их?",
-                            "Редактирование объекта", JOptionPane.YES_NO_CANCEL_OPTION);
-                    if (ret == JOptionPane.YES_OPTION)
-                    {
                         dialog.pressOK();
                         succeeded = true;
+                        System.out.println("ok pressed");
+
+                        String name = tfName.getText();
+                        Security certificate = new Security(name);
                         dispose();
-                    } else if (ret == JOptionPane.NO_OPTION)
-                    {
-                        dialog.dispose();
-                    }
-                    //return; is unnecessary
                 } else
                 {
-                    dialog.dispose();
+                    dispose();
                 }
             }
-        });*/
+        });
+
+        createControls(panel);
+        //getContentPane().add(panel);
+        dialog.setMainPanel(panel);
+        dialog.setSize(size);
+        dialog.setVisible(true);
+        logger.log(Level.FINE, String.valueOf(dialog.isOkPressed()));
 
     }
 
@@ -104,7 +102,7 @@ public abstract class CertificateDialog extends OkCancelDialog {
         tfName = new JTextField(20);
         panel.addField("File Name", "Имя файла", tfName, false);
 
-        btnCert = new JButton("Generate");
+        /*btnCert = new JButton("Generate");
         panel.addField("Genarete Keys", "Создание ключей, подпись файла", btnCert,false);
         btnCert.addActionListener(new ActionListener() {
             @Override
@@ -113,10 +111,9 @@ public abstract class CertificateDialog extends OkCancelDialog {
                 System.out.println(name);
                 Security certificate = new Security(name);
             }
-        });
+        });*/
 
         logger.log(Level.FINE, "create Controls");
-        System.out.print("controls");
         panel.addGlue();
 
     }

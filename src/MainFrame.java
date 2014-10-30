@@ -175,9 +175,11 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     }
 
     protected void createDialog(JFrame frame) {
-        OkCancelDialog dialog = new OkCancelDialog(frame, "Сертификаты","Save&Generate");
-
-        dialog.setVisible(true);
-        //System.out.println(dialog?"true":"false");
+        try {
+            final CertificateDialog dialog = new CertificateDialog(frame, "Save&Generate");
+            //System.out.println(dialog?"true":"false");
+        } catch (Exception e) {
+            System.out.println( e.getLocalizedMessage());
+        }
     }
 }

@@ -25,7 +25,7 @@ class Security {
 
     public void main(String[] args) {
         if (args.length!=1) {
-            System.out.println("Usage: GenSig nameOfFileToSign");
+            System.out.println("Name OfFileToSign required");
         }
         else try {
             GenSig();
@@ -34,7 +34,7 @@ class Security {
             byte[] key = pub.getEncoded();
 
             writeFile("Signature", realSig);
-            writeFile("Key.pem", key);
+            writeFile("Key", key);
 
         } catch (Exception e) {
             System.err.println("Caught exception " + e.toString());
