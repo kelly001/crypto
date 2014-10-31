@@ -1,5 +1,18 @@
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.jce.X509Principal;
+import org.bouncycastle.openssl.PEMWriter;
+import org.bouncycastle.x509.X509V3CertificateGenerator;
+//import org.bouncycastle.asn1.DEREncodable;
+
 import java.io.*;
+import java.math.BigInteger;
 import java.security.*;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Date;
+import java.util.Map;
 
 /*
  Класс для создания сертификатов. Используется провайдер (бибилиотека) BouncyCastle
@@ -8,18 +21,30 @@ import java.security.*;
 class Security {
 
     public Signature dsa; // подписываемые данные
-    public PublicKey pub;
+    public PublicKey pubKey;
+    public X509Certificate certificate;
     private byte[] realSig;
     private byte[] key;
+    private PrivateKey privKey;
 
     public Security(String name) {
         if (!(name.length()>0)) {
             System.out.println("Usage: GenSig nameOfFileToSign");
         } else {
             System.out.println("Cert gen class");
-            GenSig();
-            saveKey(name);
-            writeFile("Signature",readFile(name));
+            GenKeys();
+            saveEncKey(name);
+
+            //подпись ключом данных (файла)
+            String filename = "data";
+            signData(filename);
+
+            //создание и сохранение сертификата
+            BigInteger serial = BigInteger.valueOf(1l);
+            Date start = new Date();
+            Date end = start;
+            String issuer = "";
+            X509Certificate endCert = X509V3CertificateGenerator.generateX509Certificate(serial, "CN=end",issuer, start, end, "SHA1withDSA", privKey, pubKey, null, );
         }
     }
 
@@ -28,10 +53,10 @@ class Security {
             System.out.println("Name OfFileToSign required");
         }
         else try {
-            GenSig();
+            GenKeys();
 
-            byte[] realSig = readFile(args[1]);
-            byte[] key = pub.getEncoded();
+           // byte[] realSig = readFile(args[1]);
+            byte[] key = pubKey.getEncoded();
 
             writeFile("Signature", realSig);
             writeFile("Key", key);
@@ -41,7 +66,59 @@ class Security {
         }
     }
 
-    private void GenSig () {
+    private void GenCertificates (String name) {
+
+    }
+
+    public static X509Certificate generateX509Certificate(BigInteger serialnumber, String subject, String issuer, Date start , Date end, String signAlgorithm, PrivateKey privateKey, PublicKey publicKey, String provider)
+            throws CertificateEncodingException, InvalidKeyException, IllegalStateException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException
+    {
+        if(serialnumber!=null && subject!=null && issuer!=null && start!=null && end!=null && signAlgorithm !=null && privateKey!=null && publicKey!=null)
+        {
+            //-----GENERATE THE X509 CERTIFICATE
+            X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
+            X509Principal dnSubject = new X509Principal(subject);
+            //X509Principal dnIssuer = new X509Principal(issuer);
+
+            certGen.setSerialNumber(serialnumber);
+            certGen.setSubjectDN(dnSubject);
+            //certGen.setIssuerDN(dnIssuer);
+            certGen.setNotBefore(start);
+            certGen.setNotAfter(end);
+            certGen.setPublicKey(publicKey);
+            certGen.setSignatureAlgorithm(signAlgorithm);
+
+            /*
+            //-----insert extension if needed
+            if(map!=null)
+                for(ASN1ObjectIdentifier extension : map.keySet())
+                    certGen.addExtension(extension, map.get(extension).getKey(), map.get(extension).getValue());
+*/
+            return certGen.generate(privateKey, provider);
+        }
+        return null;
+    }
+
+    public static boolean savePemX509Certificate(X509Certificate cert, PrivateKey key, Writer writer) throws NoSuchAlgorithmException, NoSuchProviderException, CertificateEncodingException, SignatureException, InvalidKeyException, IOException
+    {
+        if(cert!=null && key!=null && writer!=null)
+        {
+            PEMWriter pemWriter = new PEMWriter(writer);
+            pemWriter.writeObject(cert);
+            pemWriter.flush();
+
+            if(key!=null)
+            {
+                pemWriter.writeObject(key);
+                pemWriter.flush();
+            }
+            pemWriter.close();
+            return true;
+        }
+        return false;
+    }
+
+    private void GenKeys () {
         /* Generate a DSA signature */
          try {
 
@@ -50,37 +127,68 @@ class Security {
             keyGen.initialize(1024, random);
 
             KeyPair pair = keyGen.generateKeyPair();
-            PrivateKey priv = pair.getPrivate();
-            pub = pair.getPublic();
+            privKey = pair.getPrivate();
+            pubKey = pair.getPublic();
 
-             // объект для подписываемых данных
-            dsa = Signature.getInstance("SHA1withDSA", "BC");
-            dsa.initSign(priv);
         } catch (Exception e) {
             System.err.println("Caught exception " + e.toString());
         }
     }
 
-    private void saveKey(String filename) {
+    private void saveEncKey(String name) {
         try {
-            byte[] key = pub.getEncoded();
+            byte[] key = pubKey.getEncoded();
             //System.out.println(key.toString());
-            FileOutputStream keyfos = new FileOutputStream(filename + "-key");
+            FileOutputStream keyfos = new FileOutputStream(name + "-key");
             keyfos.write(key);
             keyfos.close();
             //writeFile(filename + "-key.pem", key);
         } catch (Exception e) {
             e.getLocalizedMessage();
         }
-        writeFile(filename, realSig);
+        writeFile(name, realSig);
+    }
 
+    private void readEncKey(String filename) {
+        try {
+            FileInputStream keyfis = new FileInputStream(filename);
+            //byte[] encKey = new byte[keyfis.available()];
+            key = new byte[keyfis.available()];
+            keyfis.read(key);
+            keyfis.close();
+
+
+        X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(key);
+        KeyFactory keyFactory = KeyFactory.getInstance("DSA", "BC");
+        pubKey = keyFactory.generatePublic(pubKeySpec);
+    } catch (InvalidKeySpecException e) {
+            System.err.println(e.getLocalizedMessage());
+    } catch (Exception e) {
+            System.err.println(e.getLocalizedMessage());
+    }
+    }
+
+    public void verifySig(String filename){
+        try {
+            FileInputStream sigfis = new FileInputStream(filename);
+            byte[] sigToVerify = new byte[sigfis.available()];
+            sigfis.read(sigToVerify);
+            sigfis.close();
+        } catch (IOException e) {
+            System.err.println(e.getLocalizedMessage());
+        }
     }
 
     // подпись данных приватным ключом
     // возвращает подписанные данные
-    private byte[] readFile (String name) {
-        byte[] sign;
+    public void signData (String name) {
+
         try {
+            // объект для подписываемых данных
+            dsa = Signature.getInstance("SHA1withDSA", "BC");
+            dsa.initSign(privKey);
+
+            //читаем файл для подписи
             FileInputStream fis = new FileInputStream(name);
             BufferedInputStream bufin = new BufferedInputStream(fis);
             byte[] buffer = new byte[1024];
@@ -89,11 +197,15 @@ class Security {
                 dsa.update(buffer, 0, len);
             }
             bufin.close();
-            return dsa.sign();
+            realSig = dsa.sign();
+
+            /* save the signature in a file */
+            FileOutputStream sigfos = new FileOutputStream("data_signature");
+            sigfos.write(realSig);
+            sigfos.close();
         } catch (Exception e) {
-            e.getLocalizedMessage();
+            System.err.println(e.getLocalizedMessage());
         }
-        return null;
     }
 
     private void writeFile (String name, byte[] data) {
