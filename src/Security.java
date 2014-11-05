@@ -1,6 +1,7 @@
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.openssl.PEMWriter;
+import org.bouncycastle.x509.X509V1CertificateGenerator;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 //import org.bouncycastle.asn1.DEREncodable;
 
@@ -11,6 +12,8 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
@@ -41,10 +44,26 @@ class Security {
 
             //создание и сохранение сертификата
             BigInteger serial = BigInteger.valueOf(1l);
-            Date start = new Date();
-            Date end = start;
+            Date startDate = new Date();
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(startDate);
+            cal.add(Calendar.YEAR, 1); // to get previous year add -1
+            Date nextYear = cal.getTime();
+            System.out.println(startDate);
+            System.out.println(nextYear);
             String issuer = "";
-            X509Certificate endCert = X509V3CertificateGenerator.generateX509Certificate(serial, "CN=end",issuer, start, end, "SHA1withDSA", privKey, pubKey, null, );
+            try {
+                // Rooot certificate
+                X509Certificate rootCert= generateX509CertificateRoot(serial, startDate, nextYear, "SHA1withDSA", privKey, pubKey, "BC");
+                //savePemX509Certificate(rootCert, privKey, "root-cert"); TODO write file
+            } catch (Exception e) {
+                e.getLocalizedMessage();
+            }
+            /*try {
+                X509Certificate endCert = generateX509Certificate(serial, "CN=end",issuer, startDate, nextYear, "SHA1withDSA", privKey, pubKey, "BC");
+            } catch (Exception e) {
+                e.getLocalizedMessage();
+            }*/
         }
     }
 
@@ -94,6 +113,29 @@ class Security {
                 for(ASN1ObjectIdentifier extension : map.keySet())
                     certGen.addExtension(extension, map.get(extension).getKey(), map.get(extension).getValue());
 */
+            return certGen.generate(privateKey, provider);
+        }
+        return null;
+    }
+
+    public static X509Certificate generateX509CertificateRoot (BigInteger serialnumber, Date start , Date end, String signAlgorithm, PrivateKey privateKey, PublicKey publicKey, String provider)
+            throws CertificateEncodingException, InvalidKeyException, IllegalStateException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException
+    {
+        if(serialnumber!=null && start!=null && end!=null && signAlgorithm !=null && privateKey!=null && publicKey!=null)
+        {
+            //-----GENERATE THE X509 CERTIFICATE
+            X509V1CertificateGenerator certGen = new X509V1CertificateGenerator();
+            X509Principal dnSubject = new X509Principal("CN=Test CA Certificate");
+            //X509Principal dnIssuer = new X509Principal(issuer);
+
+            certGen.setSerialNumber(serialnumber);
+            certGen.setSubjectDN(dnSubject);
+            //certGen.setIssuerDN(dnIssuer);
+            certGen.setNotBefore(start);
+            certGen.setNotAfter(end);
+            certGen.setPublicKey(publicKey);
+            certGen.setSignatureAlgorithm(signAlgorithm);
+
             return certGen.generate(privateKey, provider);
         }
         return null;
