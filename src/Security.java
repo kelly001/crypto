@@ -49,13 +49,13 @@ class Security {
             cal.setTime(startDate);
             cal.add(Calendar.YEAR, 1); // to get previous year add -1
             Date nextYear = cal.getTime();
-            System.out.println(startDate);
-            System.out.println(nextYear);
             String issuer = "";
             try {
+                Writer writer = new FileWriter("my sert");
                 // Rooot certificate
-                X509Certificate rootCert= generateX509CertificateRoot(serial, startDate, nextYear, "SHA1withDSA", privKey, pubKey, "BC");
-                //savePemX509Certificate(rootCert, privKey, "root-cert"); TODO write file
+                X509Certificate rootCert = this.generateX509CertificateRoot(serial, startDate, nextYear, "SHA1withDSA", privKey, pubKey, "BC");
+                System.out.println(rootCert);
+                savePemX509Certificate(rootCert, privKey, writer); //TODO write file
             } catch (Exception e) {
                 e.getLocalizedMessage();
             }
@@ -188,7 +188,7 @@ class Security {
         } catch (Exception e) {
             e.getLocalizedMessage();
         }
-        writeFile(name, realSig);
+        //writeFile(name, realSig);
     }
 
     private void readEncKey(String filename) {
