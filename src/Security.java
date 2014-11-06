@@ -32,7 +32,7 @@ class Security {
 
     public Security(String name) {
         if (!(name.length()>0)) {
-            System.out.println("Usage: GenSig nameOfFileToSign");
+            System.out.println("too short name");
         } else {
             System.out.println("Cert gen class");
             GenKeys();
@@ -43,7 +43,7 @@ class Security {
             signData(filename);
 
             //создание и сохранение сертификата
-            BigInteger serial = BigInteger.valueOf(1l);
+            BigInteger serial = BigInteger.valueOf(System.currentTimeMillis());
             Date startDate = new Date();
             Calendar cal = Calendar.getInstance();
             cal.setTime(startDate);
@@ -51,11 +51,19 @@ class Security {
             Date nextYear = cal.getTime();
             String issuer = "";
             try {
-                Writer writer = new FileWriter("my sert");
+
                 // Rooot certificate
-                X509Certificate rootCert = this.generateX509CertificateRoot(serial, startDate, nextYear, "SHA1withDSA", privKey, pubKey, "BC");
-                System.out.println(rootCert);
-                savePemX509Certificate(rootCert, privKey, writer); //TODO write file
+                System.out.print("root sert");
+                X509Certificate rootCert = generateX509CertificateRoot(serial, startDate, nextYear, "SHA1withDSA", privKey, pubKey, "BC");
+
+                if (rootCert!=null) {
+                    System.out.println(rootCert);
+                    //saveCert(rootCert, "sertmy");
+                    Writer writer = new FileWriter("my sert");
+                    savePemX509Certificate(rootCert, privKey, writer);
+                }else { System.out.println("beda");}
+
+
             } catch (Exception e) {
                 e.getLocalizedMessage();
             }
@@ -64,6 +72,7 @@ class Security {
             } catch (Exception e) {
                 e.getLocalizedMessage();
             }*/
+
         }
     }
 
@@ -83,10 +92,6 @@ class Security {
         } catch (Exception e) {
             System.err.println("Caught exception " + e.toString());
         }
-    }
-
-    private void GenCertificates (String name) {
-
     }
 
     public static X509Certificate generateX509Certificate(BigInteger serialnumber, String subject, String issuer, Date start , Date end, String signAlgorithm, PrivateKey privateKey, PublicKey publicKey, String provider)
@@ -123,6 +128,7 @@ class Security {
     {
         if(serialnumber!=null && start!=null && end!=null && signAlgorithm !=null && privateKey!=null && publicKey!=null)
         {
+            System.out.print("generate");
             //-----GENERATE THE X509 CERTIFICATE
             X509V1CertificateGenerator certGen = new X509V1CertificateGenerator();
             X509Principal dnSubject = new X509Principal("CN=Test CA Certificate");
@@ -137,6 +143,7 @@ class Security {
             certGen.setSignatureAlgorithm(signAlgorithm);
 
             return certGen.generate(privateKey, provider);
+
         }
         return null;
     }
@@ -158,6 +165,21 @@ class Security {
             return true;
         }
         return false;
+    }
+
+    public static void saveCert(X509Certificate cert, String name){
+        try {
+            System.out.print("saving");
+            byte[] encCert = cert.getEncoded();
+            System.out.println(encCert.toString());
+            FileOutputStream certfos = new FileOutputStream(name);
+            certfos.write(encCert);
+            certfos.close();
+        } catch (Exception e){
+            System.out.println(e.getLocalizedMessage());
+        }
+
+
     }
 
     private void GenKeys () {

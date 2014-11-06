@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.Time;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -20,6 +21,14 @@ public class CertificateDialog extends OkCancelDialog {
     public static Dimension size = new Dimension(500,500);
     public boolean succeeded;
     private JTextField tfName;
+    private JTextField tfOrganization;
+    private JTextField tfDepartment;
+    private JTextField tfUsername;
+    private JTextField tfEmail;
+    private JTextField tfType;
+    private JTextField tfComment;
+    private JTextField tfLocalty;
+    private Time timestamp;
     private JButton btnCert;
 
     public CertificateDialog(Frame parent, String title) throws Exception{
@@ -34,13 +43,10 @@ public class CertificateDialog extends OkCancelDialog {
         {
             public void windowClosed(WindowEvent we)
             {
-                System.out.println("event");
                 if (isOkPressed())
                 {
                         dialog.pressOK();
                         succeeded = true;
-                        System.out.println("ok pressed");
-
                         String name = tfName.getText();
                         Security certificate = new Security(name);
                         dispose();
@@ -100,7 +106,18 @@ public class CertificateDialog extends OkCancelDialog {
     //create new certfificate manage dialog
     protected void createControls(FieldPanel panel) throws Exception {
         tfName = new JTextField(20);
+        tfOrganization = new JTextField(20);
+        tfDepartment =new JTextField(20);
+        tfEmail = new JTextField(20);
+        tfUsername = new JTextField(20);
+        tfLocalty = new JTextField(20);
         panel.addField("File Name", "Имя файла", tfName, false);
+        panel.addField("Организация", "Оргранизация", tfOrganization,false);
+        panel.addField("Отделение", "Подразделение организации", tfDepartment, false);
+        panel.addField("Имя", "Имя владельца сертификата", tfUsername, false);
+        panel.addField("Email", "Почта владельца ящика", tfEmail, false);
+        panel.addField("City","Город или другой населенный пункт", tfLocalty, false);
+
 
         /*btnCert = new JButton("Generate");
         panel.addField("Genarete Keys", "Создание ключей, подпись файла", btnCert,false);
