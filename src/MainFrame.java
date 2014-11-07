@@ -54,7 +54,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         menuBar.add(menu);
 
 
-        addMenu("Сертификат", this, "cert");
+        addMenu("Сертификаты", this, "cert");
         addMenu("Организация", this, "org");
         addMenu("Ключи", this,"key");
         addMenu("Хеш", this, "hash");
@@ -113,7 +113,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                 System.out.println("source is not a Component");
             }
         } else if (e.getActionCommand().equals("cert")) {
-            // create new InternalFrame with generation Form
             //find main frame
             Object item = e.getSource();
             if (item instanceof Component) {

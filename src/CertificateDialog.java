@@ -32,13 +32,15 @@ public class CertificateDialog extends OkCancelDialog {
     private JButton btnCert;
 
     public CertificateDialog(Frame parent, String title) throws Exception{
+
         super(parent, title, title);
+        System.out.println("constructor");
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         succeeded = false;
         final OkCancelDialog dialog = this;
-        final FieldPanel panel = new FieldPanel();
+        final CertificatePanel panel = new CertificatePanel(parent);
 
-        System.out.println("constructor");
+
         this.addWindowListener(new WindowAdapter()
         {
             public void windowClosed(WindowEvent we)
@@ -47,9 +49,11 @@ public class CertificateDialog extends OkCancelDialog {
                 {
                         dialog.pressOK();
                         succeeded = true;
-                        String name = tfName.getText();
-                        Security certificate = new Security(name);
-                        dispose();
+                        //String name = tfName.getText();
+                        panel.save();
+                        Security certificate = new Security("test");
+                        //dispose();
+                        dialog.setVisible(false);
                 } else
                 {
                     dispose();
@@ -57,13 +61,13 @@ public class CertificateDialog extends OkCancelDialog {
             }
         });
 
-        createControls(panel);
-        //getContentPane().add(panel);
-        dialog.setMainPanel(panel);
+        //createControls(panel);
+        getContentPane().add(panel);
         dialog.setSize(size);
+        dialog.pack();
         dialog.setVisible(true);
         logger.log(Level.FINE, String.valueOf(dialog.isOkPressed()));
-
+        System.out.println("??");
     }
 
     //public abstract boolean hasChanged();
@@ -81,14 +85,14 @@ public class CertificateDialog extends OkCancelDialog {
             public void actionPerformed(ActionEvent e) {
                 String name = tfName.getText();
                 System.out.println(name);
-                Security certificate = new Security(name);
+                //Security certificate = new Security(name);
+
             }
         });
         CertificateDialog dialog = new CertificateDialog(frame, title)
         {
             public boolean hasChanged()
             {
-                //TODO haschanged nethod
                 return tfName.getText().equals("")?false:true;
             }
         };
@@ -111,12 +115,12 @@ public class CertificateDialog extends OkCancelDialog {
         tfEmail = new JTextField(20);
         tfUsername = new JTextField(20);
         tfLocalty = new JTextField(20);
-        panel.addField("File Name", "Имя файла", tfName, false);
-        panel.addField("Организация", "Оргранизация", tfOrganization,false);
-        panel.addField("Отделение", "Подразделение организации", tfDepartment, false);
-        panel.addField("Имя", "Имя владельца сертификата", tfUsername, false);
-        panel.addField("Email", "Почта владельца ящика", tfEmail, false);
-        panel.addField("City","Город или другой населенный пункт", tfLocalty, false);
+        panel.addField("File Name", "Имя файла", tfName, true);
+        panel.addField("Организация", "Оргранизация", tfOrganization,true);
+        panel.addField("Отделение", "Подразделение организации", tfDepartment, true);
+        panel.addField("Имя", "Имя владельца сертификата", tfUsername, true);
+        panel.addField("Email", "Почта владельца ящика", tfEmail, true);
+        panel.addField("City","Город или другой населенный пункт", tfLocalty, true);
 
 
         /*btnCert = new JButton("Generate");
@@ -132,7 +136,6 @@ public class CertificateDialog extends OkCancelDialog {
 
         logger.log(Level.FINE, "create Controls");
         panel.addGlue();
-
     }
 
     public boolean isSucceeded() {
