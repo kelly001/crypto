@@ -67,7 +67,6 @@ public class CertificateDialog extends OkCancelDialog {
         dialog.pack();
         dialog.setVisible(true);
         logger.log(Level.FINE, String.valueOf(dialog.isOkPressed()));
-        System.out.println("??");
     }
 
     //public abstract boolean hasChanged();

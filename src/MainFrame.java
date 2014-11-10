@@ -12,13 +12,13 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
     static int openFrameCount = 0;
     static final int xOffset = 30, yOffset = 30;
-    Dimension size = new Dimension(1000,800);
+    Dimension size = new Dimension(640,480);
 
     private JMenuBar menuBar;
-    private JMenu menu, submenu;
+    private JMenu menu, certificateMenu, companyMenu, userMenu;
     private JMenuItem menuItem;
 
-    private void addMenu(String name, ActionListener action, String id) {
+    private void addMenuItem(String name, ActionListener action, String id, JMenu menu) {
 
         //a group of JMenuItems
         menuItem = new JMenuItem(name,
@@ -31,6 +31,53 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         menuItem.addActionListener(action);
         menuItem.addItemListener(this);
         menu.add(menuItem);
+    }
+
+    public void setMenu () {
+        //MENU
+        //Create the menu bar.
+        menuBar = new JMenuBar();
+
+        //Build the first menu.
+        menu = new JMenu("Меню");
+        menu.setMnemonic(KeyEvent.VK_F1);
+        menu.getAccessibleContext().setAccessibleDescription(
+                "The only menu in this program that has menu items");
+        //addMenuItem("Сертификаты", this, "cert", menu);
+        //addMenuItem("Организация", this, "org", menu);
+        //addMenuItem("Ключи", this,"key", menu);
+        //addMenuItem("Хеш", this, "hash", menu);
+        addMenuItem("Сменить пользователя", this, "logout", menu);
+        addMenuItem("Выход", this, "exit", menu);
+        menuBar.add(menu);
+
+        //Build the cert menu.
+        certificateMenu = new JMenu("Сертификаты");
+        certificateMenu.setMnemonic(KeyEvent.VK_F3);
+        certificateMenu.getAccessibleContext().setAccessibleDescription(
+                "The only menu in this program that has menu items");
+        addMenuItem("Добавить", this, "certificate-add", certificateMenu);
+        addMenuItem("Отозвать", this, "certificate-delete", certificateMenu);
+        //menuBar.add(certificateMenu);
+        //Build the company menu.
+        companyMenu = new JMenu("Редактирование");
+        companyMenu.setMnemonic(KeyEvent.VK_F2);
+        companyMenu.getAccessibleContext().setAccessibleDescription(
+                "The only menu in this program that has menu items");
+        addMenuItem("Информация", this, "company-add", companyMenu);
+        addMenuItem("Ключ", this,"key", companyMenu);
+        addMenuItem("Хеш", this, "hash", companyMenu);
+        companyMenu.add(certificateMenu);
+        //addMenuItem("Сертификат", this, "company-certificate", companyMenu);
+        menuBar.add(companyMenu);
+
+        //Build the user menu.
+        userMenu = new JMenu("Сотрудники");
+        userMenu.setMnemonic(KeyEvent.VK_U);
+        addMenuItem("Список", this, "users", userMenu);
+        menuBar.add(userMenu);
+        setJMenuBar(menuBar);
+
     }
 
     public void createGUI() {
@@ -48,28 +95,58 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
         //Build the first menu.
         menu = new JMenu("Меню");
-        menu.setMnemonic(KeyEvent.VK_T);
+        menu.setMnemonic(KeyEvent.VK_F1);
         menu.getAccessibleContext().setAccessibleDescription(
                 "The only menu in this program that has menu items");
+        //addMenuItem("Сертификаты", this, "cert", menu);
+        //addMenuItem("Организация", this, "org", menu);
+        //addMenuItem("Ключи", this,"key", menu);
+        //addMenuItem("Хеш", this, "hash", menu);
+        addMenuItem("Сменить пользователя", this, "logout", menu);
+        addMenuItem("Выход", this, "exit", menu);
         menuBar.add(menu);
 
+        //Build the cert menu.
+        certificateMenu = new JMenu("Сертификаты");
+        certificateMenu.setMnemonic(KeyEvent.VK_F3);
+        certificateMenu.getAccessibleContext().setAccessibleDescription(
+                "The only menu in this program that has menu items");
+        addMenuItem("Добавить", this, "certificate-add", certificateMenu);
+        addMenuItem("Отозвать", this, "certificate-delete", certificateMenu);
+        //menuBar.add(certificateMenu);
+        //Build the company menu.
+        companyMenu = new JMenu("Организация");
+        companyMenu.setMnemonic(KeyEvent.VK_F2);
+        addMenuItem("Информация", this, "company-add", companyMenu);
+        addMenuItem("Ключ", this,"key", companyMenu);
+        addMenuItem("Хеш", this, "hash", companyMenu);
+        companyMenu.add(certificateMenu);
+        //addMenuItem("Сертификат", this, "company-certificate", companyMenu);
+        menuBar.add(companyMenu);
 
-        addMenu("Сертификаты", this, "cert");
-        addMenu("Организация", this, "org");
-        addMenu("Ключи", this,"key");
-        addMenu("Хеш", this, "hash");
-        addMenu("Сменить пользователя", this, "logout");
-        addMenu("Выход", this, "exit");
+        //Build the user menu.
+        userMenu = new JMenu("Сотрудники");
+        userMenu.setMnemonic(KeyEvent.VK_U);
+        userMenu.setActionCommand("users");
+        userMenu.addActionListener(this);
+        userMenu.addItemListener(this);
+        addMenuItem("Список", this, "users", userMenu);
+        menuBar.add(userMenu);
         setJMenuBar(menuBar);
         //panel.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
         getContentPane().add(panel);
     }
 
+
+
     public MainFrame() {
         super("Crypto App");
-        createGUI();
-        setSize(size);
-        setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        final MainPanel panel = new MainPanel(this);
+        setMenu();
+        this.getContentPane().add(panel);
+        this.setSize(size);
+        this.setVisible(true);
     }
 
     public static void main(String[] args) {
@@ -112,14 +189,27 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
             } else {
                 System.out.println("source is not a Component");
             }
-        } else if (e.getActionCommand().equals("cert")) {
-            //find main frame
-            Object item = e.getSource();
-            if (item instanceof Component) {
-                Window w = findWindow((Component) item);
-                createDialog((JFrame) w);
-            } else {
-                System.out.println("source is not a Component");
+        } else if (e.getActionCommand().contains("certificate")) {
+            if (e.getActionCommand().contains("add") || e.getActionCommand().equals("certificate-update")) {
+                //find main frame
+                Object item = e.getSource();
+                if (item instanceof Component) {
+                    Window w = findWindow((Component) item);
+                    createCertificateDialog((JFrame) w);
+                } else {
+                    System.out.println("source is not a Component");
+                }
+            } else if(e.getActionCommand().contains("delete")){
+               System.out.println("delete");
+            } else if (e.getActionCommand().equals("users")) {
+                System.out.println("users menu");
+                //set new FRAMe or DIALOG??
+                JFrame usersFrame = new JFrame("Сотрудники");
+                final UserPanel panel = new UserPanel(usersFrame);
+                setMenu();
+                usersFrame.getContentPane().add(panel);
+                usersFrame.setSize(size);
+                usersFrame.setVisible(true);
             }
         }
     }
@@ -173,7 +263,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         openFrameCount +=1;
     }
 
-    protected void createDialog(JFrame frame) {
+    protected void createCertificateDialog(JFrame frame) {
         try {
             final CertificateDialog dialog = new CertificateDialog(frame, "Save&Generate");
             //System.out.println(dialog?"true":"false");
