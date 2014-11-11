@@ -28,13 +28,14 @@ public class UserPanel extends FieldPanel {
     public UserPanel (Frame frame) {
         this.frame = frame;
         System.out.println("Users view panel");
+        createusers(users);
         setControls(this);
     }
 
     protected void setControls(FieldPanel panel) {
         final JLabel label = new JLabel();
-        String companyLabel = "Сотрудники";
-        panel.addField(companyLabel, "label", label, true);
+        String companyLabel = "Сотрудники компании";
+        panel.addField(companyLabel, "label", label, false);
 
         for (String user: users) {
             JButton field = new JButton("Сертификат");

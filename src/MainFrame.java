@@ -1,8 +1,10 @@
+import com.teacode.swing.dialog.CloseButtonDialog;
 import com.teacode.swing.dialog.OkCancelDialog;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.logging.Logger;
 
 
 /**
@@ -64,7 +66,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         companyMenu.setMnemonic(KeyEvent.VK_F2);
         companyMenu.getAccessibleContext().setAccessibleDescription(
                 "The only menu in this program that has menu items");
-        addMenuItem("Информация", this, "company-add", companyMenu);
+        addMenuItem("Информация", this, "company-edit", companyMenu);
         addMenuItem("Ключ", this,"key", companyMenu);
         addMenuItem("Хеш", this, "hash", companyMenu);
         companyMenu.add(certificateMenu);
@@ -72,72 +74,14 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         menuBar.add(companyMenu);
 
         //Build the user menu.
-        userMenu = new JMenu("Сотрудники");
+        userMenu = new JMenu("Просмотр");
         userMenu.setMnemonic(KeyEvent.VK_U);
-        addMenuItem("Список", this, "users", userMenu);
+        addMenuItem("Информация", this, "company-view", userMenu);
+        addMenuItem("Сотрудники", this, "users", userMenu);
         menuBar.add(userMenu);
         setJMenuBar(menuBar);
 
     }
-
-    public void createGUI() {
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        JPanel panel = new JPanel();
-        //panel.setSize(350, 150);
-        panel.setLayout(new FlowLayout());
-
-        final JLabel infolabel = new JLabel("Информация");
-        panel.add(infolabel);
-
-        //MENU
-        //Create the menu bar.
-        menuBar = new JMenuBar();
-
-        //Build the first menu.
-        menu = new JMenu("Меню");
-        menu.setMnemonic(KeyEvent.VK_F1);
-        menu.getAccessibleContext().setAccessibleDescription(
-                "The only menu in this program that has menu items");
-        //addMenuItem("Сертификаты", this, "cert", menu);
-        //addMenuItem("Организация", this, "org", menu);
-        //addMenuItem("Ключи", this,"key", menu);
-        //addMenuItem("Хеш", this, "hash", menu);
-        addMenuItem("Сменить пользователя", this, "logout", menu);
-        addMenuItem("Выход", this, "exit", menu);
-        menuBar.add(menu);
-
-        //Build the cert menu.
-        certificateMenu = new JMenu("Сертификаты");
-        certificateMenu.setMnemonic(KeyEvent.VK_F3);
-        certificateMenu.getAccessibleContext().setAccessibleDescription(
-                "The only menu in this program that has menu items");
-        addMenuItem("Добавить", this, "certificate-add", certificateMenu);
-        addMenuItem("Отозвать", this, "certificate-delete", certificateMenu);
-        //menuBar.add(certificateMenu);
-        //Build the company menu.
-        companyMenu = new JMenu("Организация");
-        companyMenu.setMnemonic(KeyEvent.VK_F2);
-        addMenuItem("Информация", this, "company-add", companyMenu);
-        addMenuItem("Ключ", this,"key", companyMenu);
-        addMenuItem("Хеш", this, "hash", companyMenu);
-        companyMenu.add(certificateMenu);
-        //addMenuItem("Сертификат", this, "company-certificate", companyMenu);
-        menuBar.add(companyMenu);
-
-        //Build the user menu.
-        userMenu = new JMenu("Сотрудники");
-        userMenu.setMnemonic(KeyEvent.VK_U);
-        userMenu.setActionCommand("users");
-        userMenu.addActionListener(this);
-        userMenu.addItemListener(this);
-        addMenuItem("Список", this, "users", userMenu);
-        menuBar.add(userMenu);
-        setJMenuBar(menuBar);
-        //panel.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
-        getContentPane().add(panel);
-    }
-
-
 
     public MainFrame() {
         super("Crypto App");
@@ -199,18 +143,20 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                 } else {
                     System.out.println("source is not a Component");
                 }
-            } else if(e.getActionCommand().contains("delete")){
+
+            }
+        } else if(e.getActionCommand().contains("delete")){
                System.out.println("delete");
-            } else if (e.getActionCommand().equals("users")) {
+        } else if (e.getActionCommand().equals("users")) {
                 System.out.println("users menu");
                 //set new FRAMe or DIALOG??
-                JFrame usersFrame = new JFrame("Сотрудники");
-                final UserPanel panel = new UserPanel(usersFrame);
-                setMenu();
-                usersFrame.getContentPane().add(panel);
-                usersFrame.setSize(size);
-                usersFrame.setVisible(true);
-            }
+                Object item = e.getSource();
+                if (item instanceof Component) {
+                    Window w = findWindow((Component) item);
+                    createUsersDialog((JFrame) w);
+                } else {
+                    System.out.println("source is not a Component");
+                }
         }
     }
 
@@ -248,25 +194,27 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         MenuSelectionManager.defaultManager().clearSelectedPath();
     }
 
-    protected static void createFrame(JFrame desktop) {
-        CertificateFrame certificate_frame = new CertificateFrame("Frame #" + (openFrameCount+1));
-        //certificate_frame.setSize(desktop.getSize());
-        certificate_frame.setLocation(xOffset*openFrameCount, yOffset*openFrameCount);
-        certificate_frame.setVisible(true);
-        //desktop.getContentPane().add(frame);
-        desktop.add(certificate_frame);
-        try {
-            certificate_frame.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {
-            System.out.println( e.getLocalizedMessage());
-        }
-        openFrameCount +=1;
-    }
-
     protected void createCertificateDialog(JFrame frame) {
         try {
             final CertificateDialog dialog = new CertificateDialog(frame, "Save&Generate");
             //System.out.println(dialog?"true":"false");
+        } catch (Exception e) {
+            System.out.println( e.getLocalizedMessage());
+        }
+    }
+
+    protected void createUsersDialog(JFrame frame) {
+        Logger logger = Logger.getLogger("CertificateDialog log");
+        System.out.println("create users dialog func");
+        Dimension size = new Dimension(500,500);
+        try {
+            final UserPanel panel = new UserPanel(frame);
+            final CloseButtonDialog dialog = new CloseButtonDialog(frame, "Сотрудники", panel);
+            //System.out.println(dialog?"true":"false");
+            //dialog.getContentPane().add(panel);
+            dialog.setSize(size);
+            dialog.pack();
+            dialog.setVisible(true);
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());
         }
