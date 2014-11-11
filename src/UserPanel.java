@@ -23,9 +23,16 @@ public class UserPanel extends FieldPanel {
     protected ArrayList<User> users1 = new ArrayList<User>();
     //TODO load users from data
     protected void createusers(ArrayList<String> list) {
-        for (int i=0; i < 10; i++){
-               list.add("Пользователь" + i);
+
+        for (int i=0; i < 5; i++){
+               list.add("Пользователь " + i);
         }
+        try {
+            User.loadUsers();
+        } catch (Exception e) {
+            e.getLocalizedMessage();
+        }
+
     }
 
     public UserPanel (Frame frame) {

@@ -12,7 +12,7 @@ public class Database {
     protected String username = "crypto";
     protected String password = "crypto";
     protected String server = "localhost";
-    protected String port = "85";
+    protected String port = "3306";
 
     public Connection getConnection() throws SQLException {
 

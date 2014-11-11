@@ -74,28 +74,33 @@ public class User {
         return keys;
     }
 
-    public void loadUsers(Connection con, String dbName)
+    public static void loadUsers()
             throws SQLException {
+System.out.println("load users class");
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         //Connection conn = Database.getConnection(); TODO
+        Connection con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/crypto?user=crypto&password=crypto");
         Statement stmt = null;
-        String query = "select * " +
-                "from " + dbName;
+        String query = "select * from users";
         try {
+            System.out.println("query exec");
             stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                String coffeeName = rs.getString("COF_NAME");
-                int supplierID = rs.getInt("SUP_ID");
-                float price = rs.getFloat("PRICE");
-                int sales = rs.getInt("SALES");
-                int total = rs.getInt("TOTAL");
-                System.out.println(coffeeName + "\t" + supplierID +
-                        "\t" + price + "\t" + sales +
-                        "\t" + total);
+
+                String name = rs.getString("name");
+                int userID = rs.getInt("id");
+                System.out.println(name + "\t" + userID);
             }
         } catch (SQLException e ) {
-            e.getLocalizedMessage();
+            System.out.println(e.getLocalizedMessage());
+        }catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
         } finally {
             if (stmt != null) { stmt.close(); }
         }
