@@ -41,16 +41,21 @@ public class UserPanel extends FieldPanel {
     protected void setControls(FieldPanel panel) {
         final JLabel label = new JLabel();
         String companyLabel = "Сотрудники компании";
-        panel.addField(companyLabel, "label", label, false);
+        panel.addField(companyLabel, "label", label, true);
 
         for (User user: users) {
-            JButton button = new JButton("Сертификат");
-            button.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    //TODO start new dialog with certificates, load user cert
-                }
-            });
-            panel.addField(user.getUsername(), "Фамилия, Имя, Отчество сотрудника", button, true);
+            //final JLabel label = new JLabel();
+            panel.addField(user.getUsername(), "Фамилия, Имя, Отчество сотрудника", label, false);
+            if (user.getCertificates().size() > 0)   {
+                JButton button = new JButton("Сертификат");
+                button.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        //TODO start new dialog with certificates, load user cert
+                    }
+                });
+                panel.addField("Сертификат", "Посмтреть сертификат сотрудника", button, true);
+            }
+
         }
 
         panel.addGlue();

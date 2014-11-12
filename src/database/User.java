@@ -103,9 +103,12 @@ public class User {
             stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                User user = new User();
-                user.setId(rs.getLong("id"));
-                user.setUsername(rs.getString("name"));
+                String email = rs.getString("email").isEmpty()?rs.getString("email"):"";
+                String password = rs.getString("password").isEmpty()?rs.getString("password"):"";
+                String username = rs.getString("username").isEmpty()?rs.getString("username"):"";
+                Boolean status = rs.getBoolean("status");
+                Timestamp time = rs.getTimestamp("timestamp");
+                User user = new User(rs.getLong("id"), email, password, username, status, time);
                 users.add(user);
                 System.out.println(user.getUsername() + "\t" + user.getId());
             }
