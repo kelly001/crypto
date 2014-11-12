@@ -7,6 +7,8 @@ import com.teacode.swing.component.FieldPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -19,20 +21,14 @@ import database.*;
 public class UserPanel extends FieldPanel {
     protected Logger logger = Logger.getLogger("Certificate panel");
     protected Frame frame;
-    protected ArrayList<String> users = new ArrayList<String>();
-    protected ArrayList<User> users1 = new ArrayList<User>();
-    //TODO load users from data
-    protected void createusers(ArrayList<String> list) {
-
-        for (int i=0; i < 5; i++){
-               list.add("Пользователь " + i);
-        }
+    //protected ArrayList<String> users = new ArrayList<String>();
+    protected ArrayList<User> users = new ArrayList<User>();
+    protected void createusers(ArrayList<User> list) {
         try {
-            User.loadUsers();
+            list = User.loadUsers();
         } catch (Exception e) {
             e.getLocalizedMessage();
         }
-
     }
 
     public UserPanel (Frame frame) {
@@ -47,9 +43,14 @@ public class UserPanel extends FieldPanel {
         String companyLabel = "Сотрудники компании";
         panel.addField(companyLabel, "label", label, false);
 
-        for (String user: users) {
-            JButton field = new JButton("Сертификат");
-            panel.addField(user, "Фамилия, Имя, Отчество сотрудника", field, true);
+        for (User user: users) {
+            JButton button = new JButton("Сертификат");
+            button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    //TODO start new dialog with certificates, load user cert
+                }
+            });
+            panel.addField(user.getUsername(), "Фамилия, Имя, Отчество сотрудника", button, true);
         }
 
         panel.addGlue();

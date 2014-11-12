@@ -1,9 +1,11 @@
 package database;
 
-import java.security.Timestamp;
+import javax.jws.soap.SOAPBinding;
+import java.sql.Timestamp;
 import java.security.cert.CertificateEncodingException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class User {
     private Long id;
@@ -17,7 +19,22 @@ public class User {
     private String dbName = "test";
 
     public User() {
+        this.status = true;
+        java.util.Date now = Calendar.getInstance().getTime();
+        //java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
+        this.timestamp = new java.sql.Timestamp(now.getTime());
+        this.certificates = new ArrayList<Certificate>();
+        this.keys = new ArrayList<Key>();
     }
+    public User(Long id, String email, String password, String username, Boolean status, Timestamp time) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.status = status;
+        this.timestamp = time;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -74,17 +91,11 @@ public class User {
         return keys;
     }
 
-    public static void loadUsers()
+    public static ArrayList<User> loadUsers()
             throws SQLException {
-System.out.println("load users class");
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //Connection conn = Database.getConnection(); TODO
-        Connection con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/crypto?user=crypto&password=crypto");
+        System.out.println("load users class");
+        ArrayList<User> users = new ArrayList<User>();
+        Connection con = Database.getConnection();
         Statement stmt = null;
         String query = "select * from users";
         try {
@@ -92,10 +103,11 @@ System.out.println("load users class");
             stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-
-                String name = rs.getString("name");
-                int userID = rs.getInt("id");
-                System.out.println(name + "\t" + userID);
+                User user = new User();
+                user.setId(rs.getLong("id"));
+                user.setUsername(rs.getString("name"));
+                users.add(user);
+                System.out.println(user.getUsername() + "\t" + user.getId());
             }
         } catch (SQLException e ) {
             System.out.println(e.getLocalizedMessage());
@@ -104,6 +116,27 @@ System.out.println("load users class");
         } finally {
             if (stmt != null) { stmt.close(); }
         }
+        return users;
     }
+
+    public static Boolean saveUser (User user) throws SQLException {
+        Connection con = Database.getConnection();
+        Statement stmt = null;
+        String query = "insert into users values ("+
+                +user.getId()+","+user.getUsername()+")";
+        try {
+            System.out.println("query exec");
+            stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+        } catch (SQLException e ) {
+            System.out.println(e.getLocalizedMessage());
+        }catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+        } finally {
+            if (stmt != null) { stmt.close(); }
+        }
+        return true;
+    }
+
 
 }

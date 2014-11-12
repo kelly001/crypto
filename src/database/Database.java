@@ -9,20 +9,27 @@ import java.util.Properties;
  * Created by new_name on 11.11.2014.
  */
 public class Database {
-    protected String username = "crypto";
-    protected String password = "crypto";
-    protected String server = "localhost";
-    protected String port = "3306";
+    protected static String username = "crypto";
+    protected static String password = "crypto";
+    protected static String server = "localhost";
+    protected static String port = "3306";
+    protected static String database = "crypto";
 
-    public Connection getConnection() throws SQLException {
+    public static Connection getConnection() throws SQLException {
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         Connection conn = null;
         Properties connectionProps = new Properties();
-        connectionProps.put("user", this.username);
-        connectionProps.put("password", this.password);
+        connectionProps.put("user", username);
+        connectionProps.put("password", password);
 
-        conn = DriverManager.getConnection("jdbc:mysql://"+this.server +
-                        ":" + this.port + "/",
+        conn = DriverManager.getConnection("jdbc:mysql://"+server +
+                        ":" + port + "/"+database,
                 connectionProps);
 
         /*if (this.dbms.equals("mysql")) {
