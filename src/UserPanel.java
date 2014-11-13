@@ -23,18 +23,15 @@ public class UserPanel extends FieldPanel {
     protected Frame frame;
     //protected ArrayList<String> users = new ArrayList<String>();
     protected ArrayList<User> users = new ArrayList<User>();
-    protected void createusers(ArrayList<User> list) {
-        try {
-            list = User.loadUsers();
-        } catch (Exception e) {
-            e.getLocalizedMessage();
-        }
-    }
 
     public UserPanel (Frame frame) {
         this.frame = frame;
         System.out.println("Users view panel");
-        createusers(users);
+        try {
+            users = User.loadUsers();
+        } catch (Exception e) {
+            System.out.println("Load users error: " + e.getLocalizedMessage());
+        }
         setControls(this);
     }
 
@@ -45,16 +42,24 @@ public class UserPanel extends FieldPanel {
 
         for (User user: users) {
             //final JLabel label = new JLabel();
-            panel.addField(user.getUsername(), "Фамилия, Имя, Отчество сотрудника", label, false);
+            panel.addField(user.getUsername(), "Фамилия, Имя, Отчество сотрудника", label, true);
+            JButton button;
             if (user.getCertificates().size() > 0)   {
-                JButton button = new JButton("Сертификат");
+                button = new JButton("посмотреть");
                 button.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         //TODO start new dialog with certificates, load user cert
                     }
                 });
-                panel.addField("Сертификат", "Посмтреть сертификат сотрудника", button, true);
+            } else {
+                button = new JButton("создать");
+                button.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        //TODO start new dialog with certificates, load user cert
+                    }
+                });
             }
+            panel.addField("Сертификаты", "Посмотреть сертификат сотрудника", button, true);
 
         }
 

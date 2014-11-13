@@ -22,10 +22,11 @@ public class User {
         this.status = true;
         java.util.Date now = Calendar.getInstance().getTime();
         //java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
-        this.timestamp = new java.sql.Timestamp(now.getTime());
+        this.timestamp = new Timestamp(now.getTime());
         this.certificates = new ArrayList<Certificate>();
         this.keys = new ArrayList<Key>();
     }
+
     public User(Long id, String email, String password, String username, Boolean status, Timestamp time) {
         this.id = id;
         this.email = email;
@@ -103,14 +104,14 @@ public class User {
             stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                String email = rs.getString("email").isEmpty()?rs.getString("email"):"";
-                String password = rs.getString("password").isEmpty()?rs.getString("password"):"";
-                String username = rs.getString("username").isEmpty()?rs.getString("username"):"";
+                String email = rs.getString("email");//.isEmpty()?rs.getString("email"):"";
+                String password = rs.getString("password");//.isEmpty()?rs.getString("password"):"";
+                String username = rs.getString("username");//.isEmpty()?rs.getString("username"):"";
                 Boolean status = rs.getBoolean("status");
-                Timestamp time = rs.getTimestamp("timestamp");
+                Timestamp time = new Timestamp(rs.getLong("timestamp"));
                 User user = new User(rs.getLong("id"), email, password, username, status, time);
                 users.add(user);
-                System.out.println(user.getUsername() + "\t" + user.getId());
+                System.out.println(user.getUsername() + " " + user.getId() + " " + user.getTimestamp());
             }
         } catch (SQLException e ) {
             System.out.println(e.getLocalizedMessage());

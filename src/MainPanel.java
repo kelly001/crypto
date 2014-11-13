@@ -27,6 +27,9 @@ public class MainPanel extends FieldPanel {
     public MainPanel (Frame frame) {
         this.frame = frame;
         System.out.println("Main application panel");
+        //set icon
+        ImageIcon img = new ImageIcon("icon.jpg");
+        frame.setIconImage(img.getImage());
         setControls(this);
     }
 
@@ -44,6 +47,18 @@ public class MainPanel extends FieldPanel {
             controls.add(field);
             panel.addField(labels[i], names[i], field, true);
         }
+
+        final JLabel labelCert = new JLabel();
+        panel.addField("Сертификаты: ", "label", labelCert, true);
+
+        final JButton getCertificate = new JButton("Получить");
+        //getCertificate.setSize(50, 50);
+        //panel.add(getCertificate, FlowLayout.LEFT);
+        panel.addField("", "", getCertificate, false);
+
+        final JLabel infoLabel = new JLabel();
+        String infoLabelText = "Сссылки на Z-Payment";
+        panel.addField(infoLabelText, "label", infoLabel, true);
 
         panel.addGlue();
     }
