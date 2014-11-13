@@ -14,6 +14,7 @@ import com.teacode.swing.dialog
         .OkCancelDialog;
 import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.exception.WWRuntimeException;
+import database.Certificate;
 
 public class CertificateDialog extends OkCancelDialog {
 
@@ -31,7 +32,7 @@ public class CertificateDialog extends OkCancelDialog {
     private Time timestamp;
     private JButton btnCert;
 
-    public CertificateDialog(Frame parent, String title) throws Exception{
+    public CertificateDialog(Frame parent, String title, Certificate my_certificate) throws Exception{
 
         super(parent, title, title);
         System.out.println("constructor");
@@ -88,7 +89,7 @@ public class CertificateDialog extends OkCancelDialog {
 
             }
         });
-        CertificateDialog dialog = new CertificateDialog(frame, title)
+        CertificateDialog dialog = new CertificateDialog(frame, title, new Certificate())
         {
             public boolean hasChanged()
             {

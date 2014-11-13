@@ -1,5 +1,7 @@
+import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.dialog.CloseButtonDialog;
 import com.teacode.swing.dialog.OkCancelDialog;
+import database.Certificate;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +19,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     Dimension size = new Dimension(640,480);
 
     private JMenuBar menuBar;
-    private JMenu menu, certificateMenu, companyMenu, userMenu;
+    private JMenu menu, certificateMenu, companyMenu, userMenu, viewMenu;
     private JMenuItem menuItem;
 
     private void addMenuItem(String name, ActionListener action, String id, JMenu menu) {
@@ -48,37 +50,43 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         //addMenuItem("Сертификаты", this, "cert", menu);
         //addMenuItem("Организация", this, "org", menu);
         //addMenuItem("Ключи", this,"key", menu);
-        //addMenuItem("Хеш", this, "hash", menu);
+        addMenuItem("Главная", this, "", menu);
         addMenuItem("Сменить пользователя", this, "logout", menu);
         addMenuItem("Выход", this, "exit", menu);
         menuBar.add(menu);
 
         //Build the cert menu.
-        certificateMenu = new JMenu("Сертификаты");
+        certificateMenu = new JMenu("Сертификат организации");
         certificateMenu.setMnemonic(KeyEvent.VK_F3);
-        certificateMenu.getAccessibleContext().setAccessibleDescription(
-                "The only menu in this program that has menu items");
+        certificateMenu.getAccessibleContext().setAccessibleDescription("");
         addMenuItem("Добавить", this, "certificate-add", certificateMenu);
         addMenuItem("Отозвать", this, "certificate-delete", certificateMenu);
-        //menuBar.add(certificateMenu);
+
+        //Build the users menu.
+        userMenu = new JMenu("Сотрудники");
+        userMenu.setMnemonic(KeyEvent.VK_F4);
+        userMenu.getAccessibleContext().setAccessibleDescription("");
+        addMenuItem("Добавить", this, "user-add", userMenu);
+        addMenuItem("Удалить", this, "-delete", userMenu);
+
         //Build the company menu.
         companyMenu = new JMenu("Редактирование");
         companyMenu.setMnemonic(KeyEvent.VK_F2);
-        companyMenu.getAccessibleContext().setAccessibleDescription(
-                "The only menu in this program that has menu items");
-        addMenuItem("Информация", this, "company-edit", companyMenu);
-        addMenuItem("Ключ", this,"key", companyMenu);
-        addMenuItem("Хеш", this, "hash", companyMenu);
+        companyMenu.getAccessibleContext().setAccessibleDescription("");
+        addMenuItem("Информация о компании", this, "company-edit", companyMenu);
         companyMenu.add(certificateMenu);
+        companyMenu.add(userMenu);
         //addMenuItem("Сертификат", this, "company-certificate", companyMenu);
         menuBar.add(companyMenu);
 
-        //Build the user menu.
-        userMenu = new JMenu("Просмотр");
-        userMenu.setMnemonic(KeyEvent.VK_U);
-        addMenuItem("Информация", this, "company-view", userMenu);
-        addMenuItem("Сотрудники", this, "users", userMenu);
-        menuBar.add(userMenu);
+        //Build the view menu.
+        viewMenu = new JMenu("Просмотр");
+        viewMenu.setMnemonic(KeyEvent.VK_U);
+        addMenuItem("Информация о компании", this, "company-view", viewMenu);
+        addMenuItem("Ключ", this,"key", viewMenu);
+        addMenuItem("Хеш", this, "hash", viewMenu);
+        addMenuItem("Сотрудники", this, "users", viewMenu);
+        menuBar.add(viewMenu);
         setJMenuBar(menuBar);
 
     }
@@ -196,7 +204,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
     protected void createCertificateDialog(JFrame frame) {
         try {
-            final CertificateDialog dialog = new CertificateDialog(frame, "Save&Generate");
+            final CertificateDialog dialog = new CertificateDialog(frame, "Save&Generate", new Certificate());
             //System.out.println(dialog?"true":"false");
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());
@@ -208,12 +216,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         System.out.println("create users dialog func");
         Dimension size = new Dimension(500,500);
         try {
-            final UserPanel panel = new UserPanel(frame);
-            final CloseButtonDialog dialog = new CloseButtonDialog(frame, "Сотрудники", panel);
-            //System.out.println(dialog?"true":"false");
-            //dialog.getContentPane().add(panel);
-            dialog.setSize(size);
-            dialog.pack();
+            final FieldPanel panel = new FieldPanel();
+            final UsersViewDialog dialog = new UsersViewDialog(frame, "Сотрудники", panel);
             dialog.setVisible(true);
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());
