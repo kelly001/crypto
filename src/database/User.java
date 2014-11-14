@@ -34,6 +34,10 @@ public class User {
         this.username = username;
         this.status = status;
         this.timestamp = time;
+        try {
+            this.certificates = Certificate.load(this.id);
+        } catch (SQLException e)
+        { System.out.println(e.getLocalizedMessage());}
     }
 
     public void setId(Long id) {
