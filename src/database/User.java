@@ -35,7 +35,7 @@ public class User {
         this.status = status;
         this.timestamp = time;
         try {
-            this.certificates = Certificate.load(this.id);
+            this.certificates = Certificate.loadByUser(this.id);
         } catch (SQLException e)
         { System.out.println(e.getLocalizedMessage());}
     }
@@ -101,10 +101,16 @@ public class User {
         System.out.println("load users class");
         ArrayList<User> users = new ArrayList<User>();
         Connection con = Database.getConnection();
-        Statement stmt = null;
         String query = "select * from users";
+        Statement stmt = null;
         try {
             System.out.println("query exec");
+
+            PreparedStatement preparedStatement = null;
+            preparedStatement = con.prepareStatement(query);
+            ResultSet result2 = preparedStatement.executeQuery();
+
+
             stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
@@ -127,6 +133,42 @@ public class User {
         return users;
     }
 
+    public static ArrayList<User> loadByCompany (Long company_id) {
+        ArrayList<User> users = new ArrayList<User>();
+        return users;
+    }
+
+
+    public static User loadById(Long id) throws SQLException{
+        User user = new User();
+        Connection con = Database.getConnection();
+        String query = "select * from users where id = ?";
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setLong(1, id);
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                String email = result.getString("email");//.isEmpty()?rs.getString("email"):"";
+                String password = result.getString("password");//.isEmpty()?rs.getString("password"):"";
+                String username = result.getString("username");//.isEmpty()?rs.getString("username"):"";
+                Boolean status = result.getBoolean("status");
+                Timestamp time = new Timestamp(result.getLong("timestamp"));
+                user = new User(result.getLong("id"), email, password, username, status, time);
+                System.out.println(user.getUsername() + " " + user.getId() + " " + user.getTimestamp());
+            }
+        } catch (SQLException e ) {
+            System.out.println(e.getLocalizedMessage());
+        }catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+        } finally {
+            if (stmt != null) { stmt.close(); }
+        }
+
+        return user;
+    }
+
+
     public static Boolean saveUser (User user) throws SQLException {
         Connection con = Database.getConnection();
         Statement stmt = null;
@@ -135,7 +177,8 @@ public class User {
         try {
             System.out.println("query exec");
             stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
+            //ResultSet rs = stmt.executeQuery(query);
+            stmt.executeUpdate(query);
         } catch (SQLException e ) {
             System.out.println(e.getLocalizedMessage());
         }catch (Exception e) {

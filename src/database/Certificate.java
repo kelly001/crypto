@@ -127,17 +127,24 @@ public class Certificate {
         return certificates;
     }
 
-    public static ArrayList<Certificate> load(Long user_id) throws SQLException {
+    public static ArrayList<Certificate> loadByUser(Long user_id) throws SQLException {
         System.out.println("load cert class");
         ArrayList<Certificate> certificates = new ArrayList<Certificate>();
 
         Connection con = Database.getConnection();
         Statement stmt = null;
-        String query = "select * from certificates";
+        PreparedStatement preparedStatement = null;
+        // select by user_id
+        String query = "select * from certificates where user_id = ?";
         try {
             System.out.println("query exec");
-            stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
+            //stmt = con.createStatement();
+            //ResultSet rs = stmt.executeQuery(query);
+
+            preparedStatement = con.prepareStatement(query);
+            preparedStatement.setLong(1, user_id);
+            ResultSet rs = preparedStatement.executeQuery();
+
             while (rs.next()) {
                 //Timestamp time = new Timestamp(rs.getLong("timestamp"));
                 Long id = rs.getLong("id");
@@ -155,8 +162,47 @@ public class Certificate {
         }catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
         } finally {
-            if (stmt != null) { stmt.close(); }
+            if (preparedStatement != null) { preparedStatement.close(); }
         }
         return certificates;
+    }
+
+    public static Certificate loadById(Long cert_id) throws SQLException {
+        System.out.println("load cert class");
+        Certificate certificate = new Certificate();
+
+        Connection con = Database.getConnection();
+        Statement stmt = null;
+        PreparedStatement preparedStatement = null;
+        // select by user_id
+        String query = "select * from certificates where id = ?";
+        try {
+            System.out.println("query exec");
+            //stmt = con.createStatement();
+            //ResultSet rs = stmt.executeQuery(query);
+
+            preparedStatement = con.prepareStatement(query);
+            preparedStatement.setLong(1, cert_id);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            while (rs.next()) {
+                //Timestamp time = new Timestamp(rs.getLong("timestamp"));
+                Long id = rs.getLong("id");
+                if (id.equals(cert_id)) {
+                    certificate = new Certificate(
+                            id, rs.getString("email"), rs.getString("username"), rs.getString("filename"),
+                            rs.getString("comment"), rs.getString("department"),
+                            rs.getString("city"), rs.getString("type"), rs.getBoolean("status"), rs.getLong("timestamp"));
+                }
+
+            }
+        } catch (SQLException e ) {
+            System.out.println(e.getLocalizedMessage());
+        }catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+        } finally {
+            if (preparedStatement != null) { preparedStatement.close(); }
+        }
+        return certificate;
     }
 }
