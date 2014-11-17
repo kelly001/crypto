@@ -38,7 +38,7 @@ public class LoginFrame extends JFrame{
 
                 if(dialog.isSucceeded()) {
                     infolabel.setText("Hi " + dialog.getUsername() + "!\n\r");
-                    MainFrame new_frame = new MainFrame();
+                    MainFrame new_frame = new MainFrame(dialog.getUsername());
                     new_frame.setVisible(true);
                     dispose();
                 }
@@ -49,7 +49,6 @@ public class LoginFrame extends JFrame{
 
         dialog = new LoginDialog(frame);
         dialog.setVisible(true);
-        System.out.println(dialog.isSucceeded()?"true":"false");
 
         getContentPane().add(infolabel);
         setSize(350, 150);

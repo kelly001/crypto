@@ -14,6 +14,7 @@ public class LoginDialog extends JDialog{
     private JButton btnLogin;
     private JButton btnCancel;
     private boolean succeeded = false;
+    private Long user;
 
 
 

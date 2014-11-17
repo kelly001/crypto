@@ -2,6 +2,8 @@ import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.dialog.CloseButtonDialog;
 import com.teacode.swing.dialog.OkCancelDialog;
 import database.Certificate;
+import database.Company;
+import database.User;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,9 +16,8 @@ import java.util.logging.Logger;
  */
 public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
-    static int openFrameCount = 0;
-    static final int xOffset = 30, yOffset = 30;
     Dimension size = new Dimension(640,480);
+    public User company;// = new Company();
 
     private JMenuBar menuBar;
     private JMenu menu, certificateMenu, companyMenu, userMenu, viewMenu;
@@ -96,9 +97,31 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         final MainPanel panel = new MainPanel(this);
         setMenu();
-        this.getContentPane().add(panel);
+        this.setContentPane(panel);
         this.setSize(size);
         this.setVisible(true);
+    }
+
+    public MainFrame(String name) {
+        super("Crypto App");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        final MainPanel panel;
+        setCompany(name);
+        if (company != null) {
+             panel = new MainPanel(this, company);
+        } else panel = new MainPanel(this);
+        setMenu();
+        this.setContentPane(panel);
+        this.setSize(size);
+        this.setVisible(true);
+    }
+
+    public void setCompany(String company_name) {
+        try {
+            company = Company.loadByName(company_name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {

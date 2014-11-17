@@ -138,6 +138,35 @@ public class User {
         return users;
     }
 
+    public static User loadByName (String name) throws SQLException{
+        User user = new User();
+
+        Connection con = Database.getConnection();
+        String query = "select * from users where username = ?";
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, name);
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                String password = result.getString("password");//.isEmpty()?rs.getString("password"):"";
+                String username = result.getString("username");//.isEmpty()?rs.getString("username"):"";
+                user = new User();
+                user.setId(result.getLong("id"));
+                user.setUsername(username);
+                user.setPassword(password);
+            }
+        } catch (SQLException e ) {
+            System.out.println(e.getLocalizedMessage());
+        }catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+        } finally {
+            if (stmt != null) { stmt.close(); }
+        }
+
+        return user;
+    }
+
 
     public static User loadById(Long id) throws SQLException{
         User user = new User();
