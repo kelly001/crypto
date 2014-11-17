@@ -22,6 +22,6 @@ public class Company extends User {
     public Company(Long id, String email, String password, String username, Boolean status, Timestamp time,
                    String Country, String Region, String City, String Department){
         super(id,email,password,username,status,time);
-        
+
     }
 }

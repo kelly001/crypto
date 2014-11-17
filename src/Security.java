@@ -66,6 +66,7 @@ class Security {
 
             } catch (Exception e) {
                 e.getLocalizedMessage();
+                e.printStackTrace();
             }
             /*try {
                 X509Certificate endCert = generateX509Certificate(serial, "CN=end",issuer, startDate, nextYear, "SHA1withDSA", privKey, pubKey, "BC");
@@ -76,22 +77,8 @@ class Security {
         }
     }
 
-    public void main(String[] args) {
-        if (args.length!=1) {
-            System.out.println("Name OfFileToSign required");
-        }
-        else try {
-            GenKeys();
-
-           // byte[] realSig = readFile(args[1]);
-            byte[] key = pubKey.getEncoded();
-
-            writeFile("Signature", realSig);
-            writeFile("Key", key);
-
-        } catch (Exception e) {
-            System.err.println("Caught exception " + e.toString());
-        }
+    public static void main(String[] args) {
+        Security security = new Security("test");
     }
 
     public static X509Certificate generateX509Certificate(BigInteger serialnumber, String subject, String issuer, Date start , Date end, String signAlgorithm, PrivateKey privateKey, PublicKey publicKey, String provider)
@@ -131,12 +118,12 @@ class Security {
             System.out.print("generate");
             //-----GENERATE THE X509 CERTIFICATE
             X509V1CertificateGenerator certGen = new X509V1CertificateGenerator();
-            X509Principal dnSubject = new X509Principal("CN=Test CA Certificate");
-            //X509Principal dnIssuer = new X509Principal(issuer);
+            X509Principal dnSubject = new X509Principal("CN=Root CA Certificate");
+            X509Principal dnIssuer = new X509Principal("CN=Root CA Certificate");
 
             certGen.setSerialNumber(serialnumber);
             certGen.setSubjectDN(dnSubject);
-            //certGen.setIssuerDN(dnIssuer);
+            certGen.setIssuerDN(dnIssuer);
             certGen.setNotBefore(start);
             certGen.setNotAfter(end);
             certGen.setPublicKey(publicKey);
