@@ -37,8 +37,9 @@ public class LoginFrame extends JFrame{
                 System.out.println("WindowListener method called: windowActivated custom.");
 
                 if(dialog.isSucceeded()) {
+                    String user = dialog.getUsername();
                     infolabel.setText("Hi " + dialog.getUsername() + "!\n\r");
-                    MainFrame new_frame = new MainFrame(dialog.getUsername());
+                    MainFrame new_frame = new MainFrame(user);
                     new_frame.setVisible(true);
                     dispose();
                 }

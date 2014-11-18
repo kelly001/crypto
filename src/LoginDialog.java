@@ -14,7 +14,7 @@ public class LoginDialog extends JDialog{
     private JButton btnLogin;
     private JButton btnCancel;
     private boolean succeeded = false;
-    private Long user;
+    private String username = "";
 
 
 
@@ -96,6 +96,7 @@ public class LoginDialog extends JDialog{
         public void actionPerformed(ActionEvent e) {
 
             if (Login.authenticate(getUsername(), getPassword())) {
+
                 JOptionPane.showMessageDialog(LoginDialog.this,
                         "Hi " + getUsername() + "! You have successfully logged in.",
                         "Login",
@@ -118,7 +119,9 @@ public class LoginDialog extends JDialog{
 
 
     public String getUsername() {
-        return tfUsername.getText().trim();
+        if (!tfUsername.getText().trim().equals(""))
+            username = tfUsername.getText().trim();
+        return username;
     }
 
     public String getPassword() {

@@ -19,7 +19,10 @@ public class User {
     private String dbName = "test";
 
     public User() {
-        this.status = true;
+        //this.email = "";
+        this.password = "";
+        //this.username = "";
+        //this.status = true;
         java.util.Date now = Calendar.getInstance().getTime();
         //java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
         this.timestamp = new Timestamp(now.getTime());
