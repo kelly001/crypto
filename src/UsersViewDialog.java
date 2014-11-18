@@ -2,6 +2,8 @@ import com.teacode.swing.CommonRB;
 import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.dialog.CloseButtonDialog;
 import database.Certificate;
+import database.Company;
+import database.Employer;
 import database.User;
 
 import javax.swing.*;
@@ -19,7 +21,7 @@ public class UsersViewDialog extends CloseButtonDialog {
     static Logger logger = Logger.getLogger("CertificateDialog log");
     public static Dimension size = new Dimension(500,500);
     protected Frame frame;
-    protected ArrayList<User> users = new ArrayList<User>();
+    protected ArrayList<Employer> users = new ArrayList<Employer>();
     //protected FieldPanel panel = new FieldPanel();
 
 
@@ -27,40 +29,39 @@ public class UsersViewDialog extends CloseButtonDialog {
         super(parent, title, panel);
         System.out.println("constructor");
         final CloseButtonDialog dialog = this;
-
-
-        try {
-            users = User.loadUsers();
-        } catch (Exception e) {
-            System.out.println("Load users error: " + e.getLocalizedMessage());
-        }
-
         setControls(panel);
         dialog.getContentPane().add(panel);
         dialog.setSize(size);
         dialog.pack();
     }
 
+    public void setUsers(Long company_id) {
+        try {
+            users = Employer.loadByCompany(company_id);
+        } catch (Exception e) {
+            System.out.println("Load users error: " + e.getLocalizedMessage());
+        }
+    }
+
     protected void setControls(FieldPanel panel) {
         final JLabel label = new JLabel();
-        String companyLabel = "Сотрудники компании";
-        panel.addField(companyLabel, "label", label, true);
-
+        panel.addField("Сотрудники компании", "label", label, true);
         for (User user: users) {
             //final JLabel label = new JLabel();
             panel.addField(user.getUsername(), "Фамилия, Имя, Отчество сотрудника", label, true);
-            JButton button;
-            if (user.getCertificates().size() > 0)   {
-                button = new JButton("посмотреть");
-                button.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        dispose();
-                        //TODO start new dialog with certificates, load user cert
-                    }
-                });
+            JButton button = new JButton();
+            ArrayList<Certificate> certificates  = new ArrayList<Certificate>();
+            if (certificates.size() > 0)   {
+                final JLabel cert_label = new JLabel();
+                panel.addField("Сертификаты", "label", cert_label, true);
+                for (Certificate cert: certificates){
+                    button.setText("Edit");
+                    button.addActionListener(new certAction(cert));
+                }
+
             } else {
-                button = new JButton("создать");
-                button.addActionListener(new certActionListener());
+                button.setText("New");
+                button.addActionListener(new certAction());
             }
             panel.addField("Сертификаты", "Посмотреть сертификат сотрудника", button, true);
 
@@ -69,12 +70,21 @@ public class UsersViewDialog extends CloseButtonDialog {
         panel.addGlue();
     }
 
-    public class certActionListener implements ActionListener
+    public class certAction implements ActionListener
     {
+        private final Certificate cert;// = new Certificate();
+        certAction(Certificate cert) {
+            super();
+            this.cert = cert;
+        }
+
+        certAction() {
+            super();
+            this.cert = new Certificate();
+        }
+
         public void actionPerformed(ActionEvent e) {
             dispose();
-            //new certificate
-            Certificate cert = new Certificate();
             try {
                 final CertificateDialog dialog = new CertificateDialog(frame, "Save&Generate", cert);
                 //System.out.println(dialog?"true":"false");

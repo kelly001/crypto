@@ -101,7 +101,7 @@ public class User {
         System.out.println("load users class");
         ArrayList<User> users = new ArrayList<User>();
         Connection con = Database.getConnection();
-        String query = "select * from users";
+        String query = "select * from user";
         Statement stmt = null;
         try {
             System.out.println("query exec");
@@ -133,16 +133,11 @@ public class User {
         return users;
     }
 
-    public static ArrayList<User> loadByCompany (Long company_id) {
-        ArrayList<User> users = new ArrayList<User>();
-        return users;
-    }
-
     public static User loadByName (String name) throws SQLException{
         User user = new User();
 
         Connection con = Database.getConnection();
-        String query = "select * from users where username = ?";
+        String query = "select * from user where username = ?";
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
@@ -171,7 +166,7 @@ public class User {
     public static User loadById(Long id) throws SQLException{
         User user = new User();
         Connection con = Database.getConnection();
-        String query = "select * from users where id = ?";
+        String query = "select * from user where id = ?";
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
@@ -194,6 +189,34 @@ public class User {
             if (stmt != null) { stmt.close(); }
         }
 
+        return user;
+    }
+
+    public static User loadByEmail (String name) throws SQLException{
+        User user = new User();
+        Connection con = Database.getConnection();
+        String query = "select * from user where email = ?";
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, name);
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                String password = result.getString("password");//.isEmpty()?rs.getString("password"):"";
+                String username = result.getString("username");//.isEmpty()?rs.getString("username"):"";
+                user = new User();
+                user.setId(result.getLong("id"));
+                user.setUsername(username);
+                user.setPassword(password);
+                user.setEmail(result.getString("email"));
+            }
+        } catch (SQLException e ) {
+            System.out.println(e.getLocalizedMessage());
+        }catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+        } finally {
+            if (stmt != null) { stmt.close(); }
+        }
         return user;
     }
 

@@ -118,7 +118,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
     public void setCompany(String company_name) {
         try {
-            company = Company.loadByName(company_name);
+            System.out.println(company_name);
+            company = Company.loadByEmail(company_name);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -241,6 +242,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         try {
             final FieldPanel panel = new FieldPanel();
             final UsersViewDialog dialog = new UsersViewDialog(frame, "Сотрудники", panel);
+            dialog.setUsers(company.getId());
             dialog.setVisible(true);
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());

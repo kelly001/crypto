@@ -3,22 +3,25 @@ package database;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by new_name on 11.11.2014.
  */
 public class Certificate {
     private Long id;
-    private String username;
     private String email;
+    private String username;
     private String filename;
+    private String organization;
     private String department;
-    private String city;
+    private String locality;
+    private String state;
     private String type;
     private String comment;
     private Timestamp timestamp;
     private Boolean status;
-    private Long user_id;
+    private User owner;
 
     public Certificate () {
         /* root cert
@@ -43,16 +46,19 @@ public class Certificate {
         this.timestamp = new java.sql.Timestamp(now.getTime());
     }
 
-    public Certificate (Long id, String email, String username, String filename, String comment,
-                        String department, String city, String type, Boolean status, Long time) {
+    public Certificate (Long id, String email, String username, String filename, String organization,
+                        String comment, String department, String locality,
+                        String state, String type, Boolean status, Long time) {
 
         this.id = id;
         this.email = email;
         this.username = username;
         this.filename = filename;
+        this.organization = organization;
         this.comment = comment;
         this.department = department;
-        this.city = city;
+        this.locality = locality;
+        this.state = state;
         this.type = type;
         this.status = status;
         this.timestamp = new java.sql.Timestamp(time);
@@ -75,9 +81,21 @@ public class Certificate {
     }
     public void setDepartment(String department) {this.department = department; }
     public void setFilename(String filename) { this.filename = filename; }
-    public void setCity(String city) {this.city = city;}
+    public void setOrganization(String organization_name) { this.organization = organization_name; }
+    public void setState(String state) {this.state = state;}
+    public void setLocality(String locality) {this.locality = locality;}
     public void setType(String type) {this.type = type;}
     public  void setComment(String comment) {this.comment = comment;}
+    public void setOwner(User user) {this.owner = user;}
+    public void setOwner(Long user_id) {
+        User user = new User();
+        try {
+            user = User.loadById(user_id);
+        }catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        this.owner = user;}
 
     public Long getId() {return this.id; }
     public String getEmail() {
@@ -94,9 +112,12 @@ public class Certificate {
     }
     public String getDepartment() { return this.department; }
     public String getFilename() { return this.filename; }
-    public String getCity() {return this.city;}
+    public String getOrganization() {return  this.organization; }
+    public String getState() {return this.state;}
+    public String getLocality() {return this.locality;}
     public String getType() {return  this.type; }
     public String getComment() {return this.comment; }
+    public User getOwner() {return this.owner;}
 
     public static ArrayList<Certificate> load() throws SQLException {
         System.out.println("load cert class");
@@ -104,17 +125,26 @@ public class Certificate {
 
         Connection con = Database.getConnection();
         Statement stmt = null;
-        String query = "select * from certificates";
+        String query = "select * from certificate";
         try {
             System.out.println("query exec");
             stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                //Timestamp time = new Timestamp(rs.getLong("timestamp"));
-                Certificate cert = new Certificate(
-                        rs.getLong("id"), rs.getString("email"), rs.getString("username"), rs.getString("filename"),
-                        rs.getString("comment"), rs.getString("department"),
-                        rs.getString("city"), rs.getString("type"), rs.getBoolean("status"), rs.getLong("timestamp"));
+                Timestamp time = new Timestamp(rs.getLong("timestamp"));
+                Certificate cert = new Certificate();
+                cert.setId(rs.getLong("id"));
+                cert.setEmail(rs.getString("email"));
+                cert.setUsername(rs.getString("username"));
+                cert.setFilename(rs.getString("filename"));
+                cert.setDepartment(rs.getString("department"));
+                cert.setComment(rs.getString("comment"));
+                cert.setLocality(rs.getString("locality"));
+                cert.setState(rs.getString("state"));
+                cert.setOrganization(rs.getString("organization"));
+                cert.setStatus(rs.getBoolean("status"));
+                cert.setTimestamp(time);
+                cert.setOwner(rs.getLong("user_id"));
                 certificates.add(cert);
             }
         } catch (SQLException e ) {
@@ -135,7 +165,7 @@ public class Certificate {
         Statement stmt = null;
         PreparedStatement preparedStatement = null;
         // select by user_id
-        String query = "select * from certificates where user_id = ?";
+        String query = "select * from certificate where user_id = ?";
         try {
             System.out.println("query exec");
             //stmt = con.createStatement();
@@ -149,10 +179,20 @@ public class Certificate {
                 //Timestamp time = new Timestamp(rs.getLong("timestamp"));
                 Long id = rs.getLong("id");
                 if (id.equals(user_id)) {
-                    Certificate cert = new Certificate(
-                            id, rs.getString("email"), rs.getString("username"), rs.getString("filename"),
-                            rs.getString("comment"), rs.getString("department"),
-                            rs.getString("city"), rs.getString("type"), rs.getBoolean("status"), rs.getLong("timestamp"));
+                    Timestamp time = new Timestamp(rs.getLong("timestamp"));
+                    Certificate cert = new Certificate();
+                    cert.setId(rs.getLong("id"));
+                    cert.setEmail(rs.getString("email"));
+                    cert.setUsername(rs.getString("username"));
+                    cert.setFilename(rs.getString("filename"));
+                    cert.setDepartment(rs.getString("department"));
+                    cert.setComment(rs.getString("comment"));
+                    cert.setLocality(rs.getString("locality"));
+                    cert.setState(rs.getString("state"));
+                    cert.setOrganization(rs.getString("organization"));
+                    cert.setStatus(rs.getBoolean("status"));
+                    cert.setTimestamp(time);
+                    cert.setOwner(rs.getLong("user_id"));
                     certificates.add(cert);
                 }
 
@@ -189,10 +229,20 @@ public class Certificate {
                 //Timestamp time = new Timestamp(rs.getLong("timestamp"));
                 Long id = rs.getLong("id");
                 if (id.equals(cert_id)) {
-                    certificate = new Certificate(
-                            id, rs.getString("email"), rs.getString("username"), rs.getString("filename"),
-                            rs.getString("comment"), rs.getString("department"),
-                            rs.getString("city"), rs.getString("type"), rs.getBoolean("status"), rs.getLong("timestamp"));
+                    Timestamp time = new Timestamp(rs.getLong("timestamp"));
+                    certificate.setId(rs.getLong("id"));
+                    certificate.setEmail(rs.getString("email"));
+                    certificate.setUsername(rs.getString("username"));
+                    certificate.setFilename(rs.getString("filename"));
+                    certificate.setDepartment(rs.getString("department"));
+                    certificate.setComment(rs.getString("comment"));
+                    certificate.setLocality(rs.getString("locality"));
+                    certificate.setState(rs.getString("state"));
+                    certificate.setOrganization(rs.getString("organization"));
+                    certificate.setStatus(rs.getBoolean("status"));
+                    certificate.setTimestamp(time);
+                    certificate.setOwner(rs.getLong("user_id"));
+
                 }
 
             }

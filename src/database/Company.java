@@ -1,6 +1,6 @@
 package database;
 
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.ArrayList;
 
 /**
@@ -46,4 +46,63 @@ public class Company extends User {
                 employer = emp;
         }
         return employer;}
+
+    public static User loadByEmail (String name) throws SQLException {
+        User user = new User();
+        Connection con = Database.getConnection();
+        String query = "select * from company where email = ?";
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, name);
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                String password = result.getString("password");//.isEmpty()?rs.getString("password"):"";
+                String username = result.getString("username");//.isEmpty()?rs.getString("username"):"";
+                user = new User();
+                user.setId(result.getLong("id"));
+                user.setUsername(username);
+                user.setPassword(password);
+                user.setEmail(result.getString("email"));
+            }
+        } catch (SQLException e ) {
+            System.out.println(e.getLocalizedMessage());
+        }catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+        } finally {
+            if (stmt != null) { stmt.close(); }
+        }
+        return user;
+    }
+
+    public static User loadByName (String name) throws SQLException{
+        User user = new User();
+
+        Connection con = Database.getConnection();
+        String query = "select * from company where username = ?";
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, name);
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                String password = result.getString("password");//.isEmpty()?rs.getString("password"):"";
+                String username = result.getString("username");//.isEmpty()?rs.getString("username"):"";
+                user = new User();
+                user.setId(result.getLong("id"));
+                user.setUsername(username);
+                user.setPassword(password);
+            }
+        } catch (SQLException e ) {
+            System.out.println(e.getLocalizedMessage());
+        }catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+        } finally {
+            if (stmt != null) { stmt.close(); }
+        }
+
+        return user;
+    }
+
+
 }

@@ -76,6 +76,7 @@ public class MainPanel extends FieldPanel {
 
     protected void setControls(FieldPanel panel, User company) {
         System.out.println("set controls with user object");
+        System.out.println(company);
         final JLabel label = new JLabel();
         String companyLabel = "Организация ООО\""+ company.getUsername() + "\"";
         panel.addField(companyLabel, "label", label, true);
