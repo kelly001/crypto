@@ -16,7 +16,6 @@ public class User {
     private Boolean status;
     private ArrayList<Certificate> certificates = new ArrayList<Certificate>();
     private ArrayList<Key> keys = new ArrayList<Key>();
-    private String dbName = "test";
 
     public User() {
         //this.email = "";
@@ -137,8 +136,7 @@ public class User {
     }
 
     public static User loadByName (String name) throws SQLException{
-        User user = new User();
-
+        User user = null;
         Connection con = Database.getConnection();
         String query = "select * from user where username = ?";
         PreparedStatement stmt = null;
@@ -161,13 +159,12 @@ public class User {
         } finally {
             if (stmt != null) { stmt.close(); }
         }
-
         return user;
     }
 
 
     public static User loadById(Long id) throws SQLException{
-        User user = new User();
+        User user = null;
         Connection con = Database.getConnection();
         String query = "select * from user where id = ?";
         PreparedStatement stmt = null;
@@ -196,7 +193,7 @@ public class User {
     }
 
     public static User loadByEmail (String name) throws SQLException{
-        User user = new User();
+        User user = null;
         Connection con = Database.getConnection();
         String query = "select * from user where email = ?";
         PreparedStatement stmt = null;

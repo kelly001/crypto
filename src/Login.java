@@ -17,11 +17,11 @@ public class Login {
                 return true;
             } else {
                 user = Employer.loadByEmail(username);
-                if (user.getPassword().equals(password)) {
+                if (user != null && user.getPassword().equals(password)) {
                     return true;
                 } else {
                     user = Company.loadByEmail(username);
-                    if (user.getPassword().equals(password)) return true;
+                    if (user != null &&  user.getPassword().equals(password)) return true;
                 }
             }
         } catch (NullPointerException e){

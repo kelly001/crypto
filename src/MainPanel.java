@@ -90,7 +90,7 @@ public class MainPanel extends FieldPanel {
         panel.addField("Почта пользователя", "Почтовый адрес пользователя", email, true);
 
         JTextField status = new JTextField(company.getStatus()?"Active":"Not");
-        email.setEditable(false);
+        status.setEditable(false);
         panel.addField("Статус пользователя", "Статус пользователя",status , true);
 
         final JLabel labelCert = new JLabel();

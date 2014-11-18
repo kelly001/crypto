@@ -1,3 +1,5 @@
+import com.teacode.swing.component.FieldPanel;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -18,12 +20,11 @@ public class LoginFrame extends JFrame{
     private JFrame frame;
     private JLabel infolabel;
     public LoginDialog dialog;
+    Dimension size = new Dimension(240, 160);
 
     public LoginFrame(String name) {
         super(name);
         //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new FlowLayout());
-
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
@@ -36,29 +37,45 @@ public class LoginFrame extends JFrame{
             public void windowActivated(WindowEvent e) {
                 System.out.println("WindowListener method called: windowActivated custom.");
 
-                if(dialog.isSucceeded()) {
-                    String user = dialog.getUsername();
-                    infolabel.setText("Hi " + dialog.getUsername() + "!\n\r");
-                    MainFrame new_frame = new MainFrame(user);
+                if (dialog.isSucceeded()) {
+                    MainFrame new_frame = new MainFrame(dialog.getUsername());
                     new_frame.setVisible(true);
                     dispose();
                 }
             }
         });
 
-        infolabel = new JLabel("Hello");
-
+        setGUI();
         dialog = new LoginDialog(frame);
         dialog.setVisible(true);
-
-        getContentPane().add(infolabel);
-        setSize(350, 150);
     }
 
     public static void main(String[] args) {
-
         JFrame frame = new LoginFrame("Login Window");
         frame.setVisible(true);
+    }
+
+    private  void setGUI() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        infolabel = new JLabel("Добро пожаловать, гость!");
+        infolabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(infolabel);
+        JButton login = new JButton("Авторизация");
+        login.setAlignmentX(Component.CENTER_ALIGNMENT);
+        login.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dialog = new LoginDialog(frame);
+                dialog.setVisible(true);
+            }
+        });
+        panel.add(login);
+        JButton registration = new JButton("Регистрация");
+        registration.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(registration);
+        this.setContentPane(panel);
+        this.setSize(size);
+        this.pack();
     }
 
 
