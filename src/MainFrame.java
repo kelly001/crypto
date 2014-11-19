@@ -22,6 +22,12 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     private JMenuBar menuBar;
     private JMenu menu, certificateMenu, companyMenu, userMenu, viewMenu;
     private JMenuItem menuItem;
+    private MainPanel panel;
+
+    public MainFrame() {
+        super("Crypto App");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
 
     private void addMenuItem(String name, ActionListener action, String id, JMenu menu) {
 
@@ -92,37 +98,27 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
     }
 
-    public MainFrame() {
-        super("Crypto App");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        final MainPanel panel = new MainPanel(this);
-        setMenu();
-        this.setContentPane(panel);
-        this.setSize(size);
-        this.setVisible(true);
-    }
-
-    public MainFrame(String name) {
-        super("Crypto App");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        final MainPanel panel;
-        setCompany(name);
-        if (company != null) {
-             panel = new MainPanel(this, company);
-        } else panel = new MainPanel(this);
-        setMenu();
-        this.setContentPane(panel);
-        this.setSize(size);
-        this.setVisible(true);
-    }
-
-    public void setCompany(String company_name) {
+    public void setCompany(String name) {
         try {
-            System.out.println(company_name);
-            company = Company.loadByEmail(company_name);
+            System.out.println(name);
+            company = Company.loadByEmail(name);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void setGUI() {
+        setMenu();
+        if (company != null) {
+            panel = new MainPanel(this);
+            panel.setControls(company);
+        } else {
+            panel = new MainPanel(this);
+            panel.setControls();
+        }
+        this.setContentPane(panel);
+        this.setSize(size);
+        this.setVisible(true);
     }
 
     public static void main(String[] args) {
@@ -243,6 +239,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
             final FieldPanel panel = new FieldPanel();
             final UsersViewDialog dialog = new UsersViewDialog(frame, "Сотрудники", panel);
             dialog.setUsers(company.getId());
+            dialog.setControls(panel);
             dialog.setVisible(true);
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());

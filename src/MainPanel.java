@@ -5,6 +5,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -13,6 +15,7 @@ import java.util.logging.Logger;
 import com.teacode.swing.SmartTextArea;
 import com.teacode.swing.component.FieldPanel;
 
+import database.Certificate;
 import database.Company;
 import database.User;
 
@@ -33,78 +36,110 @@ public class MainPanel extends FieldPanel {
         //set icon
         ImageIcon img = new ImageIcon("icon.jpg");
         frame.setIconImage(img.getImage());
-        setControls(this);
     }
 
-    public MainPanel (Frame frame, User company) {
+    /*public MainPanel (Frame frame, User company) {
         this.frame = frame;
         System.out.println("Main application panel");
         //set icon
         ImageIcon img = new ImageIcon("icon.jpg");
         frame.setIconImage(img.getImage());
-        setControls(this, company);
-    }
+        setControls(company);
+    }*/
 
-    protected void setControls(FieldPanel panel) {
+    public void setControls() {
+        //TODO throw info dialog
         final JLabel label = new JLabel();
-        String companyLabel = "Организация ООО\"Название\"";
-        panel.addField(companyLabel, "label", label, true);
+        String companyLabel = "Новая организация/пользователь";
+        this.addField(companyLabel, "label", label, true);
 
         for (int i=0; i < names.length; i++) {
             JTextField field = new JTextField(labels[i]);
             field.setName(names[i]);
             field.setColumns(20);
-            field.setEditable(false);
+            field.setEditable(true);
             controls.add(field);
-            panel.addField(labels[i], names[i], field, true);
+            this.addField(labels[i], names[i], field, true);
         }
+        final JButton saveCompanyButton = new JButton("Сохранить");
+        saveCompanyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
-        final JLabel labelCert = new JLabel();
-        panel.addField("Сертификаты: ", "label", labelCert, true);
+            }
+        });
+        this.addField("", "", saveCompanyButton, false);
 
-        final JButton getCertificate = new JButton("Получить");
-        //getCertificate.setSize(50, 50);
-        //panel.add(getCertificate, FlowLayout.LEFT);
-        panel.addField("", "", getCertificate, false);
+        final JButton getCertificateButton = new JButton("Получить сертификат");
+        getCertificateButton.addActionListener(new certAction());
+        this.addField("", "", getCertificateButton, false);
 
         final JLabel infoLabel = new JLabel();
         String infoLabelText = "Сссылки на Z-Payment";
-        panel.addField(infoLabelText, "label", infoLabel, true);
-
-        panel.addGlue();
+        this.addField(infoLabelText, "label", infoLabel, true);
+        this.addGlue();
     }
 
-    protected void setControls(FieldPanel panel, User company) {
+    public void setControls(User company) {
         System.out.println("set controls with user object");
         System.out.println(company);
         final JLabel label = new JLabel();
         String companyLabel = "Организация ООО\""+ company.getUsername() + "\"";
-        panel.addField(companyLabel, "label", label, true);
+        this.addField(companyLabel, "label", label, true);
 
         JTextField username = new JTextField(company.getUsername());
         username.setEditable(false);
-        panel.addField("Имя пользователя", "Имя пользователя/название компании", username, true);
+        this.addField("Имя пользователя", "Имя пользователя/название компании", username, true);
 
         JTextField email = new JTextField(company.getEmail());
         email.setEditable(false);
-        panel.addField("Почта пользователя", "Почтовый адрес пользователя", email, true);
+        this.addField("Почта пользователя", "Почтовый адрес пользователя", email, true);
 
         JTextField status = new JTextField(company.getStatus()?"Active":"Not");
         status.setEditable(false);
-        panel.addField("Статус пользователя", "Статус пользователя",status , true);
+        this.addField("Статус пользователя", "Статус пользователя", status, true);
 
-        final JLabel labelCert = new JLabel();
-        panel.addField("Сертификаты: ", "label", labelCert, true);
+        this.addField("Сертификаты: ", "label", new JLabel(), true);
+        ArrayList<Certificate> certificates  = company.getCertificates();
+        if (certificates.size() > 0)   {
+            for (Certificate cert: certificates){
+                this.addField(cert.getUsername(), "label", new JLabel(), true);
+            }
 
-        final JButton getCertificate = new JButton("Получить");
+        }
         //getCertificate.setSize(50, 50);
         //panel.add(getCertificate, FlowLayout.LEFT);
-        panel.addField("", "", getCertificate, false);
+        JButton getCertificateButton = new JButton("Получить");
+        this.addField("", "", getCertificateButton, false);
 
         final JLabel infoLabel = new JLabel();
         String infoLabelText = "Сссылки на Z-Payment";
-        panel.addField(infoLabelText, "label", infoLabel, true);
+        this.addField(infoLabelText, "label", infoLabel, true);
 
-        panel.addGlue();
+        this.addGlue();
+    }
+
+    public class certAction implements ActionListener
+    {
+        private final Certificate cert;// = new Certificate();
+        certAction(Certificate cert) {
+            super();
+            this.cert = cert;
+        }
+
+        certAction() {
+            super();
+            this.cert = new Certificate();
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            try {
+                final CertificateDialog dialog = new CertificateDialog(frame, "Save&Generate", cert);
+                //System.out.println(dialog?"true":"false");
+            } catch (Exception e1) {
+                System.out.println( e1.getLocalizedMessage());
+            }
+
+        }
     }
 }

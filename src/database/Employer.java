@@ -19,10 +19,11 @@ public class Employer extends User {
     public static ArrayList<Employer> loadByCompany (Long company_id) throws SQLException{
         ArrayList<Employer> users = new ArrayList<Employer>();
         Connection con = Database.getConnection();
-        String query = "select * from employer";
+        String query = "select * from employer where company_id = ?";
         PreparedStatement preparedStatement = null;
         try {
             preparedStatement = con.prepareStatement(query);
+            preparedStatement.setLong(1,company_id);
             ResultSet result = preparedStatement.executeQuery();
             while (result.next()) {
                 Employer employer = new Employer();
@@ -32,7 +33,7 @@ public class Employer extends User {
                 employer.setPassword(result.getString("password"));
                 employer.setStatus(result.getBoolean("status"));
                 employer.setTimestamp(time);
-                employer.setCompany(Company.loadById(company_id));
+                //employer.setCompany(Company.loadById(company_id));
                 users.add(employer);
             }
         } catch (SQLException e ) {

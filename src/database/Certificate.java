@@ -158,7 +158,7 @@ public class Certificate {
     }
 
     public static ArrayList<Certificate> loadByUser(Long user_id) throws SQLException {
-        System.out.println("load cert class");
+        System.out.println("load cert by user class");
         ArrayList<Certificate> certificates = new ArrayList<Certificate>();
 
         Connection con = Database.getConnection();
@@ -167,10 +167,6 @@ public class Certificate {
         // select by user_id
         String query = "select * from certificate where user_id = ?";
         try {
-            System.out.println("query exec");
-            //stmt = con.createStatement();
-            //ResultSet rs = stmt.executeQuery(query);
-
             preparedStatement = con.prepareStatement(query);
             preparedStatement.setLong(1, user_id);
             ResultSet rs = preparedStatement.executeQuery();

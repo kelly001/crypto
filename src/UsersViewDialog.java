@@ -21,53 +21,57 @@ public class UsersViewDialog extends CloseButtonDialog {
     static Logger logger = Logger.getLogger("CertificateDialog log");
     public static Dimension size = new Dimension(500,500);
     protected Frame frame;
-    protected ArrayList<Employer> users = new ArrayList<Employer>();
+    protected ArrayList<Employer> users;
     //protected FieldPanel panel = new FieldPanel();
 
 
     public UsersViewDialog(Frame parent, String title, FieldPanel panel) {
         super(parent, title, panel);
         System.out.println("constructor");
-        final CloseButtonDialog dialog = this;
-        setControls(panel);
-        dialog.getContentPane().add(panel);
-        dialog.setSize(size);
-        dialog.pack();
+        //final CloseButtonDialog dialog = this;
     }
 
     public void setUsers(Long company_id) {
+        System.out.println("Loading users by company " + company_id);
         try {
             users = Employer.loadByCompany(company_id);
+            System.out.println(users.size());
         } catch (Exception e) {
             System.out.println("Load users error: " + e.getLocalizedMessage());
         }
     }
 
-    protected void setControls(FieldPanel panel) {
+    public void setControls(FieldPanel panel) {
         final JLabel label = new JLabel();
-        panel.addField("Сотрудники компании", "label", label, true);
-        for (User user: users) {
-            //final JLabel label = new JLabel();
-            panel.addField(user.getUsername(), "Фамилия, Имя, Отчество сотрудника", label, true);
-            JButton button = new JButton();
-            ArrayList<Certificate> certificates  = new ArrayList<Certificate>();
-            if (certificates.size() > 0)   {
-                final JLabel cert_label = new JLabel();
-                panel.addField("Сертификаты", "label", cert_label, true);
-                for (Certificate cert: certificates){
-                    button.setText("Edit");
-                    button.addActionListener(new certAction(cert));
+        panel.addField("Сотрудники", "label", label, true);
+        if (users.size() != 0) {
+            for (User user: users) {
+                //final JLabel label = new JLabel();
+                panel.addField(user.getUsername(), "Фамилия, Имя, Отчество сотрудника", label, true);
+                JButton button = new JButton();
+                panel.addField("Сертификаты", "label", new JLabel(), true);
+                ArrayList<Certificate> certificates  = new ArrayList<Certificate>(); //user.getCertificates();
+                if (certificates.size() > 0)   {
+                    for (Certificate cert: certificates){
+                        button.setText("Edit");
+                        button.addActionListener(new certAction(cert));
+                    }
+
+                } else {
+                    button.setText("New");
+                    button.addActionListener(new certAction());
                 }
-
-            } else {
-                button.setText("New");
-                button.addActionListener(new certAction());
+                panel.addField("Сертификаты", "Посмотреть сертификат сотрудника", button, true);
             }
-            panel.addField("Сертификаты", "Посмотреть сертификат сотрудника", button, true);
-
+        } else {
+            panel.addField("Нет сотрудников", "Добавить нового сотрудника в компанию", new JButton("Добавить"), true);
         }
 
+
         panel.addGlue();
+        this.getContentPane().add(panel);
+        this.setSize(size);
+        this.pack();
     }
 
     public class certAction implements ActionListener

@@ -38,7 +38,9 @@ public class LoginFrame extends JFrame{
                 System.out.println("WindowListener method called: windowActivated custom.");
 
                 if (dialog.isSucceeded()) {
-                    MainFrame new_frame = new MainFrame(dialog.getUsername());
+                    MainFrame new_frame = new MainFrame();
+                    new_frame.setCompany(dialog.getUsername());
+                    new_frame.setGUI();
                     new_frame.setVisible(true);
                     dispose();
                 }
@@ -51,30 +53,25 @@ public class LoginFrame extends JFrame{
     }
 
     public static void main(String[] args) {
-        JFrame frame = new LoginFrame("Login Window");
+        JFrame frame = new LoginFrame("Welcome!");
         frame.setVisible(true);
     }
 
     private  void setGUI() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        infolabel = new JLabel("Добро пожаловать, гость!");
-        infolabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(infolabel);
+        FieldPanel panel = new FieldPanel();
         JButton login = new JButton("Авторизация");
-        login.setAlignmentX(Component.CENTER_ALIGNMENT);
         login.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dialog = new LoginDialog(frame);
                 dialog.setVisible(true);
             }
         });
-        panel.add(login);
+        panel.addField("", "Авторизация",login, true);
         JButton registration = new JButton("Регистрация");
-        registration.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(registration);
+        panel.addField("", "Регистрация",registration, true);
+        panel.addGlue();
         this.setContentPane(panel);
-        this.setSize(size);
+        //this.setSize(size);
         this.pack();
     }
 
