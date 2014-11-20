@@ -38,15 +38,6 @@ public class MainPanel extends FieldPanel {
         frame.setIconImage(img.getImage());
     }
 
-    /*public MainPanel (Frame frame, User company) {
-        this.frame = frame;
-        System.out.println("Main application panel");
-        //set icon
-        ImageIcon img = new ImageIcon("icon.jpg");
-        frame.setIconImage(img.getImage());
-        setControls(company);
-    }*/
-
     public void setControls() {
         //TODO throw info dialog
         final JLabel label = new JLabel();
@@ -84,7 +75,7 @@ public class MainPanel extends FieldPanel {
         System.out.println("set controls with user object");
         System.out.println(company);
         final JLabel label = new JLabel();
-        String companyLabel = "Организация ООО\""+ company.getUsername() + "\"";
+        String companyLabel = "Организация ООО \""+ company.getUsername() + "\"";
         this.addField(companyLabel, "label", label, true);
 
         JTextField username = new JTextField(company.getUsername());
@@ -114,7 +105,8 @@ public class MainPanel extends FieldPanel {
 
         final JLabel infoLabel = new JLabel();
         String infoLabelText = "Сссылки на Z-Payment";
-        this.addField(infoLabelText, "label", infoLabel, true);
+        JLinkButton btn = new JLinkButton("https://z-payment.com/");
+        this.addField(infoLabelText, "label", btn, true);
 
         this.addGlue();
     }

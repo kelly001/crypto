@@ -20,7 +20,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     public User company;// = new Company();
 
     private JMenuBar menuBar;
-    private JMenu menu, certificateMenu, companyMenu, userMenu, viewMenu;
+    private JMenu menu, certificateMenu, companyMenu, userMenu, viewMenu, infoMenu;
     private JMenuItem menuItem;
     private MainPanel panel;
 
@@ -57,7 +57,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         //addMenuItem("Сертификаты", this, "cert", menu);
         //addMenuItem("Организация", this, "org", menu);
         //addMenuItem("Ключи", this,"key", menu);
-        addMenuItem("Главная", this, "", menu);
+        addMenuItem("Главная", this, "main", menu);
         addMenuItem("Сменить пользователя", this, "logout", menu);
         addMenuItem("Выход", this, "exit", menu);
         menuBar.add(menu);
@@ -73,8 +73,11 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         userMenu = new JMenu("Сотрудники");
         userMenu.setMnemonic(KeyEvent.VK_F4);
         userMenu.getAccessibleContext().setAccessibleDescription("");
+        if (company==null) {
+            userMenu.setEnabled(false);
+        }
         addMenuItem("Добавить", this, "user-add", userMenu);
-        addMenuItem("Удалить", this, "-delete", userMenu);
+        addMenuItem("Удалить", this, "user-delete", userMenu);
 
         //Build the company menu.
         companyMenu = new JMenu("Редактирование");
@@ -89,11 +92,21 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         //Build the view menu.
         viewMenu = new JMenu("Просмотр");
         viewMenu.setMnemonic(KeyEvent.VK_U);
+        if (company==null) {
+            viewMenu.setEnabled(false);
+        }
         addMenuItem("Информация о компании", this, "company-view", viewMenu);
         addMenuItem("Ключ", this,"key", viewMenu);
         addMenuItem("Хеш", this, "hash", viewMenu);
         addMenuItem("Сотрудники", this, "users", viewMenu);
+
+        infoMenu = new JMenu("Помощь");
+        infoMenu.setMnemonic(KeyEvent.VK_F5);
+        infoMenu.setEnabled(false);
+        addMenuItem("О компании",this, "company", infoMenu);
+        addMenuItem("Справка", this, "help", infoMenu);
         menuBar.add(viewMenu);
+        menuBar.add(infoMenu);
         setJMenuBar(menuBar);
 
     }
@@ -108,12 +121,11 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     }
 
     public void setGUI() {
+        panel = new MainPanel(this);
         setMenu();
         if (company != null) {
-            panel = new MainPanel(this);
             panel.setControls(company);
         } else {
-            panel = new MainPanel(this);
             panel.setControls();
         }
         this.setContentPane(panel);
@@ -121,15 +133,12 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         this.setVisible(true);
     }
 
-    public static void main(String[] args) {
-
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                JFrame.setDefaultLookAndFeelDecorated(true);
-                MainFrame mainFrame = new MainFrame();
-                mainFrame.setVisible(true);
-            }
-        });
+    //main func, first argument - company email
+    public static void main(String[] arg) {
+        MainFrame new_frame = new MainFrame();
+        if (arg.length>0) new_frame.setCompany(arg[0]);
+        new_frame.setGUI();
+        new_frame.setVisible(true);
     }
 
     public class MenuActionListener implements ActionListener
@@ -147,7 +156,17 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         System.out.println(e.getActionCommand());
 
         //check menu id
-        if (e.getActionCommand().equals("exit")) {
+        if (e.getActionCommand().equals("main")) {
+            String args[] = {company.getEmail()};
+            MainFrame.main(args);
+            Object item = e.getSource();
+            if (item instanceof Component) {
+                Window w = findWindow((Component) item);
+                w.dispose();
+            } else {
+                System.out.println("source is not a Component");
+            }
+        } else if (e.getActionCommand().equals("exit")) {
             System.exit(1);
         } else if (e.getActionCommand().equals("logout")) {
             // start login frame
@@ -171,7 +190,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                 } else {
                     System.out.println("source is not a Component");
                 }
-
             }
         } else if(e.getActionCommand().contains("delete")){
                System.out.println("delete");
@@ -185,6 +203,16 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                 } else {
                     System.out.println("source is not a Component");
                 }
+        } else if (e.getActionCommand().contains("company")) {
+            if (e.getActionCommand().contains("view")) {
+                Object item = e.getSource();
+                if (item instanceof Component) {
+                    Window w = findWindow((Component) item);
+                    createCompanyDialog((JFrame) w);
+                } else {
+                    System.out.println("source is not a Component");
+                }
+            }
         }
     }
 
@@ -232,14 +260,24 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     }
 
     protected void createUsersDialog(JFrame frame) {
-        Logger logger = Logger.getLogger("CertificateDialog log");
         System.out.println("create users dialog func");
-        Dimension size = new Dimension(500,500);
         try {
             final FieldPanel panel = new FieldPanel();
             final UsersViewDialog dialog = new UsersViewDialog(frame, "Сотрудники", panel);
             dialog.setUsers(company.getId());
             dialog.setControls(panel);
+            dialog.setVisible(true);
+        } catch (Exception e) {
+            System.out.println( e.getLocalizedMessage());
+        }
+    }
+
+    protected void createCompanyDialog(JFrame frame) {
+        try {
+            final FieldPanel panel = new FieldPanel();
+            final CompanyDialog dialog = new CompanyDialog(frame, "Сотрудники", panel);
+            dialog.setCompany(company.getEmail());
+            dialog.setGUI(frame, panel);
             dialog.setVisible(true);
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());

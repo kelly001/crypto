@@ -18,8 +18,8 @@ import java.util.logging.Logger;
  */
 public class UsersViewDialog extends CloseButtonDialog {
 
-    static Logger logger = Logger.getLogger("CertificateDialog log");
-    public static Dimension size = new Dimension(500,500);
+    static Logger logger = Logger.getLogger("Users View Dialog log");
+    public static Dimension size = new Dimension(480,480);
     protected Frame frame;
     protected ArrayList<Employer> users;
     //protected FieldPanel panel = new FieldPanel();
