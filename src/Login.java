@@ -15,7 +15,7 @@ public class Login {
             user = User.loadByEmail(username);
             if (user != null &&  user.getPassword().equals(password)) {
                 return true;
-            } else {
+            }/* else {
                 user = Employer.loadByEmail(username);
                 if (user != null && user.getPassword().equals(password)) {
                     return true;
@@ -23,7 +23,7 @@ public class Login {
                     user = Company.loadByEmail(username);
                     if (user != null &&  user.getPassword().equals(password)) return true;
                 }
-            }
+            }*/
         } catch (NullPointerException e){
             e.printStackTrace();
             return false;

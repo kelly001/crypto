@@ -123,7 +123,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     public void setGUI() {
         panel = new MainPanel(this);
         setMenu();
-        if (company != null) {
+        if (company instanceof Company) {
             panel.setControls(company);
         } else {
             panel.setControls();

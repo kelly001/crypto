@@ -17,7 +17,7 @@ public class CompanyDialog extends CloseButtonDialog {
     static Logger logger = Logger.getLogger("Users View Dialog log");
     public static Dimension size = new Dimension(480,480);
     protected Frame frame;
-    public User company;
+    public Company company;
     protected String[] labels = {"Название", "Отделение", "Имя пользователя", "Email", "Город",
             "Регион", "Страна"};
     protected ArrayList<JTextField> controls = new ArrayList<JTextField>();
@@ -61,6 +61,7 @@ public class CompanyDialog extends CloseButtonDialog {
         });
         panel.addField("", "", saveCompanyButton, false);
 
+        panel.addGlue();
         this.setContentPane(panel);
         this.setSize(size);
         this.setVisible(true);

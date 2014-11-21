@@ -47,10 +47,10 @@ public class Company extends User {
         }
         return employer;}
 
-    public static User loadByEmail (String name) throws SQLException {
-        User user = null;
+    public static Company loadByEmail (String name) throws SQLException {
+        Company user = null;
         Connection con = Database.getConnection();
-        String query = "select * from company where email = ?";
+        String query = "select * from user where email = ?";
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
@@ -59,7 +59,7 @@ public class Company extends User {
             while (result.next()) {
                 String password = result.getString("password");//.isEmpty()?rs.getString("password"):"";
                 String username = result.getString("username");//.isEmpty()?rs.getString("username"):"";
-                user = new User();
+                user = new Company();
                 user.setId(result.getLong("id"));
                 user.setUsername(username);
                 user.setPassword(password);
@@ -79,7 +79,7 @@ public class Company extends User {
     public static User loadByName (String name) throws SQLException{
         User user = null;
         Connection con = Database.getConnection();
-        String query = "select * from company where username = ?";
+        String query = "select * from user where username = ?";
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);

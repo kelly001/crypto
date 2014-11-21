@@ -19,7 +19,7 @@ public class Employer extends User {
     public static ArrayList<Employer> loadByCompany (Long company_id) throws SQLException{
         ArrayList<Employer> users = new ArrayList<Employer>();
         Connection con = Database.getConnection();
-        String query = "select * from employer where company_id = ?";
+        String query = "select * from user where company_id = ?";
         PreparedStatement preparedStatement = null;
         try {
             preparedStatement = con.prepareStatement(query);
@@ -49,7 +49,7 @@ public class Employer extends User {
     public static User loadByEmail (String name) throws SQLException{
         User user = null;
         Connection con = Database.getConnection();
-        String query = "select * from employer where email = ?";
+        String query = "select * from user where email = ?";
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
@@ -77,7 +77,7 @@ public class Employer extends User {
     public static User loadById(Long id) throws SQLException{
         User user = null;
         Connection con = Database.getConnection();
-        String query = "select * from employer where id = ?";
+        String query = "select * from user where id = ?";
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);

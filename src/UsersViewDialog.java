@@ -47,9 +47,9 @@ public class UsersViewDialog extends CloseButtonDialog {
         if (users.size() != 0) {
             for (User user: users) {
                 //final JLabel label = new JLabel();
-                panel.addField(user.getUsername(), "Фамилия, Имя, Отчество сотрудника", label, true);
+                panel.addField("", "Фамилия, Имя, Отчество сотрудника", new JLabel(user.getUsername()), true);
                 JButton button = new JButton();
-                panel.addField("Сертификаты", "label", new JLabel(), true);
+                panel.addField("Сертификаты пользователя", "label", new JLabel(), true);
                 ArrayList<Certificate> certificates  = new ArrayList<Certificate>(); //user.getCertificates();
                 if (certificates.size() > 0)   {
                     for (Certificate cert: certificates){
@@ -58,10 +58,10 @@ public class UsersViewDialog extends CloseButtonDialog {
                     }
 
                 } else {
-                    button.setText("New");
+                    button.setText("Generate");
                     button.addActionListener(new certAction());
                 }
-                panel.addField("Сертификаты", "Посмотреть сертификат сотрудника", button, true);
+                panel.addField("", "Посмотреть сертификат сотрудника", button, true);
             }
         } else {
             panel.addField("Нет сотрудников", "Добавить нового сотрудника в компанию", new JButton("Добавить"), true);
