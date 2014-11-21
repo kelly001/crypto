@@ -25,7 +25,10 @@ public class User {
         java.util.Date now = Calendar.getInstance().getTime();
         //java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
         this.timestamp = new Timestamp(now.getTime());
-        this.certificates = new ArrayList<Certificate>();
+        try {
+            this.certificates = Certificate.loadByUser(this.id);
+        } catch (SQLException e)
+        { System.out.println(e.getLocalizedMessage());}
         this.keys = new ArrayList<Key>();
     }
 
@@ -219,6 +222,7 @@ public class User {
         }
         return user;
     }
+
 
 
     public static Boolean saveUser (User user) throws SQLException {

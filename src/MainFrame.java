@@ -275,7 +275,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     protected void createCompanyDialog(JFrame frame) {
         try {
             final FieldPanel panel = new FieldPanel();
-            final CompanyDialog dialog = new CompanyDialog(frame, "Сотрудники", panel);
+            final CompanyDialog dialog = new CompanyDialog(frame, "Информация о компании", panel);
             dialog.setCompany(company.getEmail());
             dialog.setGUI(frame, panel);
             dialog.setVisible(true);

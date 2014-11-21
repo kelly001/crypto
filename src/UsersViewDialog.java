@@ -35,7 +35,7 @@ public class UsersViewDialog extends CloseButtonDialog {
         System.out.println("Loading users by company " + company_id);
         try {
             users = Employer.loadByCompany(company_id);
-            System.out.println(users.size());
+            System.out.println("users size:" + users.size());
         } catch (Exception e) {
             System.out.println("Load users error: " + e.getLocalizedMessage());
         }
@@ -47,21 +47,23 @@ public class UsersViewDialog extends CloseButtonDialog {
         if (users.size() != 0) {
             for (User user: users) {
                 //final JLabel label = new JLabel();
-                panel.addField("", "Фамилия, Имя, Отчество сотрудника", new JLabel(user.getUsername()), true);
-                JButton button = new JButton();
+                panel.addField(user.getUsername(), "Фамилия, Имя, Отчество сотрудника", new JLabel(), false);
                 panel.addField("Сертификаты пользователя", "label", new JLabel(), true);
                 ArrayList<Certificate> certificates  = new ArrayList<Certificate>(); //user.getCertificates();
                 if (certificates.size() > 0)   {
-                    for (Certificate cert: certificates){
-                        button.setText("Edit");
+                    for (Certificate cert: user.getCertificates()){
+                        JButton button = new JButton("Edit");
                         button.addActionListener(new certAction(cert));
+                        panel.addField(cert.getInfo(), "Посмотреть сертификат сотрудника", button, true);
                     }
 
                 } else {
+                    JButton button = new JButton();
                     button.setText("Generate");
                     button.addActionListener(new certAction());
+                    panel.addField("Нет сертификатов", "Посмотреть сертификат сотрудника", button, true);
                 }
-                panel.addField("", "Посмотреть сертификат сотрудника", button, true);
+
             }
         } else {
             panel.addField("Нет сотрудников", "Добавить нового сотрудника в компанию", new JButton("Добавить"), true);

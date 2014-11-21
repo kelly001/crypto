@@ -62,9 +62,9 @@ public class CompanyDialog extends CloseButtonDialog {
         panel.addField("", "", saveCompanyButton, false);
 
         panel.addGlue();
+        this.pack();
         this.setContentPane(panel);
-        this.setSize(size);
-        this.setVisible(true);
+        //this.setSize(size);
     }
 
 }

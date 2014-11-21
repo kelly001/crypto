@@ -119,6 +119,11 @@ public class Certificate {
     public String getComment() {return this.comment; }
     public User getOwner() {return this.owner;}
 
+    public String getInfo() {
+        String label = "Сертификат пользователя " + this.getUsername() + " от " + this.getTimestamp() + " числа";
+        return label;
+    }
+
     public static ArrayList<Certificate> load() throws SQLException {
         System.out.println("load cert class");
         ArrayList<Certificate> certificates = new ArrayList<Certificate>();
@@ -188,7 +193,7 @@ public class Certificate {
                     cert.setOrganization(rs.getString("organization"));
                     cert.setStatus(rs.getBoolean("status"));
                     cert.setTimestamp(time);
-                    cert.setOwner(rs.getLong("user_id"));
+                    //cert.setOwner(rs.getLong("user_id"));
                     certificates.add(cert);
                 }
 

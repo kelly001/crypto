@@ -7,11 +7,15 @@ import java.util.ArrayList;
  * Created by Julia on 14.11.2014.
  */
 public class Employer extends User {
-    protected User company;
+    private User company;
 
     public Employer() {
         super();
         this.company = new Company();
+        /*try {
+            this.company = Company.loadByUser(this.id);
+        } catch (SQLException e)
+        { System.out.println(e.getLocalizedMessage());}*/
     }
     public void setCompany(User company) {this.company=company;}
     public User getCompany() {return company;}
@@ -33,6 +37,7 @@ public class Employer extends User {
                 employer.setPassword(result.getString("password"));
                 employer.setStatus(result.getBoolean("status"));
                 employer.setTimestamp(time);
+                employer.setCertificates(Certificate.loadByUser(result.getLong("id")));
                 //employer.setCompany(Company.loadById(company_id));
                 users.add(employer);
             }
