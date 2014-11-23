@@ -48,6 +48,7 @@ public class Company extends User {
         return employer;}
 
     public static Company loadByEmail (String name) throws SQLException {
+        System.out.println("loadByEmail Company");
         Company user = null;
         Connection con = Database.getConnection();
         String query = "select * from user where email = ?";
@@ -77,6 +78,7 @@ public class Company extends User {
     }
 
     public static User loadByName (String name) throws SQLException{
+        System.out.println("loadByName Company");
         User user = null;
         Connection con = Database.getConnection();
         String query = "select * from user where username = ?";

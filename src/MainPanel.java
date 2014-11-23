@@ -8,6 +8,7 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -91,13 +92,16 @@ public class MainPanel extends FieldPanel {
         this.addField("Статус пользователя", "Статус пользователя", status, true);
 
         this.addField("Сертификаты: ", "label", new JLabel(), true);
-        ArrayList<Certificate> certificates  = company.getCertificates();
-        if (certificates.size() > 0)   {
-            for (Certificate cert: certificates){
-                this.addField(cert.getUsername(), "label", new JLabel(), true);
+        //ArrayList<Certificate> certificates  = company.getCertificates();
+        try {
+            ArrayList<Certificate> certificates  = Certificate.loadByUser(company.getId());
+            if (certificates.size() > 0)   {
+                for (Certificate cert: certificates){
+                    this.addField(cert.getInfo(), "label", new JLabel(), true);
+                }
             }
-
-        }
+        } catch (SQLException e) {
+            System.out.println("Load certficates SQLException in User constructor " + e.getLocalizedMessage());}
         //getCertificate.setSize(50, 50);
         //panel.add(getCertificate, FlowLayout.LEFT);
         JButton getCertificateButton = new JButton("Получить");

@@ -14,22 +14,27 @@ public class User {
     private String username;
     private Timestamp timestamp;
     private Boolean status;
-    private ArrayList<Certificate> certificates = new ArrayList<Certificate>();
-    private ArrayList<Key> keys = new ArrayList<Key>();
+    private ArrayList<Certificate> certificates;
+    private ArrayList<Key> keys;
 
     public User() {
-        //this.email = "";
-        this.password = "";
-        //this.username = "";
-        //this.status = true;
+        this.status = true;
+        java.util.Date now = Calendar.getInstance().getTime();
+        //java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
+        this.timestamp = new Timestamp(now.getTime());
+    }
+
+    public User(Long id) {
+        this.id = id;
         java.util.Date now = Calendar.getInstance().getTime();
         //java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
         this.timestamp = new Timestamp(now.getTime());
         try {
             this.certificates = Certificate.loadByUser(this.id);
+            System.out.println("loaded certificates in constructor " + this.certificates.size());
         } catch (SQLException e)
-        { System.out.println(e.getLocalizedMessage());}
-        this.keys = new ArrayList<Key>();
+        { System.out.println("Load certficates SQLException in User constructor " + e.getLocalizedMessage());}
+        //this.keys = new ArrayList<Key>();
     }
 
     public User(Long id, String email, String password, String username, Boolean status, Timestamp time) {
@@ -42,7 +47,7 @@ public class User {
         try {
             this.certificates = Certificate.loadByUser(this.id);
         } catch (SQLException e)
-        { System.out.println(e.getLocalizedMessage());}
+        { System.out.println("Load certficates SQLException in User constructor " + e.getLocalizedMessage());}
     }
 
     public void setId(Long id) {
@@ -103,7 +108,7 @@ public class User {
 
     public static ArrayList<User> loadUsers()
             throws SQLException {
-        System.out.println("load users class");
+        System.out.println("loadUsers");
         ArrayList<User> users = new ArrayList<User>();
         Connection con = Database.getConnection();
         String query = "select * from user";
@@ -139,6 +144,7 @@ public class User {
     }
 
     public static User loadByName (String name) throws SQLException{
+        System.out.println("loadByName");
         User user = null;
         Connection con = Database.getConnection();
         String query = "select * from user where username = ?";
@@ -167,6 +173,7 @@ public class User {
 
 
     public static User loadById(Long id) throws SQLException{
+        System.out.println("loadById User");
         User user = null;
         Connection con = Database.getConnection();
         String query = "select * from user where id = ?";
@@ -196,6 +203,7 @@ public class User {
     }
 
     public static User loadByEmail (String name) throws SQLException{
+        System.out.println("loadByEmail");
         User user = null;
         Connection con = Database.getConnection();
         String query = "select * from user where email = ?";

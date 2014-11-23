@@ -11,12 +11,17 @@ public class Employer extends User {
 
     public Employer() {
         super();
-        this.company = new Company();
-        /*try {
+        /*this.company = new Company();
+        try {
             this.company = Company.loadByUser(this.id);
         } catch (SQLException e)
         { System.out.println(e.getLocalizedMessage());}*/
     }
+
+    public Employer(Long id) {
+        super(id);
+    }
+
     public void setCompany(User company) {this.company=company;}
     public User getCompany() {return company;}
 
@@ -30,7 +35,7 @@ public class Employer extends User {
             preparedStatement.setLong(1,company_id);
             ResultSet result = preparedStatement.executeQuery();
             while (result.next()) {
-                Employer employer = new Employer();
+                Employer employer = new Employer(result.getLong("id"));
                 Timestamp time = new Timestamp(result.getLong("timestamp"));
                 employer.setId(result.getLong("id"));
                 employer.setUsername(result.getString("username"));

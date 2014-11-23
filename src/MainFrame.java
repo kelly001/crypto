@@ -217,7 +217,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     }
 
     public static Window findWindow(Component c) {
-        System.out.println(c.getClass().getName());
         if (c instanceof Window) {
             return (Window) c;
         } else if (c instanceof JPopupMenu) {

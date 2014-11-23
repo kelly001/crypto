@@ -1,14 +1,23 @@
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.openssl.PEMWriter;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.x509.X509V1CertificateGenerator;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import javax.security.auth.x500.X500Principal;
 //import org.bouncycastle.asn1.DEREncodable;
 
 import java.io.*;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
@@ -25,54 +34,63 @@ class Security {
 
     public Signature dsa; // подписываемые данные
     public PublicKey pubKey;
+    private PrivateKey privKey;
+
     public X509Certificate certificate;
     private byte[] realSig;
     private byte[] key;
-    private PrivateKey privKey;
+
 
     public Security(String name) {
+        System.out.println("Security class constructor - generate certificates API");
         if (!(name.length()>0)) {
             System.out.println("too short name");
         } else {
-            System.out.println("Cert gen class");
-            GenKeys();
+
+            KeyPair rootKeys = GenKeys();
             saveEncKey(name);
 
             //подпись ключом данных (файла)
             String filename = "data";
             signData(filename);
 
-            //создание и сохранение сертификата
-            BigInteger serial = BigInteger.valueOf(System.currentTimeMillis());
             Date startDate = new Date();
             Calendar cal = Calendar.getInstance();
             cal.setTime(startDate);
             cal.add(Calendar.YEAR, 1); // to get previous year add -1
             Date nextYear = cal.getTime();
-            String issuer = "";
+
+            //создание и сохранение root сертификата
+            BigInteger RootSerial = BigInteger.valueOf(System.currentTimeMillis());
+            X509Certificate rootCert = null;
             try {
 
                 // Rooot certificate
-                System.out.print("root sert");
-                X509Certificate rootCert = generateX509CertificateRoot(serial, startDate, nextYear, "SHA1withDSA", privKey, pubKey, "BC");
-
+                rootCert = generateX509CertificateRoot(RootSerial, startDate, nextYear, "SHA1withDSA", privKey, pubKey, "BC");
                 if (rootCert!=null) {
                     System.out.println(rootCert);
                     //saveCert(rootCert, "sertmy");
                     Writer writer = new FileWriter("my sert");
                     savePemX509Certificate(rootCert, privKey, writer);
-                }else { System.out.println("beda");}
-
-
+                }else { System.out.println("Root certificate is null ");}
             } catch (Exception e) {
-                e.getLocalizedMessage();
+                System.out.println("Generate root certificate error: " + e.getLocalizedMessage());
                 e.printStackTrace();
             }
-            /*try {
-                X509Certificate endCert = generateX509Certificate(serial, "CN=end",issuer, startDate, nextYear, "SHA1withDSA", privKey, pubKey, "BC");
+
+            //creating signed certificate
+            BigInteger signedSerial = BigInteger.valueOf(System.currentTimeMillis());
+            KeyPair signedKeys = rootKeys; //TODO generate new keys
+            try {
+                X509Certificate signedCert = generateX509Certificate("CN=Signed Certificate for ...", signedSerial, rootCert, startDate, nextYear, "SHA1withDSA", signedKeys, "BC");
+                if (signedCert!=null) {
+                    System.out.println(signedCert);
+                    //TODO write certificate to disk
+                }else { System.out.println("Root certificate is null ");}
             } catch (Exception e) {
-                e.getLocalizedMessage();
-            }*/
+                System.out.println("Generate signed certificate error: " + e.getLocalizedMessage());
+                e.printStackTrace();
+            }
 
         }
     }
@@ -81,31 +99,24 @@ class Security {
         Security security = new Security("test");
     }
 
-    public static X509Certificate generateX509Certificate(BigInteger serialnumber, String subject, String issuer, Date start , Date end, String signAlgorithm, PrivateKey privateKey, PublicKey publicKey, String provider)
-            throws CertificateEncodingException, InvalidKeyException, IllegalStateException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException
+    public static X509Certificate generateX509Certificate(String name, BigInteger serial, X509Certificate issuerCert, Date start , Date end, String signAlgorithm, KeyPair keys, String provider)
+            throws IOException, OperatorCreationException, CertificateException
     {
-        if(serialnumber!=null && subject!=null && issuer!=null && start!=null && end!=null && signAlgorithm !=null && privateKey!=null && publicKey!=null)
+        if(serial!=null && name!=null && issuerCert!=null && start!=null && end!=null && signAlgorithm !=null)
         {
             //-----GENERATE THE X509 CERTIFICATE
-            X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
-            X509Principal dnSubject = new X509Principal(subject);
-            //X509Principal dnIssuer = new X509Principal(issuer);
+            ContentSigner signer = new JcaContentSignerBuilder(signAlgorithm).build(keys.getPrivate());
 
-            certGen.setSerialNumber(serialnumber);
-            certGen.setSubjectDN(dnSubject);
-            //certGen.setIssuerDN(dnIssuer);
-            certGen.setNotBefore(start);
-            certGen.setNotAfter(end);
-            certGen.setPublicKey(publicKey);
-            certGen.setSignatureAlgorithm(signAlgorithm);
+            X500Principal subject = new X500Principal(name);
+            X509v3CertificateBuilder certBldr = null;
 
-            /*
-            //-----insert extension if needed
-            if(map!=null)
+               certBldr = new JcaX509v3CertificateBuilder(issuerCert, serial, start, end, subject, keys.getPublic());
+            /*if(map!=null)
                 for(ASN1ObjectIdentifier extension : map.keySet())
-                    certGen.addExtension(extension, map.get(extension).getKey(), map.get(extension).getValue());
-*/
-            return certGen.generate(privateKey, provider);
+                    certBldr.addExtension(extension, map.get(extension).getKey(), map.get(extension).getValue());
+            */
+            X509Certificate cert = new JcaX509CertificateConverter().setProvider("BC").getCertificate(certBldr.build(signer));
+            return cert;
         }
         return null;
     }
@@ -115,7 +126,6 @@ class Security {
     {
         if(serialnumber!=null && start!=null && end!=null && signAlgorithm !=null && privateKey!=null && publicKey!=null)
         {
-            System.out.print("generate");
             //-----GENERATE THE X509 CERTIFICATE
             X509V1CertificateGenerator certGen = new X509V1CertificateGenerator();
             X509Principal dnSubject = new X509Principal("CN=Root CA Certificate");
@@ -169,21 +179,23 @@ class Security {
 
     }
 
-    private void GenKeys () {
+    private KeyPair GenKeys () {
         /* Generate a DSA signature */
-         try {
+        KeyPair pair = null;
+        try {
 
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA", "BC");
             SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
             keyGen.initialize(1024, random);
-
-            KeyPair pair = keyGen.generateKeyPair();
+            pair = keyGen.generateKeyPair();
             privKey = pair.getPrivate();
             pubKey = pair.getPublic();
 
         } catch (Exception e) {
             System.err.println("Caught exception " + e.toString());
         }
+
+        return pair;
     }
 
     private void saveEncKey(String name) {

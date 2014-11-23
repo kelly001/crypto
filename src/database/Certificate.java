@@ -153,9 +153,9 @@ public class Certificate {
                 certificates.add(cert);
             }
         } catch (SQLException e ) {
-            System.out.println(e.getLocalizedMessage());
+            System.out.println("load Certificate SQLException: "  + e.getLocalizedMessage());
         }catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
+            System.out.println("load Certificate SQLException: " + e.getLocalizedMessage());
         } finally {
             if (stmt != null) { stmt.close(); }
         }
@@ -163,11 +163,10 @@ public class Certificate {
     }
 
     public static ArrayList<Certificate> loadByUser(Long user_id) throws SQLException {
-        System.out.println("load cert by user class");
+        System.out.println("loadByUser Certificate");
         ArrayList<Certificate> certificates = new ArrayList<Certificate>();
 
         Connection con = Database.getConnection();
-        Statement stmt = null;
         PreparedStatement preparedStatement = null;
         // select by user_id
         String query = "select * from certificate where user_id = ?";
@@ -178,8 +177,6 @@ public class Certificate {
 
             while (rs.next()) {
                 //Timestamp time = new Timestamp(rs.getLong("timestamp"));
-                Long id = rs.getLong("id");
-                if (id.equals(user_id)) {
                     Timestamp time = new Timestamp(rs.getLong("timestamp"));
                     Certificate cert = new Certificate();
                     cert.setId(rs.getLong("id"));
@@ -195,13 +192,11 @@ public class Certificate {
                     cert.setTimestamp(time);
                     //cert.setOwner(rs.getLong("user_id"));
                     certificates.add(cert);
-                }
-
             }
         } catch (SQLException e ) {
-            System.out.println(e.getLocalizedMessage());
+            System.out.println("loadByUser Certificate SQLException: " + e.getLocalizedMessage());
         }catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
+            System.out.println("loadByUser Certificate Exception: " + e.getLocalizedMessage());
         } finally {
             if (preparedStatement != null) { preparedStatement.close(); }
         }
@@ -209,7 +204,7 @@ public class Certificate {
     }
 
     public static Certificate loadById(Long cert_id) throws SQLException {
-        System.out.println("load cert class");
+        System.out.println("loadById Certificate");
         Certificate certificate = new Certificate();
 
         Connection con = Database.getConnection();

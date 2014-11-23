@@ -45,7 +45,6 @@ public class Database {
                             ";create=true",
                     connectionProps);
         }*/
-        System.out.println("Connected to database");
         return conn;
     }
 }
