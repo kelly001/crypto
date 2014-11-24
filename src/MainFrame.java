@@ -8,6 +8,8 @@ import database.User;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 
@@ -27,6 +29,9 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     public MainFrame() {
         super("Crypto App");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //set icon
+        ImageIcon img = new ImageIcon("icon.jpg");
+        this.setIconImage(img.getImage());
     }
 
     private void addMenuItem(String name, ActionListener action, String id, JMenu menu) {
@@ -131,19 +136,16 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     }
 
     public void setGUI() {
-        panel = new MainPanel(this);
+        MainPanel panel = new MainPanel(this);
+        panel.setGUI(company);
         setMenu();
-        if (company instanceof Company) {
-            panel.setControls(company);
-        } else {
-            panel.setControls();
-            panel.certificatesGUI(company);
-        }
-        panel.addGlue();
         this.setContentPane(panel);
         this.setSize(size);
+        this.pack();
         this.setVisible(true);
     }
+
+
 
     //main func, first argument - company email
     public static void main(String[] arg) {
