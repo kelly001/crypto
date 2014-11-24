@@ -22,9 +22,9 @@ public class CertificatePanel extends FieldPanel {
 
     protected Logger logger = Logger.getLogger("Certificate panel");
     protected Frame frame;
-    protected ArrayList<JTextField> controls = new ArrayList<JTextField>();
+    protected ArrayList<JTextField> controls = new ArrayList<JTextField>();//TODO MAP
     public static Dimension size = new Dimension(500,500);
-    protected String[] names = {"name", "organization", "department", "user", "email", "localty", "type", "comment"};
+    protected String[] names = {"name", "organization", "department", "user", "email", "locality", "type", "comment"};
     protected String[] labels = {"Имя файла", "Организация", "Отделение", "Полное имя пользователя", "Email", "Месторасположение",
                     "Тип сертификата", "Комментарий"};
     private JTextField tfName;
@@ -34,7 +34,7 @@ public class CertificatePanel extends FieldPanel {
     private JTextField tfEmail;
     private JTextField tfType;
     private JTextField tfComment;
-    private JTextField tfLocalty;
+    private JTextField tfLocality;
     private Time timestamp;
     private JButton btnCert;
 

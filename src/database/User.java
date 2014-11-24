@@ -203,7 +203,7 @@ public class User {
     }
 
     public static User loadByEmail (String name) throws SQLException{
-        System.out.println("loadByEmail");
+        System.out.println("loadByEmail User");
         User user = null;
         Connection con = Database.getConnection();
         String query = "select * from user where email = ?";

@@ -33,70 +33,86 @@ import java.util.Map;
 class Security {
 
     public Signature dsa; // подписываемые данные
-    public PublicKey pubKey;
-    private PrivateKey privKey;
+    private KeyPair RootKP;
+    private KeyPair UserKP;
 
-    public X509Certificate certificate;
     private byte[] realSig;
     private byte[] key;
 
 
-    public Security(String name) {
+    public Security() {
         System.out.println("Security class constructor - generate certificates API");
-        if (!(name.length()>0)) {
-            System.out.println("too short name");
-        } else {
+        Date startDate = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(startDate);
+        cal.add(Calendar.YEAR, 1); // to get previous year add -1
+        Date nextYear = cal.getTime();
 
-            KeyPair rootKeys = GenKeys();
-            saveEncKey(name);
+    }
 
-            //подпись ключом данных (файла)
-            String filename = "data";
-            signData(filename);
+    public X509Certificate generateRootCertificate() {
+        System.out.println("Generate root certificate function");
+        X509Certificate rootCert = null;
+        RootKP = GenKeys();
+        saveEncKey(RootKP, "Root");
 
-            Date startDate = new Date();
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(startDate);
-            cal.add(Calendar.YEAR, 1); // to get previous year add -1
-            Date nextYear = cal.getTime();
+        Date startDate = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(startDate);
+        cal.add(Calendar.YEAR, 1); // to get previous year add -1
+        Date nextYear = cal.getTime();
 
-            //создание и сохранение root сертификата
-            BigInteger RootSerial = BigInteger.valueOf(System.currentTimeMillis());
-            X509Certificate rootCert = null;
-            try {
-
-                // Rooot certificate
-                rootCert = generateX509CertificateRoot(RootSerial, startDate, nextYear, "SHA1withDSA", privKey, pubKey, "BC");
-                if (rootCert!=null) {
-                    System.out.println(rootCert);
-                    //saveCert(rootCert, "sertmy");
-                    Writer writer = new FileWriter("my sert");
-                    savePemX509Certificate(rootCert, privKey, writer);
-                }else { System.out.println("Root certificate is null ");}
-            } catch (Exception e) {
-                System.out.println("Generate root certificate error: " + e.getLocalizedMessage());
-                e.printStackTrace();
-            }
-
-            //creating signed certificate
-            BigInteger signedSerial = BigInteger.valueOf(System.currentTimeMillis());
-            KeyPair signedKeys = rootKeys; //TODO generate new keys
-            try {
-                X509Certificate signedCert = generateX509Certificate("CN=Signed Certificate for ...", signedSerial, rootCert, startDate, nextYear, "SHA1withDSA", signedKeys, "BC");
-                if (signedCert!=null) {
-                    System.out.println(signedCert);
-                    //TODO write certificate to disk
-                }else { System.out.println("Root certificate is null ");}
-            } catch (Exception e) {
-                System.out.println("Generate signed certificate error: " + e.getLocalizedMessage());
-                e.printStackTrace();
-            }
-
+        //создание и сохранение root сертификата
+        BigInteger RootSerial = BigInteger.valueOf(System.currentTimeMillis());
+        try {
+            // Rooot certificate
+            rootCert = generateX509CertificateRoot("CN=Root CA Certificate", RootSerial, startDate, nextYear, "SHA1withDSA", RootKP, "BC");
+            if (rootCert!=null) {
+                System.out.println(rootCert);
+                //saveCert(rootCert, "sertmy");
+                Writer writer = new FileWriter("RootCertificate");
+                savePemX509Certificate(rootCert, RootKP.getPrivate(), writer);
+            }else { System.out.println("Root certificate is null ");}
+        } catch (Exception e) {
+            System.out.println("Generate root certificate error: " + e.getLocalizedMessage());
+            e.printStackTrace();
         }
+        return rootCert;
+    }
+
+    public  boolean generateUserCertificate(X509Certificate rootCert) {
+        System.out.println("Generate user certificate function");
+
+        Date startDate = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(startDate);
+        cal.add(Calendar.YEAR, 1); // to get previous year add -1
+        Date nextYear = cal.getTime();
+
+        //creating signed certificate
+        BigInteger signedSerial = BigInteger.valueOf(System.currentTimeMillis());
+        UserKP = GenKeys();
+        saveEncKey(UserKP, "User");
+        try {
+            X509Certificate signedCert = generateX509Certificate("CN=Signed Certificate for ...", signedSerial, rootCert, startDate, nextYear, "SHA1withDSA", UserKP, "BC");
+            if (signedCert!=null) {
+                System.out.println(signedCert);
+                Writer writer = new FileWriter("UserCertificate");
+                savePemX509Certificate(rootCert, UserKP.getPrivate(), writer);
+                return true;
+            }else { System.out.println("User certificate is null ");}
+        } catch (Exception e) {
+            System.out.println("Generate signed certificate error: " + e.getLocalizedMessage());
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static void main(String[] args) {
-        Security security = new Security("test");
+        Security security = new Security();
+        X509Certificate rootcert = security.generateRootCertificate();
+        if (rootcert!=null)
+            security.generateUserCertificate(rootcert);
     }
 
     public static X509Certificate generateX509Certificate(String name, BigInteger serial, X509Certificate issuerCert, Date start , Date end, String signAlgorithm, KeyPair keys, String provider)
@@ -115,32 +131,30 @@ class Security {
                 for(ASN1ObjectIdentifier extension : map.keySet())
                     certBldr.addExtension(extension, map.get(extension).getKey(), map.get(extension).getValue());
             */
-            X509Certificate cert = new JcaX509CertificateConverter().setProvider("BC").getCertificate(certBldr.build(signer));
+            X509Certificate cert = new JcaX509CertificateConverter().setProvider(provider).getCertificate(certBldr.build(signer));
             return cert;
         }
         return null;
     }
 
-    public static X509Certificate generateX509CertificateRoot (BigInteger serialnumber, Date start , Date end, String signAlgorithm, PrivateKey privateKey, PublicKey publicKey, String provider)
-            throws CertificateEncodingException, InvalidKeyException, IllegalStateException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException
+    public static X509Certificate generateX509CertificateRoot(String name, BigInteger serial, Date start , Date end, String signAlgorithm, KeyPair keys, String provider)
+            throws IOException, OperatorCreationException, CertificateException
     {
-        if(serialnumber!=null && start!=null && end!=null && signAlgorithm !=null && privateKey!=null && publicKey!=null)
+        if(serial!=null && name!=null && start!=null && end!=null && signAlgorithm !=null)
         {
             //-----GENERATE THE X509 CERTIFICATE
-            X509V1CertificateGenerator certGen = new X509V1CertificateGenerator();
-            X509Principal dnSubject = new X509Principal("CN=Root CA Certificate");
-            X509Principal dnIssuer = new X509Principal("CN=Root CA Certificate");
+            ContentSigner signer = new JcaContentSignerBuilder(signAlgorithm).build(keys.getPrivate());
 
-            certGen.setSerialNumber(serialnumber);
-            certGen.setSubjectDN(dnSubject);
-            certGen.setIssuerDN(dnIssuer);
-            certGen.setNotBefore(start);
-            certGen.setNotAfter(end);
-            certGen.setPublicKey(publicKey);
-            certGen.setSignatureAlgorithm(signAlgorithm);
+            X500Principal subject = new X500Principal(name);
+            X509v3CertificateBuilder certBldr = null;
 
-            return certGen.generate(privateKey, provider);
-
+            certBldr = new JcaX509v3CertificateBuilder(subject, serial, start, end, subject, keys.getPublic());
+            /*if(map!=null)
+                for(ASN1ObjectIdentifier extension : map.keySet())
+                    certBldr.addExtension(extension, map.get(extension).getKey(), map.get(extension).getValue());
+            */
+            X509Certificate cert = new JcaX509CertificateConverter().setProvider(provider).getCertificate(certBldr.build(signer));
+            return cert;
         }
         return null;
     }
@@ -188,9 +202,10 @@ class Security {
             SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
             keyGen.initialize(1024, random);
             pair = keyGen.generateKeyPair();
+            /*
             privKey = pair.getPrivate();
             pubKey = pair.getPublic();
-
+            */
         } catch (Exception e) {
             System.err.println("Caught exception " + e.toString());
         }
@@ -198,11 +213,11 @@ class Security {
         return pair;
     }
 
-    private void saveEncKey(String name) {
+    private void saveEncKey(KeyPair keys, String filename) {
         try {
-            byte[] key = pubKey.getEncoded();
+            byte[] key = keys.getPrivate().getEncoded();
             //System.out.println(key.toString());
-            FileOutputStream keyfos = new FileOutputStream(name + "-key");
+            FileOutputStream keyfos = new FileOutputStream(filename + "Key");
             keyfos.write(key);
             keyfos.close();
             //writeFile(filename + "-key.pem", key);
@@ -212,7 +227,7 @@ class Security {
         //writeFile(name, realSig);
     }
 
-    private void readEncKey(String filename) {
+    private PublicKey readEncKey(String filename) {
         try {
             FileInputStream keyfis = new FileInputStream(filename);
             //byte[] encKey = new byte[keyfis.available()];
@@ -223,12 +238,13 @@ class Security {
 
         X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(key);
         KeyFactory keyFactory = KeyFactory.getInstance("DSA", "BC");
-        pubKey = keyFactory.generatePublic(pubKeySpec);
+        return keyFactory.generatePublic(pubKeySpec);
     } catch (InvalidKeySpecException e) {
             System.err.println(e.getLocalizedMessage());
     } catch (Exception e) {
             System.err.println(e.getLocalizedMessage());
     }
+        return null;
     }
 
     public void verifySig(String filename){
@@ -249,7 +265,7 @@ class Security {
         try {
             // объект для подписываемых данных
             dsa = Signature.getInstance("SHA1withDSA", "BC");
-            dsa.initSign(privKey);
+            dsa.initSign(RootKP.getPrivate());
 
             //читаем файл для подписи
             FileInputStream fis = new FileInputStream(name);

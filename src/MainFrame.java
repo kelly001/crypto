@@ -73,7 +73,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         userMenu = new JMenu("Сотрудники");
         userMenu.setMnemonic(KeyEvent.VK_F4);
         userMenu.getAccessibleContext().setAccessibleDescription("");
-        if (company==null) {
+        if (company instanceof Company) {
             userMenu.setEnabled(false);
         }
         addMenuItem("Добавить", this, "user-add", userMenu);
@@ -92,7 +92,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         //Build the view menu.
         viewMenu = new JMenu("Просмотр");
         viewMenu.setMnemonic(KeyEvent.VK_U);
-        if (company==null) {
+        if (company instanceof Company) {
             viewMenu.setEnabled(false);
         }
         addMenuItem("Информация о компании", this, "company-view", viewMenu);
@@ -115,6 +115,16 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         try {
             System.out.println(name);
             company = Company.loadByEmail(name);
+            if (company == null) this.setUser(name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setUser(String name) {
+        try {
+            System.out.println(name);
+            company = User.loadByEmail(name);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -127,7 +137,9 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
             panel.setControls(company);
         } else {
             panel.setControls();
+            panel.certificatesGUI(company);
         }
+        panel.addGlue();
         this.setContentPane(panel);
         this.setSize(size);
         this.setVisible(true);

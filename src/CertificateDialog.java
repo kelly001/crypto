@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.security.cert.X509Certificate;
 import java.sql.Time;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +33,7 @@ public class CertificateDialog extends OkCancelDialog {
     private Time timestamp;
     private JButton btnCert;
 
-    public CertificateDialog(Frame parent, String title, Certificate my_certificate) throws Exception{
+    public CertificateDialog(Frame parent, String title, Certificate certificate) throws Exception{
 
         super(parent, title, title);
         System.out.println("constructor");
@@ -40,8 +41,6 @@ public class CertificateDialog extends OkCancelDialog {
         succeeded = false;
         final OkCancelDialog dialog = this;
         final CertificatePanel panel = new CertificatePanel(parent);
-
-
         this.addWindowListener(new WindowAdapter()
         {
             public void windowClosed(WindowEvent we)
@@ -49,10 +48,13 @@ public class CertificateDialog extends OkCancelDialog {
                 if (isOkPressed())
                 {
                         dialog.pressOK();
-                        succeeded = true;
                         //String name = tfName.getText();
                         panel.save();
-                        Security certificate = new Security("test");
+                    Security security = new Security();
+                    X509Certificate rootcert = security.generateRootCertificate();
+                    if (rootcert!=null) {
+                        if (security.generateUserCertificate(rootcert))succeeded = true;
+                    } else succeeded = false;
                         //dispose();
                         dialog.setVisible(false);
                 } else

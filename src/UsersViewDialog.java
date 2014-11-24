@@ -48,7 +48,7 @@ public class UsersViewDialog extends CloseButtonDialog {
             for (User user: users) {
                 //final JLabel label = new JLabel();
                 panel.addField(user.getUsername(), "Фамилия, Имя, Отчество сотрудника", new JLabel(), false);
-                panel.addField("Сертификаты пользователя", "label", new JLabel(), true);
+                panel.addField("Сертификаты пользователя:", "label", new JLabel(), true);
                 ArrayList<Certificate> certificates  = user.getCertificates();
                 if (certificates.size() > 0)   {
                     for (Certificate cert: certificates){

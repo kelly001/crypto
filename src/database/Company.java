@@ -58,14 +58,16 @@ public class Company extends User {
             stmt.setString(1, name);
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                String password = result.getString("password");//.isEmpty()?rs.getString("password"):"";
-                String username = result.getString("username");//.isEmpty()?rs.getString("username"):"";
-                user = new Company();
-                user.setId(result.getLong("id"));
-                user.setUsername(username);
-                user.setPassword(password);
-                user.setEmail(result.getString("email"));
-                user.setStatus(result.getBoolean("status"));
+                if (result.getInt("type") == 1) {
+                    String password = result.getString("password");//.isEmpty()?rs.getString("password"):"";
+                    String username = result.getString("username");//.isEmpty()?rs.getString("username"):"";
+                    user = new Company();
+                    user.setId(result.getLong("id"));
+                    user.setUsername(username);
+                    user.setPassword(password);
+                    user.setEmail(result.getString("email"));
+                    user.setStatus(result.getBoolean("status"));
+                }
             }
         } catch (SQLException e ) {
             System.out.println(e.getLocalizedMessage());

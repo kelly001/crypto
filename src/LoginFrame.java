@@ -40,6 +40,7 @@ public class LoginFrame extends JFrame{
                 if (dialog.isSucceeded()) {
                     MainFrame new_frame = new MainFrame();
                     new_frame.setCompany(dialog.getUsername());
+
                     new_frame.setGUI();
                     new_frame.setVisible(true);
                     dispose();
