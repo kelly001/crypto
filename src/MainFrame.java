@@ -78,7 +78,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         userMenu = new JMenu("Сотрудники");
         userMenu.setMnemonic(KeyEvent.VK_F4);
         userMenu.getAccessibleContext().setAccessibleDescription("");
-        if (company instanceof Company) {
+        if (!(company instanceof Company)) {
             userMenu.setEnabled(false);
         }
         addMenuItem("Добавить", this, "user-add", userMenu);
@@ -97,7 +97,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         //Build the view menu.
         viewMenu = new JMenu("Просмотр");
         viewMenu.setMnemonic(KeyEvent.VK_U);
-        if (company instanceof Company) {
+        if (!(company instanceof Company)) {
             viewMenu.setEnabled(false);
         }
         addMenuItem("Информация о компании", this, "company-view", viewMenu);

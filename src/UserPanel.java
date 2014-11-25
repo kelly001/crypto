@@ -49,6 +49,10 @@ public class UserPanel extends FieldPanel {
     }
 
     public void setControls() {
+        CloseButtonDialog infodialog =
+                new CloseButtonDialog(frame, "Приветствие",
+                        new JLabel("Ораганизации с таким логином не найдено, создайте новую"));
+        infodialog.setVisible(true);
         final JLabel label = new JLabel();
         String companyLabel = "Новая организация";
         this.addField(companyLabel, "label", label, true);
@@ -61,7 +65,7 @@ public class UserPanel extends FieldPanel {
             this.addField(labels[i], company_names[i], field, true);
         }
         JButton saveCompanyButton = new JButton("Сохранить");
-        saveCompanyButton.addActionListener(new saveUserAction());
+        saveCompanyButton.addActionListener(new saveCompanyAction());
         this.addField("", "", saveCompanyButton, false);
     }
 
@@ -96,7 +100,7 @@ public class UserPanel extends FieldPanel {
                         CloseButtonDialog infodialog =
                                 new CloseButtonDialog(frame, "Успех",
                                         new JLabel("Новая организация создана!"));
-
+                        infodialog.setVisible(true);
                         String args[] = {controls.get("email").getText()};
                         frame.dispose();
                         MainFrame.main(args);
@@ -106,5 +110,33 @@ public class UserPanel extends FieldPanel {
                     System.out.println("saving user exception " + exc.getLocalizedMessage());
                 }
             }
+    }
+
+    public class saveCompanyAction implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Company user = new Company();
+            user.setUsername(controls.get("username").getText());
+            user.setEmail(controls.get("email").getText());
+            user.setPassword(controls.get("password").getText());
+            user.setCountry(controls.get("country").getText());
+            user.setRegion(controls.get("region").getText());
+            user.setCity(controls.get("city").getText());
+            user.setDepartment(controls.get("department").getText());
+            try {
+                if (Company.newUser(user)){
+                    CloseButtonDialog infodialog =
+                            new CloseButtonDialog(frame, "Успех",
+                                    new JLabel("Новая организация создана!"));
+
+                    String args[] = {controls.get("email").getText()};
+                    frame.dispose();
+                    MainFrame.main(args);
+                }
+
+            } catch (Exception exc) {
+                System.out.println("saving user exception " + exc.getLocalizedMessage());
+            }
+        }
     }
 }

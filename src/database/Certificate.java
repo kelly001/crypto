@@ -3,6 +3,7 @@ package database;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -250,5 +251,43 @@ public class Certificate {
             if (preparedStatement != null) { preparedStatement.close(); }
         }
         return certificate;
+    }
+
+    public static Boolean newUser (HashMap<String,String> values) throws SQLException {
+        System.out.println("new Certificate Certificate class");
+        Connection con = Database.getConnection();
+        PreparedStatement preparedStatement = null;
+        String query = "insert into CERTIFICATE(id, email, username, filename, organization, department," +
+                " locality, state, type, comment, timestamp, status, user_id) values(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        try {
+            preparedStatement = con.prepareStatement(query);
+            preparedStatement.setNull(1,0);
+            preparedStatement.setString(2,values.get("email"));
+            preparedStatement.setString(3,values.get("username"));
+            preparedStatement.setString(4,values.get("filename"));
+            preparedStatement.setString(5,values.get("organization"));
+            preparedStatement.setString(6,values.get("department"));
+            preparedStatement.setString(7,values.get("locality"));
+            preparedStatement.setString(8,values.get("state"));
+            preparedStatement.setString(9,values.get("type"));
+            preparedStatement.setString(10,values.get("comment"));
+            preparedStatement.setLong(11, Calendar.getInstance().getTime().getTime());
+            preparedStatement.setInt(12,1);
+            preparedStatement.setInt(13,1);
+
+            /*preparedStatement.setString(8, user.getCountry());
+            preparedStatement.setString(9, user.getRegion());
+            preparedStatement.setString(10, user.getCity());*/
+            preparedStatement.execute();
+        } catch (SQLException e ) {
+            System.out.println(e.getLocalizedMessage());
+            return false;
+        }catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+            return false;
+        } finally {
+            if (preparedStatement != null) { preparedStatement.close(); }
+        }
+        return true;
     }
 }

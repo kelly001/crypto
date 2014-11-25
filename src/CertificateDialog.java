@@ -47,13 +47,12 @@ public class CertificateDialog extends OkCancelDialog {
             {
                 if (isOkPressed())
                 {
-                        dialog.pressOK();
-                        //String name = tfName.getText();
-                        panel.save();
+                    dialog.pressOK();
                     Security security = new Security();
                     X509Certificate rootcert = security.generateRootCertificate();
                     if (rootcert!=null) {
                         if (security.generateUserCertificate(rootcert))succeeded = true;
+                        panel.save();
                     } else succeeded = false;
                         //dispose();
                         dialog.setVisible(false);
@@ -63,7 +62,6 @@ public class CertificateDialog extends OkCancelDialog {
                 }
             }
         });
-
         //createControls(panel);
         getContentPane().add(panel);
         dialog.setSize(size);

@@ -112,7 +112,7 @@ public class MainPanel extends JPanel{
         public void actionPerformed(ActionEvent e) {
             try {
                 final CertificateDialog dialog = new CertificateDialog(frame, "Save&Generate", cert);
-                System.out.println(cert);
+                dialog.setVisible(true);
             } catch (Exception e1) {
                 System.out.println( e1.getLocalizedMessage());
             }

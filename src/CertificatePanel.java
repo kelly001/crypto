@@ -11,31 +11,26 @@ import java.awt.event.WindowEvent;
 import java.lang.reflect.Array;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.teacode.swing.dialog
         .OkCancelDialog;
 import com.teacode.swing.component.FieldPanel;
+import database.Certificate;
 
 public class CertificatePanel extends FieldPanel {
 
     protected Logger logger = Logger.getLogger("Certificate panel");
     protected Frame frame;
-    protected ArrayList<JTextField> controls = new ArrayList<JTextField>();//TODO MAP
+    protected Map<String, JTextField> controls = new HashMap<String, JTextField>();
     public static Dimension size = new Dimension(500,500);
-    protected String[] names = {"name", "organization", "department", "user", "email", "locality", "type", "comment"};
+    protected String[] names = {"email", "username","filename", "organization", "department",  "locality" , "state", "type", "comment"};
     protected String[] labels = {"Имя файла", "Организация", "Отделение", "Полное имя пользователя", "Email", "Месторасположение",
                     "Тип сертификата", "Комментарий"};
-    private JTextField tfName;
-    private JTextField tfOrganization;
-    private JTextField tfDepartment;
-    private JTextField tfUsername;
-    private JTextField tfEmail;
-    private JTextField tfType;
-    private JTextField tfComment;
-    private JTextField tfLocality;
-    private Time timestamp;
     private JButton btnCert;
 
    public CertificatePanel (Frame frame) {
@@ -50,8 +45,8 @@ public class CertificatePanel extends FieldPanel {
        for (int i=0; i < names.length; i++) {
            JTextField field = new JTextField(labels[i]);
            field.setName(names[i]);
-           controls.add(field);
-           panel.addField(labels[i], names[i], field, true);
+           controls.put(names[i], field);
+           panel.addField(names[i], names[i], field, true);
        }
        panel.addGlue();
        logger.log(Level.FINE, "create Controls");
@@ -59,9 +54,18 @@ public class CertificatePanel extends FieldPanel {
 
     public void save () {
         System.out.println("panel save");
-        for(JTextField control: controls) {
-            String value = control.getName() + control.getText();
-            System.out.println(value);
+        HashMap<String,String> values = new HashMap<String, String>(){};
+        for (Map.Entry<String, JTextField> entry : controls.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            values.put(entry.getKey(), entry.getValue().getText());
         }
+        values.put("user_id","1");
+        try {
+            Certificate.newUser(values);
+        }catch (Exception exc) {
+            System.out.println("saving user exception " + exc.getLocalizedMessage());
+            }
+
     }
 }
