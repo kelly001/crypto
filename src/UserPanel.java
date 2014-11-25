@@ -5,30 +5,39 @@ import com.teacode.swing.component.FieldPanel;
  */
 
 import javax.swing.*;
+import javax.swing.tree.ExpandVetoException;
 import java.awt.*;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.teacode.swing.component.FieldPanel;
 
+import com.teacode.swing.dialog.CloseButtonDialog;
 import database.*;
 
 public class UserPanel extends FieldPanel {
     protected Logger logger = Logger.getLogger("Certificate panel");
+    JFrame frame;
 
-    // Поля ораганизациии
-    protected String[] names = {"name", "department", "user", "email", "city", "region", "country"};
-    protected String[] labels = {"Название", "Отделение", "Имя пользователя", "Email", "Город",
+    // Поля организациии
+    protected String[] user_names = {"username", "email", "password"};
+    protected String[] company_names = {"username", "email", "password", "department", "city", "region", "country"};
+    protected String[] labels = {"Название/Имя пользователя", "Email", "Пароль", "Отделение","Город",
             "Регион", "Страна"};
-    protected ArrayList<JTextField> controls = new ArrayList<JTextField>();
+    protected Map<String, JTextField> controls = new HashMap<String, JTextField>();
 
-    public UserPanel (User user) {
+    public UserPanel (User user, JFrame frame) {
         System.out.println("Users view panel");
+        this.frame = frame;
         //FieldPanel panel = new FieldPanel();
         if (user instanceof Company) {
             this.setControls(user);
@@ -40,25 +49,19 @@ public class UserPanel extends FieldPanel {
     }
 
     public void setControls() {
-        //TODO throw info dialog
         final JLabel label = new JLabel();
         String companyLabel = "Новая организация";
         this.addField(companyLabel, "label", label, true);
-        for (int i=0; i < names.length; i++) {
-            JTextField field = new JTextField(labels[i]);
-            field.setName(names[i]);
+        for (int i=0; i < company_names.length; i++) {
+            JTextField field = new JTextField();
+            field.setName(company_names[i]);
             field.setColumns(20);
             field.setEditable(true);
-            controls.add(field);
-            this.addField(labels[i], names[i], field, true);
+            controls.put(company_names[i],field);
+            this.addField(labels[i], company_names[i], field, true);
         }
-        final JButton saveCompanyButton = new JButton("Сохранить");
-        saveCompanyButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
+        JButton saveCompanyButton = new JButton("Сохранить");
+        saveCompanyButton.addActionListener(new saveUserAction());
         this.addField("", "", saveCompanyButton, false);
     }
 
@@ -79,5 +82,29 @@ public class UserPanel extends FieldPanel {
         JTextField status = new JTextField(user.getStatus()?"Active":"Not");
         status.setEditable(false);
         this.addField("Статус пользователя", "Статус пользователя", status, true);
+    }
+
+    public class saveUserAction implements ActionListener {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                User user = new User();
+                user.setUsername(controls.get("username").getText());
+                user.setEmail(controls.get("email").getText());
+                user.setPassword(controls.get("password").getText());
+                try {
+                    if (User.newUser(user)){
+                        CloseButtonDialog infodialog =
+                                new CloseButtonDialog(frame, "Успех",
+                                        new JLabel("Новая организация создана!"));
+
+                        String args[] = {controls.get("email").getText()};
+                        frame.dispose();
+                        MainFrame.main(args);
+                    }
+
+                } catch (Exception exc) {
+                    System.out.println("saving user exception " + exc.getLocalizedMessage());
+                }
+            }
     }
 }

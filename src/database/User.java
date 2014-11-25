@@ -20,7 +20,6 @@ public class User {
     public User() {
         this.status = true;
         java.util.Date now = Calendar.getInstance().getTime();
-        //java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
         this.timestamp = new Timestamp(now.getTime());
     }
 
@@ -231,24 +230,55 @@ public class User {
         return user;
     }
 
-
-
     public static Boolean saveUser (User user) throws SQLException {
+        System.out.println("saveUser User class");
         Connection con = Database.getConnection();
-        Statement stmt = null;
-        String query = "insert into users values ("+
-                +user.getId()+","+user.getUsername()+")";
+        PreparedStatement preparedStatement = null;
+        String query = "UPDATE user SET email =?, timestamp=?, username=? WHERE id=?";
         try {
-            System.out.println("query exec");
-            stmt = con.createStatement();
-            //ResultSet rs = stmt.executeQuery(query);
-            stmt.executeUpdate(query);
+            preparedStatement = con.prepareStatement(query);
+            preparedStatement.setLong(4,user.getId());
+            preparedStatement.setString(1,user.getEmail());
+            //preparedStatement.setString(4, user.getPassword());
+            preparedStatement.setLong(2, Calendar.getInstance().getTime().getTime());
+            preparedStatement.setString(3, user.getUsername());
+            preparedStatement.execute();
         } catch (SQLException e ) {
             System.out.println(e.getLocalizedMessage());
+            return false;
         }catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
+            return false;
         } finally {
-            if (stmt != null) { stmt.close(); }
+            if (preparedStatement != null) { preparedStatement.close(); }
+        }
+        return true;
+    }
+
+    public static Boolean newUser (User user) throws SQLException {
+        System.out.println("newUser User class");
+        Connection con = Database.getConnection();
+        PreparedStatement preparedStatement = null;
+        String query = "insert into USER(id, type, email, password, timestamp," +
+                "status, username) values(?,?,?,?,?,?,?)";
+        try {
+            preparedStatement = con.prepareStatement(query);
+            preparedStatement.setNull(1,0);
+            preparedStatement.setInt(2,2);
+            preparedStatement.setString(3,user.getEmail());
+            preparedStatement.setString(4, user.getPassword());
+            preparedStatement.setLong(5, Calendar.getInstance().getTime().getTime());
+            preparedStatement.setInt(6,1);
+            preparedStatement.setString(7, user.getUsername());
+            preparedStatement.execute();
+        } catch (SQLException e ) {
+            System.out.println(e.getLocalizedMessage());
+            return false;
+        }catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+            return false;
+        } finally {
+            if (preparedStatement != null) { preparedStatement.close(); }
         }
         return true;
     }

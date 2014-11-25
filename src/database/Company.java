@@ -2,6 +2,7 @@ package database;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by Julia on 14.11.2014.
@@ -106,6 +107,37 @@ public class Company extends User {
         }
 
         return user;
+    }
+
+    public static Boolean newUser (Company user) throws SQLException {
+        System.out.println("newUser User class");
+        Connection con = Database.getConnection();
+        PreparedStatement preparedStatement = null;
+        String query = "insert into USER(id, type, email, password, timestamp," +
+                "status, username, country, region, city) values(?,?,?,?,?,?,?,?,?,?)";
+        try {
+            preparedStatement = con.prepareStatement(query);
+            preparedStatement.setNull(1,0);
+            preparedStatement.setInt(2,1);
+            preparedStatement.setString(3,user.getEmail());
+            preparedStatement.setString(4, user.getPassword());
+            preparedStatement.setLong(5, Calendar.getInstance().getTime().getTime());
+            preparedStatement.setInt(6,1);
+            preparedStatement.setString(7, user.getUsername());
+            preparedStatement.setString(8, user.getCountry());
+            preparedStatement.setString(9, user.getRegion());
+            preparedStatement.setString(10, user.getCity());
+            preparedStatement.execute();
+        } catch (SQLException e ) {
+            System.out.println(e.getLocalizedMessage());
+            return false;
+        }catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+            return false;
+        } finally {
+            if (preparedStatement != null) { preparedStatement.close(); }
+        }
+        return true;
     }
 
 
