@@ -1,10 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.security.cert.X509Certificate;
 import java.sql.Time;
 import java.util.logging.Level;
@@ -16,12 +13,14 @@ import com.teacode.swing.dialog
 import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.exception.WWRuntimeException;
 import database.Certificate;
+import database.User;
 
 public class CertificateDialog extends OkCancelDialog {
 
     static Logger logger = Logger.getLogger("CertificateDialog log");
     public static Dimension size = new Dimension(500,500);
     public boolean succeeded;
+    private Frame frame;
     private JTextField tfName;
     private JTextField tfOrganization;
     private JTextField tfDepartment;
@@ -33,9 +32,10 @@ public class CertificateDialog extends OkCancelDialog {
     private Time timestamp;
     private JButton btnCert;
 
-    public CertificateDialog(Frame parent, String title, Certificate certificate) throws Exception{
-
+    public CertificateDialog(Frame parent, String title, Certificate certificate, String user) throws Exception{
         super(parent, title, title);
+        this.frame = parent;
+        final String user_id = user;
         System.out.println("constructor");
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         succeeded = false;
@@ -51,8 +51,9 @@ public class CertificateDialog extends OkCancelDialog {
                     Security security = new Security();
                     X509Certificate rootcert = security.generateRootCertificate();
                     if (rootcert!=null) {
+                        panel.saveRoot(user_id);
                         if (security.generateUserCertificate(rootcert))succeeded = true;
-                        panel.save();
+                        panel.save(user_id);
                     } else succeeded = false;
                         //dispose();
                         dialog.setVisible(false);
@@ -69,6 +70,27 @@ public class CertificateDialog extends OkCancelDialog {
         dialog.setVisible(true);
         logger.log(Level.FINE, String.valueOf(dialog.isOkPressed()));
     }
+
+    /*public class windowListener extends WindowAdapter{
+        public void windowClosed(WindowEvent we){
+            if (isOkPressed())
+            {
+                this.pressOK();
+                Security security = new Security();
+                X509Certificate rootcert = security.generateRootCertificate();
+                if (rootcert!=null) {
+                    this.saveRoot(String.valueOf(user.getId()));
+                    if (security.generateUserCertificate(rootcert))succeeded = true;
+                    this.save("1");
+                } else succeeded = false;
+                //dispose();
+                dialog.setVisible(false);
+            } else
+            {
+                dispose();
+            }
+        }
+    }*/
 
     //public abstract boolean hasChanged();
 
@@ -89,7 +111,7 @@ public class CertificateDialog extends OkCancelDialog {
 
             }
         });
-        CertificateDialog dialog = new CertificateDialog(frame, title, new Certificate())
+        CertificateDialog dialog = new CertificateDialog(frame, title, new Certificate(),"22")
         {
             public boolean hasChanged()
             {

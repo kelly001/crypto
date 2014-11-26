@@ -10,19 +10,43 @@ import java.util.concurrent.ExecutionException;
  * Created by new_name on 11.11.2014.
  */
 public class Certificate {
+    /* add field basicConstraints, keyUsage
+    root cert
+        [v3_ca]
+        basicConstraints        = CA:true
+        nsComment       = "CA certificate of COMPANY_NAME"
+        nsCertType      = sslCA, emailCA
+        subjectKeyIdentifier=hash
+        authorityKeyIdentifier=keyid:always,issuer:always
+
+    user cert
+        [ v3_req ]
+        basicConstraints = CA:FALSE
+        keyUsage = "digitalSignature, keyEncipherment"
+        nsCertType = "client, email, objsign"
+    */
     private Long id;
-    private String email;
-    private String username;
+    private String email; //emailAddress
+    private String username; //commonName
     private String filename;
-    private String organization;
-    private String department;
-    private String locality;
-    private String state;
+    private String organization;    //0.organizationName
+    private String department;  //organizationalUnitName
+    private String locality;    //localityName
+    private String state;   //stateOrProvinceName
+    /*
+    * nsCertType = sslCA, emailCA - CA cartificates
+    * nsCertType = "client, email, objsign" - users
+    * */
     private String type;
-    private String comment;
+    /*
+    nsComment = "CA certificate of COMPANY_NAME"
+     */
+    private String comment; //nsComment
     private Timestamp timestamp;
     private Boolean status;
     private User owner;
+    private String country; //countryName
+
 
     public Certificate () {
         /* root cert
@@ -87,6 +111,7 @@ public class Certificate {
     public void setLocality(String locality) {this.locality = locality;}
     public void setType(String type) {this.type = type;}
     public  void setComment(String comment) {this.comment = comment;}
+    public void setCountry(String country) { this.country = country;}
     public void setOwner(User user) {this.owner = user;}
     public void setOwner(Long user_id) {
         User user = new User();

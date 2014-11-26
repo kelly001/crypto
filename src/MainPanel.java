@@ -57,7 +57,7 @@ public class MainPanel extends JPanel{
 
 
         JButton getCertificateButton = new JButton("Новый");
-        getCertificateButton.addActionListener(new certAction());
+        getCertificateButton.addActionListener(new certAction(user));
         c.gridwidth = 1;
         c.gridx = 0;
         c.gridy = 3;
@@ -84,7 +84,7 @@ public class MainPanel extends JPanel{
             if (certificates.size() > 0)   {
                 for (Certificate cert: certificates){
                     JButton button = new JButton("Edit");
-                    button.addActionListener(new certAction(cert));
+                    button.addActionListener(new certAction(cert, user));
                     certPanel.addField(cert.getInfo(), "Посмотреть сертификат сотрудника", button, true);
                 }
 
@@ -98,20 +98,24 @@ public class MainPanel extends JPanel{
 
     public class certAction implements ActionListener
     {
-        private final Certificate cert;// = new Certificate();
-        certAction(Certificate cert) {
+        private final Certificate cert;
+        private final User user;// = new Certificate();
+        certAction(Certificate cert, User user) {
             super();
             this.cert = cert;
+            this.user = user;
         }
 
-        certAction() {
+        certAction(User user) {
             super();
             this.cert = new Certificate();
+            this.user = user;
         }
 
         public void actionPerformed(ActionEvent e) {
             try {
-                final CertificateDialog dialog = new CertificateDialog(frame, "Save&Generate", cert);
+                final CertificateDialog dialog =
+                        new CertificateDialog(frame, "Save&Generate", cert, String.valueOf(user.getId()));
                 dialog.setVisible(true);
             } catch (Exception e1) {
                 System.out.println( e1.getLocalizedMessage());

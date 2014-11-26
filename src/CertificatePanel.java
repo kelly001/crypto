@@ -28,9 +28,9 @@ public class CertificatePanel extends FieldPanel {
     protected Frame frame;
     protected Map<String, JTextField> controls = new HashMap<String, JTextField>();
     public static Dimension size = new Dimension(500,500);
-    protected String[] names = {"email", "username","filename", "organization", "department",  "locality" , "state", "type", "comment"};
-    protected String[] labels = {"Имя файла", "Организация", "Отделение", "Полное имя пользователя", "Email", "Месторасположение",
-                    "Тип сертификата", "Комментарий"};
+    protected String[] names = {"email", "username","filename", "organization", "department",  "locality" , "state","country", "type", "comment"};
+    protected String[] labels = {"Email","Полное имя пользователя", "Имя файла", "Организация", "Отделение",   "Город",
+                    "Регион", "Страна", "Тип сертификата", "Комментарий"};
     private JButton btnCert;
 
    public CertificatePanel (Frame frame) {
@@ -43,7 +43,7 @@ public class CertificatePanel extends FieldPanel {
        System.out.println("panel setControls");
        //create and set controls
        for (int i=0; i < names.length; i++) {
-           JTextField field = new JTextField(labels[i]);
+           JTextField field = new JTextField();
            field.setName(names[i]);
            controls.put(names[i], field);
            panel.addField(names[i], names[i], field, true);
@@ -52,20 +52,38 @@ public class CertificatePanel extends FieldPanel {
        logger.log(Level.FINE, "create Controls");
     }
 
-    public void save () {
+    public boolean save (String user) {
         System.out.println("panel save");
         HashMap<String,String> values = new HashMap<String, String>(){};
         for (Map.Entry<String, JTextField> entry : controls.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
             values.put(entry.getKey(), entry.getValue().getText());
         }
-        values.put("user_id","1");
+        values.put("user_id",user);
+        values.put("type","client, email, objsign");
         try {
             Certificate.newUser(values);
+            return true;
         }catch (Exception exc) {
             System.out.println("saving user exception " + exc.getLocalizedMessage());
-            }
+            return false;
+        }
+    }
 
+    public boolean saveRoot (String user) {
+        System.out.println("panel save");
+        HashMap<String,String> values = new HashMap<String, String>(){};
+        for (Map.Entry<String, JTextField> entry : controls.entrySet()) {
+            values.put(entry.getKey(), entry.getValue().getText());
+        }
+        values.put("user_id",user);
+        values.put("type","sslCA, emailCA");
+        values.put("comment","CA certificate of " + values.get("organization"));
+        try {
+            Certificate.newUser(values);
+            return true;
+        }catch (Exception exc) {
+            System.out.println("saving user exception " + exc.getLocalizedMessage());
+            return false;
+        }
     }
 }

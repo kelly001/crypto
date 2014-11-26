@@ -152,7 +152,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         MainFrame new_frame = new MainFrame();
         if (arg.length>0) new_frame.setCompany(arg[0]);
         new_frame.setGUI();
-        new_frame.setVisible(true);
     }
 
     public class MenuActionListener implements ActionListener
@@ -265,7 +264,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
     protected void createCertificateDialog(JFrame frame) {
         try {
-            final CertificateDialog dialog = new CertificateDialog(frame, "Save&Generate", new Certificate());
+            final CertificateDialog dialog = new CertificateDialog(frame, "Save&Generate", new Certificate(), null);
             //System.out.println(dialog?"true":"false");
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());
