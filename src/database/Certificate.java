@@ -298,7 +298,7 @@ public class Certificate {
             preparedStatement.setString(10,values.get("comment"));
             preparedStatement.setLong(11, Calendar.getInstance().getTime().getTime());
             preparedStatement.setInt(12,1);
-            preparedStatement.setInt(13,1);
+            preparedStatement.setInt(13,Integer.valueOf(values.get("user_id")));
 
             /*preparedStatement.setString(8, user.getCountry());
             preparedStatement.setString(9, user.getRegion());
