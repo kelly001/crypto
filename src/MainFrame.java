@@ -199,6 +199,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                 Object item = e.getSource();
                 if (item instanceof Component) {
                     Window w = findWindow((Component) item);
+                    // TODO сделать передачу сертификата, id сертификата лучше
                     createCertificateDialog((JFrame) w);
                 } else {
                     System.out.println("source is not a Component");

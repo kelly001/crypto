@@ -9,6 +9,7 @@ import java.util.Calendar;
 
 public class User {
     private Long id;
+    private Integer type;
     private String email;
     private String password;
     private String username;
@@ -18,6 +19,7 @@ public class User {
     private ArrayList<Key> keys;
 
     public User() {
+        this.type=1;
         this.status = true;
         java.util.Date now = Calendar.getInstance().getTime();
         this.timestamp = new Timestamp(now.getTime());
@@ -38,6 +40,7 @@ public class User {
 
     public User(Long id, String email, String password, String username, Boolean status, Timestamp time) {
         this.id = id;
+        this.type = 1;
         this.email = email;
         this.password = password;
         this.username = username;
@@ -51,6 +54,9 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
+    }
+    public void setType(Integer type) {
+        this.type = type;
     }
     public void setEmail(String email) {
         this.email = email;
@@ -83,6 +89,7 @@ public class User {
     public Long getId() {
         return id;
     }
+    public Integer getType() {return type; }
     public String getEmail() {
         return email;
     }

@@ -283,7 +283,7 @@ public class Certificate {
         Connection con = Database.getConnection();
         PreparedStatement preparedStatement = null;
         String query = "insert into CERTIFICATE(id, email, username, filename, organization, department," +
-                " locality, state, type, comment, timestamp, status, user_id) values(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                " locality, state, type, comment, timestamp, status, user_id, country) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             preparedStatement = con.prepareStatement(query);
             preparedStatement.setNull(1,0);
@@ -299,6 +299,7 @@ public class Certificate {
             preparedStatement.setLong(11, Calendar.getInstance().getTime().getTime());
             preparedStatement.setInt(12,1);
             preparedStatement.setInt(13,Integer.valueOf(values.get("user_id")));
+            preparedStatement.setString(14,values.get("country"));
 
             /*preparedStatement.setString(8, user.getCountry());
             preparedStatement.setString(9, user.getRegion());
