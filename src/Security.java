@@ -10,6 +10,8 @@ import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.asn1.x500.X500Name;
+
 import javax.security.auth.x500.X500Principal;
 //import org.bouncycastle.asn1.DEREncodable;
 
@@ -70,8 +72,9 @@ class Security {
             if (rootCert!=null) {
                 System.out.println(rootCert);
                 //saveCert(rootCert, "sertmy");
-                Writer writer = new FileWriter("RootCertificate");
-                savePemX509Certificate(rootCert, RootKP.getPrivate(), writer);
+                savePemX509Certificate(rootCert, new FileWriter("RootCertificate"));
+                savePublicKey(RootKP, new FileWriter("RootPublicKey"));
+                savePrivateKey(RootKP, new FileWriter("RootPrivateKey"));
             }else { System.out.println("Root certificate is null ");}
         } catch (Exception e) {
             System.out.println("Generate root certificate error: " + e.getLocalizedMessage());
@@ -81,7 +84,7 @@ class Security {
     }
 
     public  boolean generateUserCertificate(X509Certificate rootCert) {
-        System.out.println("Generate user certificate function");
+        System.out.println("Generate user certificate by certificate function");
 
         Date startDate = new Date();
         Calendar cal = Calendar.getInstance();
@@ -97,8 +100,46 @@ class Security {
             X509Certificate signedCert = generateX509Certificate("CN=Signed Certificate for ...", signedSerial, rootCert, startDate, nextYear, "SHA1withDSA", UserKP, "BC");
             if (signedCert!=null) {
                 System.out.println(signedCert);
-                Writer writer = new FileWriter("UserCertificate");
-                savePemX509Certificate(signedCert, UserKP.getPrivate(), writer);
+                savePemX509Certificate(signedCert, new FileWriter("UserCertificate"));
+                savePublicKey(UserKP, new FileWriter("UserKey"));
+                return true;
+            }else { System.out.println("User certificate is null ");}
+        } catch (Exception e) {
+            System.out.println("Generate signed certificate error: " + e.getLocalizedMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+     /*
+     * Создание сертификата пользователя с параметрами, передвавемыми в массиве с ключами - values
+     * Подпись секретным ключом компании, имя компании.
+     *
+     *  */
+    public  boolean generateUserCertificate(PrivateKey rootKey, Map<String, String> values) {
+        System.out.println("Generate user certificate by key function");
+
+        Date startDate = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(startDate);
+        cal.add(Calendar.YEAR, 1); // to get previous year add -1
+        Date nextYear = cal.getTime();
+
+        String username = values.get("username");
+        String rootNAme = values.get("organization");
+
+        //creating signed certificate
+        BigInteger signedSerial = BigInteger.valueOf(System.currentTimeMillis());
+        UserKP = GenKeys();
+        //saveEncKey(UserKP, "User");
+        try {
+            X509Certificate signedCert = generateX509Certificate(rootKey, values,
+                    signedSerial, startDate, nextYear, UserKP.getPublic());
+            if (signedCert!=null) {
+                System.out.println(signedCert);
+                savePemX509Certificate(signedCert, new FileWriter("UserCertificate"));
+                savePublicKey(UserKP, new FileWriter("UserKey"));
                 return true;
             }else { System.out.println("User certificate is null ");}
         } catch (Exception e) {
@@ -115,6 +156,31 @@ class Security {
             security.generateUserCertificate(rootcert);
     }
 
+    public static X509Certificate generateX509Certificate(PrivateKey rootKey, Map<String, String> values,
+            BigInteger serial, Date start , Date end, PublicKey userKey)
+            throws IOException, OperatorCreationException, CertificateException
+    {
+        if(serial!=null && start!=null && end!=null)
+        {
+            //-----GENERATE THE X509 CERTIFICATE
+            ContentSigner signer = new JcaContentSignerBuilder("SHA1withDSA").build(rootKey);
+
+            X500Name subject = new X500Name("CN=Signed Certificate for " + values.get("username"));
+            org.bouncycastle.asn1.x500.X500Name issuerName = new X500Name("CN=Root CA Certificate of " + values.get("organization"));
+            X509v3CertificateBuilder certBldr = null;
+
+               certBldr = new JcaX509v3CertificateBuilder(issuerName, serial, start, end, subject, userKey);
+            /*if(map!=null)
+                for(ASN1ObjectIdentifier extension : map.keySet())
+                    certBldr.addExtension(extension, map.get(extension).getKey(), map.get(extension).getValue());
+            */
+            X509Certificate cert = new JcaX509CertificateConverter().setProvider("BC").getCertificate(certBldr.build(signer));
+            return cert;
+        }
+        return null;
+    }
+
+
     public static X509Certificate generateX509Certificate(String name, BigInteger serial, X509Certificate issuerCert, Date start , Date end, String signAlgorithm, KeyPair keys, String provider)
             throws IOException, OperatorCreationException, CertificateException
     {
@@ -126,7 +192,7 @@ class Security {
             X500Principal subject = new X500Principal(name);
             X509v3CertificateBuilder certBldr = null;
 
-               certBldr = new JcaX509v3CertificateBuilder(issuerCert, serial, start, end, subject, keys.getPublic());
+            certBldr = new JcaX509v3CertificateBuilder(issuerCert, serial, start, end, subject, keys.getPublic());
             /*if(map!=null)
                 for(ASN1ObjectIdentifier extension : map.keySet())
                     certBldr.addExtension(extension, map.get(extension).getKey(), map.get(extension).getValue());
@@ -159,38 +225,43 @@ class Security {
         return null;
     }
 
-    public static boolean savePemX509Certificate(X509Certificate cert, PrivateKey key, Writer writer) throws NoSuchAlgorithmException, NoSuchProviderException, CertificateEncodingException, SignatureException, InvalidKeyException, IOException
+    public static boolean savePemX509Certificate(X509Certificate cert, Writer writer) throws NoSuchAlgorithmException, NoSuchProviderException, CertificateEncodingException, SignatureException, InvalidKeyException, IOException
     {
-        if(cert!=null && key!=null && writer!=null)
+        if(cert!=null && writer!=null)
         {
             PEMWriter pemWriter = new PEMWriter(writer);
             pemWriter.writeObject(cert);
             pemWriter.flush();
-
-            if(key!=null)
-            {
-                pemWriter.writeObject(key);
-                pemWriter.flush();
-            }
             pemWriter.close();
             return true;
         }
         return false;
     }
 
-    public static void saveCert(X509Certificate cert, String name){
-        try {
-            System.out.print("saving");
-            byte[] encCert = cert.getEncoded();
-            System.out.println(encCert.toString());
-            FileOutputStream certfos = new FileOutputStream(name);
-            certfos.write(encCert);
-            certfos.close();
-        } catch (Exception e){
-            System.out.println(e.getLocalizedMessage());
+    public static boolean savePublicKey(KeyPair key, Writer writer) throws NoSuchAlgorithmException, NoSuchProviderException, CertificateEncodingException, SignatureException, InvalidKeyException, IOException
+    {
+        if(key!=null && writer!=null)
+        {
+            PEMWriter pemWriter = new PEMWriter(writer);
+            pemWriter.writeObject(key.getPublic());
+            pemWriter.flush();
+            pemWriter.close();
+            return true;
         }
+        return false;
+    }
 
-
+    public static boolean savePrivateKey(KeyPair key, Writer writer) throws NoSuchAlgorithmException, NoSuchProviderException, CertificateEncodingException, SignatureException, InvalidKeyException, IOException
+    {
+        if(key!=null && writer!=null)
+        {
+            PEMWriter pemWriter = new PEMWriter(writer);
+            pemWriter.writeObject(key.getPrivate());
+            pemWriter.flush();
+            pemWriter.close();
+            return true;
+        }
+        return false;
     }
 
     private KeyPair GenKeys () {
@@ -227,15 +298,13 @@ class Security {
         //writeFile(name, realSig);
     }
 
-    private PublicKey readEncKey(String filename) {
+    public PublicKey readEncKey(String filename) {
         try {
             FileInputStream keyfis = new FileInputStream(filename);
             //byte[] encKey = new byte[keyfis.available()];
             key = new byte[keyfis.available()];
             keyfis.read(key);
             keyfis.close();
-
-
         X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(key);
         KeyFactory keyFactory = KeyFactory.getInstance("DSA", "BC");
         return keyFactory.generatePublic(pubKeySpec);
@@ -244,6 +313,24 @@ class Security {
     } catch (Exception e) {
             System.err.println(e.getLocalizedMessage());
     }
+        return null;
+    }
+
+    public PrivateKey readPrivateKey(String filename) {
+        try {
+            FileInputStream keyfis = new FileInputStream(filename);
+            //byte[] encKey = new byte[keyfis.available()];
+            key = new byte[keyfis.available()];
+            keyfis.read(key);
+            keyfis.close();
+            X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(key);
+            KeyFactory keyFactory = KeyFactory.getInstance("DSA", "BC");
+            return keyFactory.generatePrivate(pubKeySpec);
+        } catch (InvalidKeySpecException e) {
+            System.err.println(e.getLocalizedMessage());
+        } catch (Exception e) {
+            System.err.println(e.getLocalizedMessage());
+        }
         return null;
     }
 

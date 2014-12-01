@@ -266,7 +266,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     protected void createCertificateDialog(JFrame frame) {
         try {
             final CertificateDialog dialog =
-                    new CertificateDialog(frame, "Save&Generate", new Certificate(), String.valueOf(company.getId()));
+                    new CertificateDialog(frame, new Certificate(), company);
             //System.out.println(dialog?"true":"false");
         } catch (Exception e) {
             System.out.println( "Create Certificate Dialog error: " + e.getLocalizedMessage());

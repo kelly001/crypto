@@ -1,9 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.Frame;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.security.cert.X509Certificate;
 import java.sql.Time;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -33,9 +36,10 @@ public class CertificateDialog extends OkCancelDialog {
     private Time timestamp;
     private JButton btnCert;
     private static String title = "Окно созднаия и редактирования сертификатов";
+    private static String okTitle = "Сохранить";
 
-    public CertificateDialog(Frame parent, Certificate certificate, final User user) throws Exception{
-        super(parent, title, title);
+    public CertificateDialog(Frame parent, final Certificate certificate, final User user) throws Exception{
+        super(parent, title, okTitle);
         this.frame = parent;
 
         System.out.println("constructor");
@@ -56,7 +60,16 @@ public class CertificateDialog extends OkCancelDialog {
                         panel.saveRoot(user.getId().toString());
                     } else {
                         //todo
-                        security.generateUserCertificate(rootcert);
+                        try {
+                            Certificate.loadByUser(user.getId());
+                        } catch (Exception exc) {
+                            System.out.print("Load root certificate by user error " + exc.getLocalizedMessage());
+                        }
+                        Map<String, String> values = new HashMap<String, String>();
+                        values.put("username", user.getUsername());
+                        values.put("organization", certificate.getOrganization());
+                        security.generateUserCertificate(security.readPrivateKey(certificate.getFilename()), values);
+                        //security.generateUserCertificate(rootcert);
                         panel.save(user.getId().toString());
                     }
                     dialog.dispose();
@@ -130,37 +143,6 @@ public class CertificateDialog extends OkCancelDialog {
         }*/
         logger.log(Level.FINE, String.valueOf(dialog.isOkPressed()));
         return dialog.isOkPressed();
-    }
-
-    //create new certfificate manage dialog
-    protected void createControls(FieldPanel panel) throws Exception {
-        tfName = new JTextField(20);
-        tfOrganization = new JTextField(20);
-        tfDepartment =new JTextField(20);
-        tfEmail = new JTextField(20);
-        tfUsername = new JTextField(20);
-        tfLocalty = new JTextField(20);
-        panel.addField("File Name", "Имя файла", tfName, true);
-        panel.addField("Организация", "Оргранизация", tfOrganization,true);
-        panel.addField("Отделение", "Подразделение организации", tfDepartment, true);
-        panel.addField("Имя", "Имя владельца сертификата", tfUsername, true);
-        panel.addField("Email", "Почта владельца ящика", tfEmail, true);
-        panel.addField("City","Город или другой населенный пункт", tfLocalty, true);
-
-
-        /*btnCert = new JButton("Generate");
-        panel.addField("Genarete Keys", "Создание ключей, подпись файла", btnCert,false);
-        btnCert.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String name = tfName.getText();
-                System.out.println(name);
-                Security certificate = new Security(name);
-            }
-        });*/
-
-        logger.log(Level.FINE, "create Controls");
-        panel.addGlue();
     }
 
     public boolean isSucceeded() {
