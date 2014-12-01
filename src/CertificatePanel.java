@@ -86,4 +86,14 @@ public class CertificatePanel extends FieldPanel {
             return false;
         }
     }
+
+    public Map<String,String> getValues () {
+        Map<String,String> values = new HashMap<String, String>(){};
+            for (HashMap.Entry<String, JTextField> entry: controls.entrySet()) {
+                values.put(entry.getKey(), entry.getValue().getText());
+            }
+        values.put("type","sslCA, emailCA");
+        values.put("comment","CA certificate of " + values.get("organization"));
+        return values;
+    }
 }

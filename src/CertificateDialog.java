@@ -25,23 +25,18 @@ public class CertificateDialog extends OkCancelDialog {
     public static Dimension size = new Dimension(500,500);
     public boolean succeeded;
     private Frame frame;
-    private JTextField tfName;
-    private JTextField tfOrganization;
-    private JTextField tfDepartment;
-    private JTextField tfUsername;
-    private JTextField tfEmail;
-    private JTextField tfType;
-    private JTextField tfComment;
-    private JTextField tfLocalty;
-    private Time timestamp;
-    private JButton btnCert;
     private static String title = "Окно созднаия и редактирования сертификатов";
     private static String okTitle = "Сохранить";
+    final Map<String, String> values = new HashMap<String, String>();
 
     public CertificateDialog(Frame parent, final Certificate certificate, final User user) throws Exception{
         super(parent, title, okTitle);
         this.frame = parent;
-
+        //final Map<String, String> values = new HashMap<String, String>();
+        if (certificate != null) {
+            values.put("username", certificate.getUsername());
+            values.put("organization", certificate.getOrganization());
+        }
         System.out.println("constructor");
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         succeeded = false;
@@ -56,8 +51,9 @@ public class CertificateDialog extends OkCancelDialog {
                     dialog.pressOK();
                     Security security = new Security();
                     if (user instanceof Company) {
-                        X509Certificate rootcert = security.generateRootCertificate();
                         panel.saveRoot(user.getId().toString());
+                        X509Certificate rootcert = security.generateRootCertificate();
+
                     } else {
                         //todo
                         try {
@@ -65,12 +61,19 @@ public class CertificateDialog extends OkCancelDialog {
                         } catch (Exception exc) {
                             System.out.print("Load root certificate by user error " + exc.getLocalizedMessage());
                         }
-                        Map<String, String> values = new HashMap<String, String>();
-                        values.put("username", user.getUsername());
-                        values.put("organization", certificate.getOrganization());
-                        security.generateUserCertificate(security.readPrivateKey(certificate.getFilename()), values);
+                        //get private org ky
+                        //PrivateKey CAkey security.readPrivateKey(certificate.getFilename();
+                        //System.out.println(CAkey);
+
                         //security.generateUserCertificate(rootcert);
-                        panel.save(user.getId().toString());
+                        try {
+                            panel.save(user.getId().toString());
+                        } catch (NullPointerException exc) {
+                            System.out.println( "Get user id Null exception: " + exc.getLocalizedMessage());
+                            panel.save("0");
+                        }
+                        security.generateUserCertificate(panel.getValues());
+
                     }
                     dialog.dispose();
                 } else

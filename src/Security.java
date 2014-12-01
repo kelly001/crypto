@@ -26,6 +26,7 @@ import java.security.spec.X509EncodedKeySpec;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /*
@@ -97,7 +98,7 @@ class Security {
         UserKP = GenKeys();
         saveEncKey(UserKP, "User");
         try {
-            X509Certificate signedCert = generateX509Certificate("CN=Signed Certificate for ...", signedSerial, rootCert, startDate, nextYear, "SHA1withDSA", UserKP, "BC");
+            X509Certificate signedCert = generateX509Certificate("CN=Signed Certificate for", signedSerial, rootCert, startDate, nextYear, "SHA1withDSA", UserKP, "BC");
             if (signedCert!=null) {
                 System.out.println(signedCert);
                 savePemX509Certificate(signedCert, new FileWriter("UserCertificate"));
@@ -115,9 +116,12 @@ class Security {
      /*
      * Создание сертификата пользователя с параметрами, передвавемыми в массиве с ключами - values
      * Подпись секретным ключом компании, имя компании.
+     * Чем подписывать сертификат - паблик ключ пользователя/компании? Нужно пользователем,
+     * Компания - секртный ключ подписывает контейнер как то так
+     * TODO generate container with company private key
      *
      *  */
-    public  boolean generateUserCertificate(PrivateKey rootKey, Map<String, String> values) {
+    public  boolean generateUserCertificate( Map<String, String> values) {
         System.out.println("Generate user certificate by key function");
 
         Date startDate = new Date();
@@ -126,20 +130,18 @@ class Security {
         cal.add(Calendar.YEAR, 1); // to get previous year add -1
         Date nextYear = cal.getTime();
 
-        String username = values.get("username");
-        String rootNAme = values.get("organization");
-
         //creating signed certificate
         BigInteger signedSerial = BigInteger.valueOf(System.currentTimeMillis());
         UserKP = GenKeys();
         //saveEncKey(UserKP, "User");
         try {
-            X509Certificate signedCert = generateX509Certificate(rootKey, values,
-                    signedSerial, startDate, nextYear, UserKP.getPublic());
+            X509Certificate signedCert = generateX509Certificate(values,
+                    signedSerial, startDate, nextYear, UserKP);
             if (signedCert!=null) {
                 System.out.println(signedCert);
                 savePemX509Certificate(signedCert, new FileWriter("UserCertificate"));
                 savePublicKey(UserKP, new FileWriter("UserKey"));
+                savePrivateKey(UserKP, new FileWriter("UserPrivateKey"));
                 return true;
             }else { System.out.println("User certificate is null ");}
         } catch (Exception e) {
@@ -150,26 +152,35 @@ class Security {
     }
 
     public static void main(String[] args) {
+        final Map<String, String> values = new HashMap<String, String>();
+        values.put("username", "USER");
+        values.put("organization", "ROOT");
+
         Security security = new Security();
         X509Certificate rootcert = security.generateRootCertificate();
+            //rootcert.getSubjectDN().toString();
         if (rootcert!=null)
             security.generateUserCertificate(rootcert);
+        Boolean user = security.generateUserCertificate(values);
     }
 
-    public static X509Certificate generateX509Certificate(PrivateKey rootKey, Map<String, String> values,
-            BigInteger serial, Date start , Date end, PublicKey userKey)
+    public static X509Certificate generateX509Certificate(Map<String, String> values,
+            BigInteger serial, Date start , Date end, KeyPair userKeys)
             throws IOException, OperatorCreationException, CertificateException
     {
         if(serial!=null && start!=null && end!=null)
         {
             //-----GENERATE THE X509 CERTIFICATE
-            ContentSigner signer = new JcaContentSignerBuilder("SHA1withDSA").build(rootKey);
+            ContentSigner signer = new JcaContentSignerBuilder("SHA1withDSA").build(userKeys.getPrivate());
 
             X500Name subject = new X500Name("CN=Signed Certificate for " + values.get("username"));
             org.bouncycastle.asn1.x500.X500Name issuerName = new X500Name("CN=Root CA Certificate of " + values.get("organization"));
             X509v3CertificateBuilder certBldr = null;
 
-               certBldr = new JcaX509v3CertificateBuilder(issuerName, serial, start, end, subject, userKey);
+            // Чем подписывать сертификат - паблик ключ пользователя/компании? Нужно пользователем,
+            // Компания - секртный ключ подписывает контейнер как то так
+            // пока нет контейнера - паблик ключ компании
+               certBldr = new JcaX509v3CertificateBuilder(issuerName, serial, start, end, subject, userKeys.getPublic());
             /*if(map!=null)
                 for(ASN1ObjectIdentifier extension : map.keySet())
                     certBldr.addExtension(extension, map.get(extension).getKey(), map.get(extension).getValue());
