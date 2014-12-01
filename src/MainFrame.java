@@ -129,7 +129,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     public void setUser(String name) {
         try {
             System.out.println(name);
-            company = User.loadByEmail(name);
+            company = Company.loadByEmail(name);
         } catch (Exception e) {
             e.printStackTrace();
         }

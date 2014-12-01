@@ -28,9 +28,9 @@ public class CertificatePanel extends FieldPanel {
     protected Frame frame;
     protected Map<String, JTextField> controls = new HashMap<String, JTextField>();
     public static Dimension size = new Dimension(500,500);
-    protected String[] names = {"email", "username","filename", "organization", "department",  "locality" , "state","country", "type", "comment"};
+    protected String[] names = {"email", "username","filename", "organization", "department",  "locality" , "state","country"};//, "type", "comment"};
     protected String[] labels = {"Email","Полное имя пользователя", "Имя файла", "Организация", "Отделение",   "Город",
-                    "Регион", "Страна", "Тип сертификата", "Комментарий"};
+                    "Регион", "Страна"};//, "Тип сертификата", "Комментарий"};
     private JButton btnCert;
 
    public CertificatePanel (Frame frame) {
@@ -70,7 +70,7 @@ public class CertificatePanel extends FieldPanel {
     }
 
     public boolean saveRoot (String user) {
-        System.out.println("panel save");
+        System.out.println("panel save user");
         HashMap<String,String> values = new HashMap<String, String>(){};
         for (Map.Entry<String, JTextField> entry : controls.entrySet()) {
             values.put(entry.getKey(), entry.getValue().getText());

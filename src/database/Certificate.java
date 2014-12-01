@@ -42,8 +42,8 @@ public class Certificate {
     nsComment = "CA certificate of COMPANY_NAME"
      */
     private String comment; //nsComment
-    private Timestamp timestamp;
-    private Boolean status;
+    private Timestamp timestamp;    // дата последнего изменения
+    private Boolean status; // true - действителен, false - отозван
     private User owner;
     private String country; //countryName
 
@@ -315,5 +315,30 @@ public class Certificate {
             if (preparedStatement != null) { preparedStatement.close(); }
         }
         return true;
+    }
+
+    public static boolean cancel(Long cert_id) throws SQLException {
+        Connection con = Database.getConnection();
+        PreparedStatement preparedStatement = null;
+        // select by user_id
+        String query = "UPDATE certificate SET status = ? where id = ?";
+        try {
+            System.out.println("query exec");
+            preparedStatement = con.prepareStatement(query);
+            preparedStatement.setInt(1, 0);
+            preparedStatement.setLong(2, cert_id);
+            preparedStatement.execute();
+            return true;
+        } catch (SQLException e) {
+            System.out.println(e.getLocalizedMessage());
+            return false;
+        } catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+            return false;
+        } finally {
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
     }
 }
