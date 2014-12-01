@@ -115,7 +115,7 @@ public class MainPanel extends JPanel{
         public void actionPerformed(ActionEvent e) {
             try {
                 final CertificateDialog dialog =
-                        new CertificateDialog(frame, "Save&Generate", cert, String.valueOf(user.getId()));
+                        new CertificateDialog(frame, cert, user);
                 //dialog.setVisible(true);
             } catch (Exception e1) {
                 System.out.println( "certAction actionPerfomed Exception: " + e1.getLocalizedMessage());

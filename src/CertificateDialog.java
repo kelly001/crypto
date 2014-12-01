@@ -13,6 +13,7 @@ import com.teacode.swing.dialog
 import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.exception.WWRuntimeException;
 import database.Certificate;
+import database.Company;
 import database.User;
 
 public class CertificateDialog extends OkCancelDialog {
@@ -31,11 +32,12 @@ public class CertificateDialog extends OkCancelDialog {
     private JTextField tfLocalty;
     private Time timestamp;
     private JButton btnCert;
+    private static String title = "Окно созднаия и редактирования сертификатов";
 
-    public CertificateDialog(Frame parent, String title, Certificate certificate, String user) throws Exception{
+    public CertificateDialog(Frame parent, Certificate certificate, final User user) throws Exception{
         super(parent, title, title);
         this.frame = parent;
-        final String user_id = user;
+
         System.out.println("constructor");
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         succeeded = false;
@@ -49,14 +51,15 @@ public class CertificateDialog extends OkCancelDialog {
                 {
                     dialog.pressOK();
                     Security security = new Security();
-                    X509Certificate rootcert = security.generateRootCertificate();
-                    if (rootcert!=null) {
-                        panel.saveRoot(user_id);
-                        if (security.generateUserCertificate(rootcert))succeeded = true;
-                        panel.save(user_id);
-                    } else succeeded = false;
-                        //dispose();
-                        dialog.setVisible(false);
+                    if (user instanceof Company) {
+                        X509Certificate rootcert = security.generateRootCertificate();
+                        panel.saveRoot(user.getId().toString());
+                    } else {
+                        //todo
+                        security.generateUserCertificate(rootcert);
+                        panel.save(user.getId().toString());
+                    }
+                    dialog.dispose();
                 } else
                 {
                     dispose();
@@ -111,7 +114,7 @@ public class CertificateDialog extends OkCancelDialog {
 
             }
         });
-        CertificateDialog dialog = new CertificateDialog(frame, title, new Certificate(),"22")
+        CertificateDialog dialog = new CertificateDialog(frame, new Certificate(),new User())
         {
             public boolean hasChanged()
             {

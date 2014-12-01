@@ -98,7 +98,7 @@ class Security {
             if (signedCert!=null) {
                 System.out.println(signedCert);
                 Writer writer = new FileWriter("UserCertificate");
-                savePemX509Certificate(rootCert, UserKP.getPrivate(), writer);
+                savePemX509Certificate(signedCert, UserKP.getPrivate(), writer);
                 return true;
             }else { System.out.println("User certificate is null ");}
         } catch (Exception e) {
