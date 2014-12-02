@@ -101,8 +101,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
             viewMenu.setEnabled(false);
         }
         addMenuItem("Информация о компании", this, "company-view", viewMenu);
-        addMenuItem("Ключ", this,"key", viewMenu);
-        addMenuItem("Хеш", this, "hash", viewMenu);
+        //addMenuItem("Ключ", this,"key", viewMenu);
+        //addMenuItem("Хеш", this, "hash", viewMenu);
         addMenuItem("Сотрудники", this, "users", viewMenu);
 
         infoMenu = new JMenu("Помощь");
@@ -226,6 +226,13 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                 } else {
                     System.out.println("source is not a Component");
                 }
+            } else if (e.getActionCommand().contains("edit")) {
+                if (e.getSource() instanceof Component) {
+                    Window w = findWindow((Component) e.getSource());
+                    createEditCompanyDialog((JFrame) w);
+                } else {
+                    System.out.println("source is not a Component");
+                }
             }
         }
     }
@@ -242,7 +249,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         }
     }
 
-    //TODO
     public void itemStateChanged(ItemEvent e) {
         //...Get information from the item event...
         //...Display it in the text area...
@@ -280,7 +286,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
             final UsersViewDialog dialog = new UsersViewDialog(frame, "Сотрудники", panel);
             dialog.setUsers(company.getId());
             dialog.setControls(panel);
-            dialog.setVisible(true);
+            //dialog.setVisible(true);
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());
         }
@@ -291,6 +297,17 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
             final CompanyDialog dialog = new CompanyDialog(frame, "Информация о компании", new JPanel());
             dialog.setCompany(company.getEmail());
             dialog.setGUI();
+            dialog.setVisible(true);
+        } catch (Exception e) {
+            System.out.println( e.getLocalizedMessage());
+        }
+    }
+
+    protected void createEditCompanyDialog(JFrame frame) {
+        try {
+            final CompanyDialog dialog = new CompanyDialog(frame, "Информация о компании", new JPanel());
+            dialog.setCompany(company.getEmail());
+            dialog.createUserEditDialog();
             dialog.setVisible(true);
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());

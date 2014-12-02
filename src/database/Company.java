@@ -140,5 +140,34 @@ public class Company extends User {
         return true;
     }
 
+    public static Boolean updateUser (Company user) throws SQLException {
+        System.out.println("updateUser User class");
+        Connection con = Database.getConnection();
+        PreparedStatement preparedStatement = null;
+        String query = "UPDATE user SET email=?, password=?, timestamp=?," +
+                "status=?, username=?, country=?, region=?, city=? where id = ?";
+        try {
+            preparedStatement = con.prepareStatement(query);
+            preparedStatement.setString(1,user.getEmail());
+            preparedStatement.setString(2, user.getPassword());
+            preparedStatement.setLong(3, Calendar.getInstance().getTime().getTime());
+            preparedStatement.setInt(4,1);
+            preparedStatement.setString(5, user.getUsername());
+            preparedStatement.setString(6, user.getCountry());
+            preparedStatement.setString(7, user.getRegion());
+            preparedStatement.setString(8, user.getCity());
+            preparedStatement.setLong(9,user.getId());
+            preparedStatement.execute();
+        } catch (SQLException e ) {
+            System.out.println(e.getLocalizedMessage());
+            return false;
+        }catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+            return false;
+        } finally {
+            if (preparedStatement != null) { preparedStatement.close(); }
+        }
+        return true;
+    }
 
 }

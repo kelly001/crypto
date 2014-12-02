@@ -48,4 +48,13 @@ public class CompanyDialog extends CloseButtonDialog {
         //this.setSize(size);
     }
 
+    public void createUserEditDialog() {
+        this.panel.setLayout(new FlowLayout());
+        UserPanel companyPanel = new UserPanel(new User(), (JFrame) frame);
+        companyPanel.setValues(company);
+        this.panel.add(companyPanel);
+        this.pack();
+        this.setContentPane(panel);
+        //this.setSize(size);
+    }
 }

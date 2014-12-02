@@ -73,10 +73,9 @@ class Security {
             if (rootCert!=null) {
                 System.out.println(rootCert);
                 //saveCert(rootCert, "sertmy");
-                File file = new File("files/", "RootCertificate");
-                savePemX509Certificate(rootCert, new FileWriter(file));
-                savePublicKey(RootKP, new FileWriter(new File("files/", "RootPublicKey")));
-                savePrivateKey(RootKP, new FileWriter(new File("files/", "RootPublicKey")));
+                savePemX509Certificate(rootCert, "RootCertificate");
+                savePublicKey(RootKP,"RootPublicKey");
+                savePrivateKey(RootKP,"RootPublicKey");
             }else { System.out.println("Root certificate is null ");}
         } catch (Exception e) {
             System.out.println("Generate root certificate error: " + e.getLocalizedMessage());
@@ -102,8 +101,8 @@ class Security {
             X509Certificate signedCert = generateX509Certificate("CN=Signed Certificate for", signedSerial, rootCert, startDate, nextYear, "SHA1withDSA", UserKP, "BC");
             if (signedCert!=null) {
                 System.out.println(signedCert);
-                savePemX509Certificate(signedCert, new FileWriter("UserCertificate"));
-                savePublicKey(UserKP, new FileWriter("UserKey"));
+                savePemX509Certificate(signedCert,"UserCertificate");
+                savePublicKey(UserKP, "UserKey");
                 return true;
             }else { System.out.println("User certificate is null ");}
         } catch (Exception e) {
@@ -140,9 +139,9 @@ class Security {
                     signedSerial, startDate, nextYear, UserKP);
             if (signedCert!=null) {
                 System.out.println(signedCert);
-                savePemX509Certificate(signedCert, new FileWriter(values.get("filename")));
-                savePublicKey(UserKP, new FileWriter(values.get("filename")+"-key"));
-                savePrivateKey(UserKP, new FileWriter(values.get("filename")+"-privateKey"));
+                savePemX509Certificate(signedCert, values.get("filename"));
+                savePublicKey(UserKP, values.get("filename")+"PublicKey");
+                savePrivateKey(UserKP, values.get("filename")+"PrivateKey");
                 return true;
             }else { System.out.println("User certificate is null ");}
         } catch (Exception e) {
@@ -237,9 +236,10 @@ class Security {
         return null;
     }
 
-    public static boolean savePemX509Certificate(X509Certificate cert, Writer writer) throws NoSuchAlgorithmException, NoSuchProviderException, CertificateEncodingException, SignatureException, InvalidKeyException, IOException
+    public static boolean savePemX509Certificate(X509Certificate cert, String name) throws NoSuchAlgorithmException, NoSuchProviderException, CertificateEncodingException, SignatureException, InvalidKeyException, IOException
     {
-        if(cert!=null && writer!=null)
+        Writer writer = new FileWriter (new File("files/", name));
+        if(cert!=null)
         {
             PEMWriter pemWriter = new PEMWriter(writer);
             pemWriter.writeObject(cert);
@@ -250,9 +250,10 @@ class Security {
         return false;
     }
 
-    public static boolean savePublicKey(KeyPair key, Writer writer) throws NoSuchAlgorithmException, NoSuchProviderException, CertificateEncodingException, SignatureException, InvalidKeyException, IOException
+    public static boolean savePublicKey(KeyPair key, String name) throws NoSuchAlgorithmException, NoSuchProviderException, CertificateEncodingException, SignatureException, InvalidKeyException, IOException
     {
-        if(key!=null && writer!=null)
+        Writer writer = new FileWriter (new File("files/", name));
+        if(key!=null)
         {
             PEMWriter pemWriter = new PEMWriter(writer);
             pemWriter.writeObject(key.getPublic());
@@ -263,9 +264,10 @@ class Security {
         return false;
     }
 
-    public static boolean savePrivateKey(KeyPair key, Writer writer) throws NoSuchAlgorithmException, NoSuchProviderException, CertificateEncodingException, SignatureException, InvalidKeyException, IOException
+    public static boolean savePrivateKey(KeyPair key, String name) throws NoSuchAlgorithmException, NoSuchProviderException, CertificateEncodingException, SignatureException, InvalidKeyException, IOException
     {
-        if(key!=null && writer!=null)
+        Writer writer = new FileWriter (new File("files/", name));
+        if(key!=null)
         {
             PEMWriter pemWriter = new PEMWriter(writer);
             pemWriter.writeObject(key.getPrivate());

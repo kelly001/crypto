@@ -91,12 +91,9 @@ public class CertificateDialog extends OkCancelDialog {
                         }
                     }
                 }
-                frame.setVisible(false);
-                MainFrame new_frame = new MainFrame();
-                new_frame.setCompany(user.getEmail());
-                new_frame.setGUI();
-                new_frame.setVisible(true);
                 dialog.dispose();
+                frame.repaint();
+
             }
         });
         //createControls(panel);

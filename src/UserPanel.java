@@ -29,11 +29,11 @@ public class UserPanel extends FieldPanel {
     JFrame frame;
 
     // Поля организациии
-    protected String[] user_names = {"username", "email", "password"};
     protected String[] company_names = {"username", "email", "password", "department", "city", "region", "country"};
     protected String[] labels = {"Название/Имя пользователя", "Email", "Пароль", "Отделение","Город",
             "Регион", "Страна"};
     protected Map<String, JTextField> controls = new HashMap<String, JTextField>();
+    JButton saveCompanyButton = new JButton("Сохранить");
 
     public UserPanel (User user, JFrame frame) {
         System.out.println("Users view panel");
@@ -64,8 +64,9 @@ public class UserPanel extends FieldPanel {
             controls.put(company_names[i],field);
             this.addField(labels[i], company_names[i], field, true);
         }
-        JButton saveCompanyButton = new JButton("Сохранить");
-        saveCompanyButton.addActionListener(new saveCompanyAction());
+        saveCompanyButton = new JButton("Сохранить");
+        ActionListener action1 = new saveCompanyAction();
+        saveCompanyButton.addActionListener(action1);
         this.addField("", "", saveCompanyButton, false);
     }
 
@@ -88,6 +89,23 @@ public class UserPanel extends FieldPanel {
         this.addField("Статус пользователя", "Статус пользователя", status, true);
     }
 
+    public void setValues(Company user) {
+        if (user != null) {
+            controls.get("username").setText(user.getUsername());
+            controls.get("email").setText(user.getEmail());
+            controls.get("city").setText(user.getCity());
+            controls.get("region").setText(user.getRegion());
+            controls.get("department").setText(user.getDepartment());
+            controls.get("country").setText(user.getCountry());
+            saveCompanyButton.addActionListener(new updateCompanyAction(user));
+            //saveCompanyButton.removeActionListener(action1);
+            this.addGlue();
+            this.repaint();
+
+        }
+    }
+
+
     public class saveUserAction implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -99,7 +117,7 @@ public class UserPanel extends FieldPanel {
                     if (User.newUser(user)){
                         CloseButtonDialog infodialog =
                                 new CloseButtonDialog(frame, "Успех",
-                                        new JLabel("Новая организация создана!"));
+                                        new JLabel("Новый пользователь создан!"));
                         infodialog.setVisible(true);
                         String args[] = {controls.get("email").getText()};
                         frame.dispose();
@@ -125,6 +143,38 @@ public class UserPanel extends FieldPanel {
             user.setDepartment(controls.get("department").getText());
             try {
                 if (Company.newUser(user)){
+                    CloseButtonDialog infodialog =
+                            new CloseButtonDialog(frame, "Успех",
+                                    new JLabel("Новая организация создана!"));
+
+                    String args[] = {controls.get("email").getText()};
+                    frame.dispose();
+                    MainFrame.main(args);
+                }
+
+            } catch (Exception exc) {
+                System.out.println("saving user exception " + exc.getLocalizedMessage());
+            }
+        }
+    }
+
+    public class updateCompanyAction implements ActionListener {
+        private Company user;
+        updateCompanyAction(Company user) {
+            this.user = user;
+        }
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            user.setUsername(controls.get("username").getText());
+            user.setEmail(controls.get("email").getText());
+            user.setPassword(controls.get("password").getText());
+            user.setCountry(controls.get("country").getText());
+            user.setRegion(controls.get("region").getText());
+            user.setCity(controls.get("city").getText());
+            user.setDepartment(controls.get("department").getText());
+            try {
+                if (Company.updateUser(user)){
                     CloseButtonDialog infodialog =
                             new CloseButtonDialog(frame, "Успех",
                                     new JLabel("Новая организация создана!"));
