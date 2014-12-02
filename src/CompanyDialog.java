@@ -21,9 +21,12 @@ public class CompanyDialog extends CloseButtonDialog {
     protected String[] labels = {"Название", "Отделение", "Имя пользователя", "Email", "Город",
             "Регион", "Страна"};
     protected ArrayList<JTextField> controls = new ArrayList<JTextField>();
+    protected JPanel panel;
 
-    public CompanyDialog(Frame parent, String title, FieldPanel panel) {
-        super(parent, title,panel);
+    public CompanyDialog(Frame parent, String title, JPanel panel) {
+        super(parent, title, panel);
+        this.panel = panel;
+        this.frame = parent;
     }
 
     public void setCompany(String name) {
@@ -35,33 +38,11 @@ public class CompanyDialog extends CloseButtonDialog {
         }
     }
 
-    public void setGUI(Frame parent, FieldPanel panel) {
+    public void setGUI() {
         //FieldPanel panel = new FieldPanel();
-        if (company == null) {
-            for( String label: labels) {
-                JTextField field = new JTextField(label);
-                field.setName(label);
-                field.setColumns(20);
-                field.setEditable(true);
-                controls.add(field);
-                panel.addField(label, label, field, true);
-            }
-        } else {
-            final JLabel label = new JLabel();
-            String companyLabel = "Организация ООО\""+ company.getUsername() + "\"";
-            panel.addField(companyLabel, "label", label, true);
-        }
-
-        final JButton saveCompanyButton = new JButton("Сохранить");
-        saveCompanyButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-        panel.addField("", "", saveCompanyButton, false);
-
-        panel.addGlue();
+        this.panel.setLayout(new FlowLayout());
+        FieldPanel companyPanel = new UserPanel(company, (JFrame) frame);
+        this.panel.add(companyPanel);
         this.pack();
         this.setContentPane(panel);
         //this.setSize(size);

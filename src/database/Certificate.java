@@ -144,6 +144,7 @@ public class Certificate {
     public String getType() {return  this.type; }
     public String getComment() {return this.comment; }
     public User getOwner() {return this.owner;}
+    public String getCountry() {return this.country;}
 
     public String getInfo() {
         String label = "Сертификат пользователя " + this.getUsername() + " от " + this.getTimestamp() + " числа";
@@ -188,43 +189,46 @@ public class Certificate {
         return certificates;
     }
 
-    public static ArrayList<Certificate> loadByUser(Long user_id) throws SQLException {
+    public static ArrayList<Certificate> loadByUser(Long user_id){
         System.out.println("loadByUser Certificate");
         ArrayList<Certificate> certificates = new ArrayList<Certificate>();
-
-        Connection con = Database.getConnection();
-        PreparedStatement preparedStatement = null;
-        // select by user_id
-        String query = "select * from certificate where user_id = ?";
         try {
-            preparedStatement = con.prepareStatement(query);
-            preparedStatement.setLong(1, user_id);
-            ResultSet rs = preparedStatement.executeQuery();
+            Connection con = Database.getConnection();
+            PreparedStatement preparedStatement = null;
+            // select by user_id
+            String query = "select * from certificate where user_id = ?";
+            try {
+                preparedStatement = con.prepareStatement(query);
+                preparedStatement.setLong(1, user_id);
+                ResultSet rs = preparedStatement.executeQuery();
 
-            while (rs.next()) {
-                //Timestamp time = new Timestamp(rs.getLong("timestamp"));
-                    Timestamp time = new Timestamp(rs.getLong("timestamp"));
-                    Certificate cert = new Certificate();
-                    cert.setId(rs.getLong("id"));
-                    cert.setEmail(rs.getString("email"));
-                    cert.setUsername(rs.getString("username"));
-                    cert.setFilename(rs.getString("filename"));
-                    cert.setDepartment(rs.getString("department"));
-                    cert.setComment(rs.getString("comment"));
-                    cert.setLocality(rs.getString("locality"));
-                    cert.setState(rs.getString("state"));
-                    cert.setOrganization(rs.getString("organization"));
-                    cert.setStatus(rs.getBoolean("status"));
-                    cert.setTimestamp(time);
-                    //cert.setOwner(rs.getLong("user_id"));
-                    certificates.add(cert);
+                while (rs.next()) {
+                    //Timestamp time = new Timestamp(rs.getLong("timestamp"));
+                        Timestamp time = new Timestamp(rs.getLong("timestamp"));
+                        Certificate cert = new Certificate();
+                        cert.setId(rs.getLong("id"));
+                        cert.setEmail(rs.getString("email"));
+                        cert.setUsername(rs.getString("username"));
+                        cert.setFilename(rs.getString("filename"));
+                        cert.setDepartment(rs.getString("department"));
+                        cert.setComment(rs.getString("comment"));
+                        cert.setLocality(rs.getString("locality"));
+                        cert.setState(rs.getString("state"));
+                        cert.setOrganization(rs.getString("organization"));
+                        cert.setStatus(rs.getBoolean("status"));
+                        cert.setTimestamp(time);
+                        //cert.setOwner(rs.getLong("user_id"));
+                        certificates.add(cert);
+                }
+            } catch (SQLException e ) {
+                System.out.println("loadByUser Certificate SQLException: " + e.getLocalizedMessage());
+            }catch (Exception e) {
+                System.out.println("loadByUser Certificate Exception: " + e.getLocalizedMessage());
+            } finally {
+                if (preparedStatement != null) { preparedStatement.close(); }
             }
-        } catch (SQLException e ) {
-            System.out.println("loadByUser Certificate SQLException: " + e.getLocalizedMessage());
-        }catch (Exception e) {
-            System.out.println("loadByUser Certificate Exception: " + e.getLocalizedMessage());
-        } finally {
-            if (preparedStatement != null) { preparedStatement.close(); }
+        }catch (SQLException sqlexc) {
+            System.out.println("SQLExCeption load certificate class " + sqlexc.getLocalizedMessage());
         }
         return certificates;
     }

@@ -73,9 +73,10 @@ class Security {
             if (rootCert!=null) {
                 System.out.println(rootCert);
                 //saveCert(rootCert, "sertmy");
-                savePemX509Certificate(rootCert, new FileWriter("RootCertificate"));
-                savePublicKey(RootKP, new FileWriter("RootPublicKey"));
-                savePrivateKey(RootKP, new FileWriter("RootPrivateKey"));
+                File file = new File("files/", "RootCertificate");
+                savePemX509Certificate(rootCert, new FileWriter(file));
+                savePublicKey(RootKP, new FileWriter(new File("files/", "RootPublicKey")));
+                savePrivateKey(RootKP, new FileWriter(new File("files/", "RootPublicKey")));
             }else { System.out.println("Root certificate is null ");}
         } catch (Exception e) {
             System.out.println("Generate root certificate error: " + e.getLocalizedMessage());
@@ -139,9 +140,9 @@ class Security {
                     signedSerial, startDate, nextYear, UserKP);
             if (signedCert!=null) {
                 System.out.println(signedCert);
-                savePemX509Certificate(signedCert, new FileWriter("UserCertificate"));
-                savePublicKey(UserKP, new FileWriter("UserKey"));
-                savePrivateKey(UserKP, new FileWriter("UserPrivateKey"));
+                savePemX509Certificate(signedCert, new FileWriter(values.get("filename")));
+                savePublicKey(UserKP, new FileWriter(values.get("filename")+"-key"));
+                savePrivateKey(UserKP, new FileWriter(values.get("filename")+"-privateKey"));
                 return true;
             }else { System.out.println("User certificate is null ");}
         } catch (Exception e) {

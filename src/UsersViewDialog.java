@@ -96,7 +96,7 @@ public class UsersViewDialog extends CloseButtonDialog {
             try {
                 final CertificateDialog dialog =
                         new CertificateDialog(frame,cert, user);
-                dialog.setVisible(true);
+                //dialog.setVisible(true);
             } catch (Exception e1) {
                 System.out.println( e1.getLocalizedMessage());
             }

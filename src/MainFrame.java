@@ -288,10 +288,9 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
     protected void createCompanyDialog(JFrame frame) {
         try {
-            final FieldPanel panel = new FieldPanel();
-            final CompanyDialog dialog = new CompanyDialog(frame, "Информация о компании", panel);
+            final CompanyDialog dialog = new CompanyDialog(frame, "Информация о компании", new JPanel());
             dialog.setCompany(company.getEmail());
-            dialog.setGUI(frame, panel);
+            dialog.setGUI();
             dialog.setVisible(true);
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());

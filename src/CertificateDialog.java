@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.Frame;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.sql.Time;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.exception.WWRuntimeException;
 import database.Certificate;
 import database.Company;
+import database.Employer;
 import database.User;
 
 public class CertificateDialog extends OkCancelDialog {
@@ -33,15 +35,15 @@ public class CertificateDialog extends OkCancelDialog {
         super(parent, title, okTitle);
         this.frame = parent;
         //final Map<String, String> values = new HashMap<String, String>();
-        if (certificate != null) {
-            values.put("username", certificate.getUsername());
-            values.put("organization", certificate.getOrganization());
-        }
+
         System.out.println("constructor");
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         succeeded = false;
         final OkCancelDialog dialog = this;
         final CertificatePanel panel = new CertificatePanel(parent);
+        if (certificate != null) {
+            panel.setValues(certificate);
+        }
         this.addWindowListener(new WindowAdapter()
         {
             public void windowClosed(WindowEvent we)
@@ -50,36 +52,51 @@ public class CertificateDialog extends OkCancelDialog {
                 {
                     dialog.pressOK();
                     Security security = new Security();
-                    if (user instanceof Company) {
-                        panel.saveRoot(user.getId().toString());
-                        X509Certificate rootcert = security.generateRootCertificate();
-
-                    } else {
-                        //todo
-                        try {
-                            Certificate.loadByUser(user.getId());
-                        } catch (Exception exc) {
-                            System.out.print("Load root certificate by user error " + exc.getLocalizedMessage());
+                    String id = null;
+                    try{
+                        id = user.getId().toString();
+                        /*
+                        //TODO load user's company from class
+                        //Certificate.loadByUser((Employer) user.getCompany().getId());
+                        User rootCompany =  User.loadByName(panel.getValues().get("organization"));
+                        Certificate rootCert = rootCompany.getValidCertificate();
+                        //get private key of organization
+                        PrivateKey CAkey = security.readPrivateKey(rootCert.getFilename());
+                        System.out.println(CAkey);
+                        */
+                    } catch (NullPointerException ne){
+                        System.out.println( "Get user id Null exception: " + ne.getLocalizedMessage());
+                        id = User.newUserId(user).toString();
+                    } catch (Exception e){
+                        System.out.print(e.getLocalizedMessage());
+                    } finally {
+                        if (user instanceof Company) {
+                            panel.saveRoot(id);
+                            X509Certificate rootcert = security.generateRootCertificate();
+                        } else {
+                            panel.save(id);
+                            try {
+                                //TODO load user's company from class
+                                //Certificate.loadByUser((Employer) user.getCompany().getId());
+                                User rootCompany = User.loadByName(panel.getValues().get("organization"));
+                                Certificate rootCert = rootCompany.getValidCertificate();
+                                //get private key of organization
+                                PrivateKey CAkey = security.readPrivateKey(rootCert.getFilename());
+                                System.out.println(CAkey);
+                            } catch (Exception e) {
+                                System.out.println("Error to load root certificate: " + e.getLocalizedMessage());
+                                System.out.println("User saved, certificate saved to db, closing dialog..");
+                            }
+                            security.generateUserCertificate(panel.getValues());
                         }
-                        //get private org ky
-                        //PrivateKey CAkey security.readPrivateKey(certificate.getFilename();
-                        //System.out.println(CAkey);
-
-                        //security.generateUserCertificate(rootcert);
-                        try {
-                            panel.save(user.getId().toString());
-                        } catch (NullPointerException exc) {
-                            System.out.println( "Get user id Null exception: " + exc.getLocalizedMessage());
-                            panel.save("0");
-                        }
-                        security.generateUserCertificate(panel.getValues());
-
                     }
-                    dialog.dispose();
-                } else
-                {
-                    dispose();
                 }
+                frame.setVisible(false);
+                MainFrame new_frame = new MainFrame();
+                new_frame.setCompany(user.getEmail());
+                new_frame.setGUI();
+                new_frame.setVisible(true);
+                dialog.dispose();
             }
         });
         //createControls(panel);
@@ -89,6 +106,7 @@ public class CertificateDialog extends OkCancelDialog {
         dialog.setVisible(true);
         logger.log(Level.FINE, String.valueOf(dialog.isOkPressed()));
     }
+
 
     /*public class windowListener extends WindowAdapter{
         public void windowClosed(WindowEvent we){

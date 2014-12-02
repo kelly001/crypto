@@ -30,11 +30,8 @@ public class User {
         java.util.Date now = Calendar.getInstance().getTime();
         //java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
         this.timestamp = new Timestamp(now.getTime());
-        try {
             this.certificates = Certificate.loadByUser(this.id);
             System.out.println("loaded certificates in constructor " + this.certificates.size());
-        } catch (SQLException e)
-        { System.out.println("Load certficates SQLException in User constructor " + e.getLocalizedMessage());}
         //this.keys = new ArrayList<Key>();
     }
 
@@ -46,10 +43,7 @@ public class User {
         this.username = username;
         this.status = status;
         this.timestamp = time;
-        try {
             this.certificates = Certificate.loadByUser(this.id);
-        } catch (SQLException e)
-        { System.out.println("Load certficates SQLException in User constructor " + e.getLocalizedMessage());}
     }
 
     public void setId(Long id) {
@@ -110,6 +104,49 @@ public class User {
     }
     public ArrayList<Key> keys() {
         return keys;
+    }
+
+    public Certificate getValidCertificate() {
+        Certificate cert = null;
+        try {
+            Connection con = Database.getConnection();
+            PreparedStatement preparedStatement = null;
+            // select by user_id
+            String query = "select * from certificate where user_id = ? and status = ?";
+            try {
+                preparedStatement = con.prepareStatement(query);
+                preparedStatement.setLong(1, this.id);
+                preparedStatement.setBoolean(2,true);
+                ResultSet rs = preparedStatement.executeQuery();
+
+                while (rs.next()) {
+                    //Timestamp time = new Timestamp(rs.getLong("timestamp"));
+                    Timestamp time = new Timestamp(rs.getLong("timestamp"));
+                    cert = new Certificate();
+                    cert.setId(rs.getLong("id"));
+                    cert.setEmail(rs.getString("email"));
+                    cert.setUsername(rs.getString("username"));
+                    cert.setFilename(rs.getString("filename"));
+                    cert.setDepartment(rs.getString("department"));
+                    cert.setComment(rs.getString("comment"));
+                    cert.setLocality(rs.getString("locality"));
+                    cert.setState(rs.getString("state"));
+                    cert.setOrganization(rs.getString("organization"));
+                    cert.setStatus(rs.getBoolean("status"));
+                    cert.setTimestamp(time);
+                    cert.setOwner(rs.getLong("user_id"));
+                }
+            } catch (SQLException e ) {
+                System.out.println("getValidCertificate SQLException: " + e.getLocalizedMessage());
+            }catch (Exception e) {
+                System.out.println("getValidCertificate Exception: " + e.getLocalizedMessage());
+            } finally {
+                if (preparedStatement != null) { preparedStatement.close(); }
+            }
+        }catch (SQLException sqlexc) {
+            System.out.println("SQLExCeption load certificate class " + sqlexc.getLocalizedMessage());
+        }
+        return cert;
     }
 
     public static ArrayList<User> loadUsers()
@@ -260,6 +297,44 @@ public class User {
             if (preparedStatement != null) { preparedStatement.close(); }
         }
         return true;
+    }
+
+    public static Long newUserId (User user) {
+        System.out.println("newUser User class return long");
+        Long risultat = null;
+        try {
+            Connection con = Database.getConnection();
+            PreparedStatement preparedStatement = null;
+            String query = "insert into USER(id, type, email, password, timestamp," +
+                    "status, username) values(?,?,?,?,?,?,?)";
+            try {
+                preparedStatement = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                preparedStatement.setNull(1, 0);
+                preparedStatement.setInt(2, 2);
+                preparedStatement.setString(3, user.getEmail());
+                preparedStatement.setString(4, user.getPassword());
+                preparedStatement.setLong(5, Calendar.getInstance().getTime().getTime());
+                preparedStatement.setInt(6, 1);
+                preparedStatement.setString(7, user.getUsername());
+                preparedStatement.execute();
+
+                ResultSet rs = preparedStatement.getGeneratedKeys();
+                if (rs.next()){
+                    risultat=rs.getLong(1);
+                }
+            } catch (SQLException e) {
+                System.out.println(e.getLocalizedMessage());
+            } catch (Exception e) {
+                System.out.println(e.getLocalizedMessage());
+            } finally {
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+            }
+        }catch (SQLException sqlexc) {
+            System.out.println("SQLExCeption newUser User class " + sqlexc.getLocalizedMessage());
+        }
+        return risultat;
     }
 
     public static Boolean newUser (User user) throws SQLException {

@@ -51,7 +51,7 @@ public class UserPanel extends FieldPanel {
     public void setControls() {
         CloseButtonDialog infodialog =
                 new CloseButtonDialog(frame, "Приветствие",
-                        new JLabel("Организации с таким логином не найдено, создайте новую"));
+                        new JLabel("Cоздайте новую организацию!"));
         infodialog.setVisible(true);
         final JLabel label = new JLabel();
         String companyLabel = "Новая организация";

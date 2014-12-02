@@ -52,6 +52,20 @@ public class CertificatePanel extends FieldPanel {
        logger.log(Level.FINE, "create Controls");
     }
 
+
+    public void setValues(Certificate certificate) {
+        if (certificate != null) {
+            controls.get("username").setText(certificate.getUsername());
+            controls.get("organization").setText(certificate.getOrganization());
+            controls.get("email").setText(certificate.getEmail());
+            controls.get("filename").setText(certificate.getFilename());
+            controls.get("state").setText(certificate.getState());
+            controls.get("locality").setText(certificate.getLocality());
+            controls.get("department").setText(certificate.getDepartment());
+            controls.get("country").setText(certificate.getCountry());
+        }
+    }
+
     public boolean save (String user) {
         System.out.println("panel save");
         HashMap<String,String> values = new HashMap<String, String>(){};
@@ -60,6 +74,7 @@ public class CertificatePanel extends FieldPanel {
         }
         values.put("user_id",user);
         values.put("type","client, email, objsign");
+        values.put("comment","Certificate of " + values.get("username"));
         try {
             Certificate.newUser(values);
             return true;
