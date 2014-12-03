@@ -278,14 +278,15 @@ public class User {
         System.out.println("saveUser User class");
         Connection con = Database.getConnection();
         PreparedStatement preparedStatement = null;
-        String query = "UPDATE user SET email =?, timestamp=?, username=? WHERE id=?";
+        String query = "UPDATE user SET email =?, timestamp=?, username=?, password=? WHERE id=?";
         try {
             preparedStatement = con.prepareStatement(query);
-            preparedStatement.setLong(4,user.getId());
+            preparedStatement.setLong(5,user.getId());
             preparedStatement.setString(1,user.getEmail());
             //preparedStatement.setString(4, user.getPassword());
             preparedStatement.setLong(2, Calendar.getInstance().getTime().getTime());
             preparedStatement.setString(3, user.getUsername());
+            preparedStatement.setString(4, user.getPassword());
             preparedStatement.execute();
         } catch (SQLException e ) {
             System.out.println(e.getLocalizedMessage());

@@ -57,8 +57,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         //Build the first menu.
         menu = new JMenu("Меню");
         menu.setMnemonic(KeyEvent.VK_F1);
-        menu.getAccessibleContext().setAccessibleDescription(
-                "The only menu in this program that has menu items");
         //addMenuItem("Сертификаты", this, "cert", menu);
         //addMenuItem("Организация", this, "org", menu);
         //addMenuItem("Ключи", this,"key", menu);
@@ -169,71 +167,49 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         System.out.println(e.getActionCommand());
 
         //check menu id
-        if (e.getActionCommand().equals("main")) {
-            String args[] = {company.getEmail()};
-            MainFrame.main(args);
-            Object item = e.getSource();
-            if (item instanceof Component) {
-                Window w = findWindow((Component) item);
+        if (e.getSource() instanceof Component) {
+            if (e.getActionCommand().equals("main")) {
+                String args[] = {company.getEmail()};
+                MainFrame.main(args);
+                Window w = findWindow((Component)e.getSource());
                 w.dispose();
-            } else {
-                System.out.println("source is not a Component");
-            }
-        } else if (e.getActionCommand().equals("exit")) {
-            System.exit(1);
-        } else if (e.getActionCommand().equals("logout")) {
-            // start login frame
-            LoginFrame new_frame = new LoginFrame("Авторизация");
-            new_frame.setVisible(true);
-            //find main frame
-            Object item = e.getSource();
-            if (item instanceof Component) {
-                Window w = findWindow((Component) item);
-                w.dispose();
-            } else {
-                System.out.println("source is not a Component");
-            }
-        } else if (e.getActionCommand().contains("certificate")) {
-            if (e.getActionCommand().contains("add") || e.getActionCommand().equals("certificate-update")) {
-                //find main frame
-                Object item = e.getSource();
-                if (item instanceof Component) {
-                    Window w = findWindow((Component) item);
+            } else if (e.getActionCommand().equals("exit")) {
+                System.exit(1);
+            } else if (e.getActionCommand().equals("logout")) {
+                // start login frame
+                LoginFrame new_frame = new LoginFrame("Авторизация");
+                new_frame.setVisible(true);
+                findWindow((Component) e.getSource()).dispose();
+            } else if (e.getActionCommand().contains("certificate")) {
+                if (e.getActionCommand().contains("add") || e.getActionCommand().equals("certificate-update")) {
+                    //find main
+                    Window w = findWindow((Component) e.getSource());
                     // TODO сделать передачу сертификата, id сертификата лучше
                     createCertificateDialog((JFrame) w);
-                } else {
-                    System.out.println("source is not a Component");
                 }
-            }
-        } else if(e.getActionCommand().contains("delete")){
-               System.out.println("delete");
-        } else if (e.getActionCommand().equals("users")) {
-                System.out.println("users menu");
-                //set new FRAMe or DIALOG??
-                Object item = e.getSource();
-                if (item instanceof Component) {
-                    Window w = findWindow((Component) item);
-                    createUsersDialog((JFrame) w);
-                } else {
-                    System.out.println("source is not a Component");
-                }
-        } else if (e.getActionCommand().contains("company")) {
-            if (e.getActionCommand().contains("view")) {
-                Object item = e.getSource();
-                if (item instanceof Component) {
-                    Window w = findWindow((Component) item);
-                    createCompanyDialog((JFrame) w);
-                } else {
-                    System.out.println("source is not a Component");
-                }
-            } else if (e.getActionCommand().contains("edit")) {
-                if (e.getSource() instanceof Component) {
+            } else if (e.getActionCommand().equals("users")) {
+                    System.out.println("users menu");
                     Window w = findWindow((Component) e.getSource());
-                    createEditCompanyDialog((JFrame) w);
-                } else {
-                    System.out.println("source is not a Component");
+                    createUsersDialog((JFrame) w);
+            } else if (e.getActionCommand().contains("company")) {
+                if (e.getActionCommand().contains("view")) {
+                        Window w = findWindow((Component) e.getSource());
+                        createCompanyDialog((JFrame) w);
+                } else if (e.getActionCommand().contains("edit")) {
+                        Window w = findWindow((Component) e.getSource());
+                        createEditCompanyDialog((JFrame) w);
+                }
+            } else if (e.getActionCommand().contains("user")) {
+                if (e.getActionCommand().contains("add")){
+                    Window w = findWindow((Component) e.getSource());
+                    NewUserDialog((JFrame) w);
+                }
+                if (e.getActionCommand().contains("delete")) {
+                    //TODO get user's id
                 }
             }
+        }else {
+            System.out.println("source is not a Component");
         }
     }
 
@@ -286,7 +262,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
             final UsersViewDialog dialog = new UsersViewDialog(frame, "Сотрудники", panel);
             dialog.setUsers(company.getId());
             dialog.setControls(panel);
-            //dialog.setVisible(true);
+            dialog.setVisible(true);
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());
         }
@@ -307,7 +283,27 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         try {
             final CompanyDialog dialog = new CompanyDialog(frame, "Информация о компании", new JPanel());
             dialog.setCompany(company.getEmail());
-            dialog.createUserEditDialog();
+            dialog.createCompanyEditDialog();
+            dialog.setVisible(true);
+        } catch (Exception e) {
+            System.out.println( e.getLocalizedMessage());
+        }
+    }
+
+    protected void EditUserDialog(JFrame frame) {
+        try {
+            final CompanyDialog dialog = new CompanyDialog(frame, "Пользователи", new JPanel());
+            dialog.createUserEditDialog(company);
+            dialog.setVisible(true);
+        } catch (Exception e) {
+            System.out.println( e.getLocalizedMessage());
+        }
+    }
+
+    protected void NewUserDialog(JFrame frame) {
+        try {
+            final CompanyDialog dialog = new CompanyDialog(frame, "Пользователи", new JPanel());
+            dialog.createNewUserDialog();
             dialog.setVisible(true);
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());
