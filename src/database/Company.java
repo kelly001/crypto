@@ -68,6 +68,9 @@ public class Company extends User {
                     user.setPassword(password);
                     user.setEmail(result.getString("email"));
                     user.setStatus(result.getBoolean("status"));
+                    user.setDepartment(result.getString("department"));
+                    user.setCity(result.getString("city"));
+                    user.setRegion(result.getString("region"));
                 }
             }
         } catch (SQLException e ) {

@@ -96,7 +96,6 @@ public class UsersViewDialog extends CloseButtonDialog {
             try {
                 final CertificateDialog dialog =
                         new CertificateDialog(frame,cert, user);
-
             } catch (Exception e1) {
                 System.out.println( e1.getLocalizedMessage());
             }

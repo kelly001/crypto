@@ -4,20 +4,14 @@
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Field;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.teacode.swing.SmartTextArea;
 import com.teacode.swing.component.FieldPanel;
 
 import database.Certificate;
-import database.Company;
 import database.User;
 
 public class MainPanel extends JPanel{
@@ -35,7 +29,7 @@ public class MainPanel extends JPanel{
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        FieldPanel companyPanel = new UserPanel(user, frame);
+        FieldPanel companyPanel = new CompanyPanel(user, frame);
         c.gridwidth = 3;
         c.gridx = 0;
         c.gridy = 0;

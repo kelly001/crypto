@@ -20,6 +20,7 @@ public class LoginFrame extends JFrame{
     private JFrame frame;
     private JLabel infolabel;
     public LoginDialog dialog;
+    public CompanyDialog RegistrationDialog;
     Dimension size = new Dimension(240, 160);
 
     public LoginFrame(String name) {
@@ -69,6 +70,18 @@ public class LoginFrame extends JFrame{
         });
         panel.addField("", "Авторизация",login, true);
         JButton registration = new JButton("Регистрация");
+        registration.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    RegistrationDialog = new CompanyDialog(frame, "Пользователи", new JPanel());
+                    RegistrationDialog.createNewUserDialog();
+                    RegistrationDialog.setVisible(true);
+                } catch (Exception exc) {
+                    System.out.println( exc.getLocalizedMessage());
+                }
+            }
+        });
         panel.addField("", "Регистрация",registration, true);
         panel.addGlue();
         this.setContentPane(panel);

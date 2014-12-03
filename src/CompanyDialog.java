@@ -3,11 +3,13 @@ import com.teacode.swing.dialog.CloseButtonDialog;
 import database.Company;
 import database.User;
 
+import javax.jws.soap.SOAPBinding;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -41,20 +43,42 @@ public class CompanyDialog extends CloseButtonDialog {
     public void setGUI() {
         //FieldPanel panel = new FieldPanel();
         this.panel.setLayout(new FlowLayout());
-        FieldPanel companyPanel = new UserPanel(company, (JFrame) frame);
+        FieldPanel companyPanel = new CompanyPanel(company, (JFrame) frame);
         this.panel.add(companyPanel);
         this.pack();
         this.setContentPane(panel);
         //this.setSize(size);
     }
 
-    public void createUserEditDialog() {
+    public void createCompanyEditDialog() {
         this.panel.setLayout(new FlowLayout());
-        UserPanel companyPanel = new UserPanel(new User(), (JFrame) frame);
+        CompanyPanel companyPanel = new CompanyPanel(new User(), (JFrame) frame);
         companyPanel.setValues(company);
         this.panel.add(companyPanel);
         this.pack();
         this.setContentPane(panel);
         //this.setSize(size);
     }
+
+    public void createUserEditDialog(User user) {
+        this.panel.setLayout(new FlowLayout());
+        UserPanel panel = new UserPanel((JFrame) frame);
+        panel.setControls();
+        panel.setValues(user);
+        this.panel.add(panel);
+        this.pack();
+        this.setContentPane(panel);
+        //this.setSize(size);
+    }
+
+    public void createNewUserDialog() {
+        this.panel.setLayout(new FlowLayout());
+        UserPanel panel = new UserPanel((JFrame) frame);
+        panel.setControls();
+        this.panel.add(panel);
+        this.pack();
+        this.setContentPane(panel);
+        //this.setSize(size);
+    }
+
 }
