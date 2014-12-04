@@ -1,5 +1,7 @@
 import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.dialog.CloseButtonDialog;
+import database.Company;
+import database.Employer;
 import database.User;
 
 import javax.swing.*;
@@ -10,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class UserPanel2 extends FieldPanel {
-    private final User user;
+    private User user;
     // Поля
     private JTextField username;
     private JTextField email;
@@ -42,18 +44,27 @@ public class UserPanel2 extends FieldPanel {
     public void setValues(User user) {
         if (user != null) {
             username.setText(user.getUsername());
+            username.setEditable(true);
             email.setText(user.getEmail());
+            email.setEditable(true);
             this.addGlue();
             this.repaint();
         }
     }
 
+    /*public void setCompany(Company company) {
+        if (user instanceof Employer)
+            user = new Employer();
+            user.setCompany(company);
+    }*/
+
     public void save(){
         user.setUsername(username.getText());
         user.setEmail(email.getText());
+        //сделть отдельным окном смену пароля для пользователя с валидацией/подтверждением пароля
         //user.setPassword(password.getText());    todo where is password field????
         try {
-            if (User.newUser(user)){
+            if (Employer.newUser(user)){
                 CloseButtonDialog infodialog =
                         new CloseButtonDialog(null, "Успех",
                                 new JLabel("Новый пользователь создан!"));

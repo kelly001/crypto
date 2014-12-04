@@ -17,12 +17,12 @@ public class CompanyDialog2 extends CloseButtonDialog {
     protected Frame frame;
     protected JPanel panel;
 
-    public CompanyDialog2(Frame parent, String title, User user) {
-        super(parent, title, getPanel(user));
+    public CompanyDialog2(Frame parent, String title, User user, Company company) {
+        super(parent, title, getPanel(user, company));
         this.frame = parent;
     }
 
-    public static JPanel getPanel(User user) {
+    public static JPanel getPanel(User user, Company company) {
         //FieldPanel panel = new FieldPanel();
         if (user instanceof Company){
             CompanyPanel companyPanel = new CompanyPanel(user, null); // TODO лучше избавиться от передачи в панель диалога.
@@ -30,6 +30,7 @@ public class CompanyDialog2 extends CloseButtonDialog {
             return companyPanel;
         } else  {
             UserPanel2 panel = new UserPanel2(user); //лучше избавиться от передачи в панель диалога.
+            panel.setValues(user);
             //видишь не однородность. Не единообразно передаешь пользователя в панель.
             return panel;
         }

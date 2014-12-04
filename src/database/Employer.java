@@ -124,7 +124,7 @@ public class Employer extends User {
             preparedStatement.setNull(1,0);
             preparedStatement.setInt(2,2);
             preparedStatement.setString(3,user.getEmail());
-            preparedStatement.setString(4, user.getPassword());
+            preparedStatement.setString(4, User.getSecurePassword(user.getPassword()));
             preparedStatement.setLong(5, Calendar.getInstance().getTime().getTime());
             preparedStatement.setInt(6,1);
             preparedStatement.setString(7, user.getUsername());

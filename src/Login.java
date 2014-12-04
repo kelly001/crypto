@@ -1,7 +1,7 @@
 /**
  * Created by new_name on 15.10.2014.
  */
-import com.mysql.jdbc.StringUtils;
+
 import database.Company;
 import database.Employer;
 import database.User;
@@ -13,7 +13,9 @@ public class Login {
         // hardcoded username and password
         try {
             user = User.loadByEmail(username);
-            if (user != null &&  user.getPassword().equals(password)) {
+            System.out.println(User.getSecurePassword(password));
+            System.out.println(user.getPassword());
+            if (user != null &&  user.getPassword().equals(User.getSecurePassword(password))) {
                 return true;
             }/* else {
                 user = Employer.loadByEmail(username);
@@ -38,5 +40,7 @@ public class Login {
     public Long getUser() {
         return user.getId();
     }
+
+
 
 }

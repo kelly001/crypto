@@ -3,6 +3,7 @@ import com.teacode.swing.dialog.CloseButtonDialog;
 import com.teacode.swing.dialog.OkCancelDialog;
 import database.Certificate;
 import database.Company;
+import database.Employer;
 import database.User;
 
 import javax.swing.*;
@@ -306,6 +307,16 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         try {
             final CompanyDialog dialog = new CompanyDialog(frame, "Пользователи", new JPanel());
             dialog.createNewUserDialog((Company) company);
+            dialog.setVisible(true);
+        } catch (Exception e) {
+            System.out.println( e.getLocalizedMessage());
+        }
+    }
+
+    protected void NewUserDialog2(JFrame frame) {
+        try {
+            final CompanyDialog2 dialog = new CompanyDialog2(frame, "Пользователи", new Employer(),(Company)company);
+            //dialog.createNewUserDialog((Company) company);
             dialog.setVisible(true);
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());

@@ -1,6 +1,10 @@
 package database;
 
 import javax.jws.soap.SOAPBinding;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.security.cert.CertificateEncodingException;
 import java.sql.*;
@@ -20,6 +24,9 @@ public class User {
 
     public User() {
         this.type=1;
+        this.email = "";
+        this.password = "";
+        this.username = "";
         this.status = true;
         java.util.Date now = Calendar.getInstance().getTime();
         this.timestamp = new Timestamp(now.getTime());
@@ -313,7 +320,7 @@ public class User {
                 preparedStatement.setNull(1, 0);
                 preparedStatement.setInt(2, 2);
                 preparedStatement.setString(3, user.getEmail());
-                preparedStatement.setString(4, user.getPassword());
+                preparedStatement.setString(4, getSecurePassword(user.getPassword()));
                 preparedStatement.setLong(5, Calendar.getInstance().getTime().getTime());
                 preparedStatement.setInt(6, 1);
                 preparedStatement.setString(7, user.getUsername());
@@ -349,7 +356,7 @@ public class User {
             preparedStatement.setNull(1,0);
             preparedStatement.setInt(2,2);
             preparedStatement.setString(3,user.getEmail());
-            preparedStatement.setString(4, user.getPassword());
+            preparedStatement.setString(4, getSecurePassword(user.getPassword()));
             preparedStatement.setLong(5, Calendar.getInstance().getTime().getTime());
             preparedStatement.setInt(6,1);
             preparedStatement.setString(7, user.getUsername());
@@ -366,5 +373,51 @@ public class User {
         return true;
     }
 
+    //Secure password
+
+    public static String getSecurePassword(String passwordToHash)
+    {
+        String generatedPassword = null;
+        try {
+            // Create MessageDigest instance for MD5
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            //Add password bytes to digest
+            md.update(getSalt().getBytes());
+            //Get the hash's bytes
+            byte[] bytes = md.digest(passwordToHash.getBytes());
+            //This bytes[] has bytes in decimal format;
+            //Convert it to hexadecimal format
+            StringBuilder sb = new StringBuilder();
+            for(int i=0; i< bytes.length ;i++)
+            {
+                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+            }
+            //Get complete hashed password in hex format
+            generatedPassword = sb.toString();
+        }
+        catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return generatedPassword;
+    }
+
+    //Add salt
+    public static String getSalt()
+    {
+        return "securesalt123!!!!!!";
+        /*
+        //Create array for salt
+        byte[] salt = new byte[16];
+        try {
+            //Always use a SecureRandom generator
+            SecureRandom sr = SecureRandom.getInstance("SHA1PRNG", "SUN");
+            //Get a random salt
+            sr.nextBytes(salt);
+        } catch (Exception e) {
+            System.out.println("getSalt exception: " + e.getLocalizedMessage());
+        }
+        return salt.toString();
+        */
+    }
 
 }
