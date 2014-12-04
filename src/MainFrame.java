@@ -279,6 +279,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         }
     }
 
+
+
     protected void createEditCompanyDialog(JFrame frame) {
         try {
             final CompanyDialog dialog = new CompanyDialog(frame, "Информация о компании", new JPanel());
