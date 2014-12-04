@@ -16,21 +16,21 @@ import database.*;
 import static com.sun.deploy.uitoolkit.ToolkitStore.dispose;
 
 public class UserPanel extends FieldPanel {
-    Component parent;
+    JDialog parent;
 
     // Поля
     protected String[] names = {"username", "email", "password"};
     protected String[] labels = {"Название/Имя пользователя", "Email", "Пароль"};
     protected Map<String, JTextField> controls = new HashMap<String, JTextField>();
     JButton saveCompanyButton;
-    ActionListener action1 = new saveUserAction();
+    ActionListener action1;
 
     public UserPanel(Component parent) {
         System.out.println("Users view panel");
-        this.parent = parent;
+        this.parent = (JDialog) parent;
     }
 
-    public void setControls() {
+    public void setControls(Company company) {
         final JLabel label = new JLabel();
         String companyLabel = "Новый пользователь";
         this.addField(companyLabel, "label", label, true);
@@ -43,6 +43,7 @@ public class UserPanel extends FieldPanel {
             this.addField(labels[i], names[i], field, true);
         }
         saveCompanyButton = new JButton("Сохранить");
+        action1 = new saveUserAction(company);
         saveCompanyButton.addActionListener(action1);
         this.addField("", "", saveCompanyButton, false);
         this.addGlue();
@@ -82,16 +83,21 @@ public class UserPanel extends FieldPanel {
     }
 
     public class saveUserAction implements ActionListener {
+        private Employer user = new Employer();
+        saveUserAction(Company company) {
+            this.user.setCompany(company);
+        }
+
         @Override
         public void actionPerformed(ActionEvent e) {
-            User user = new User();
+            //User user = new User();
             user.setUsername(controls.get("username").getText());
             user.setEmail(controls.get("email").getText());
             user.setPassword(controls.get("password").getText());
             try {
-                if (User.newUser(user)){
+                if (Employer.newUser(user)){
                     CloseButtonDialog infodialog =
-                            new CloseButtonDialog((JFrame)parent, "Успех",
+                            new CloseButtonDialog((JFrame) findWindow(parent), "Успех",
                                     new JLabel("Новый пользователь создан!"));
                     infodialog.setVisible(true);
                     /* TODO просто гасить диалог, чтобы откурывалось главное окно с компанией
@@ -99,8 +105,6 @@ public class UserPanel extends FieldPanel {
                     parent.setVisible(true);
                     MainFrame.main(args);*/
                     parent.dispose();
-
-                    //parent.setVisible(true);
                 }
 
             } catch (Exception exc) {
@@ -130,4 +134,12 @@ public class UserPanel extends FieldPanel {
         }
     }
 
+    public static Window findWindow(Component c) {
+        if (c instanceof JFrame) {
+            return (Window) c;
+        } else {
+            Container parent = c.getParent();
+            return parent == null ? null : findWindow(parent);
+        }
+    }
 }

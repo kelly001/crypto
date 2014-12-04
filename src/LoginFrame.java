@@ -75,7 +75,7 @@ public class LoginFrame extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 try {
                     RegistrationDialog = new CompanyDialog(frame, "Пользователи", new JPanel());
-                    RegistrationDialog.createNewUserDialog();
+                    RegistrationDialog.createNewUserDialog(null);
                     RegistrationDialog.setVisible(true);
                 } catch (Exception exc) {
                     System.out.println( exc.getLocalizedMessage());

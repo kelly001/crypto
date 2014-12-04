@@ -71,6 +71,7 @@ public class Company extends User {
                     user.setDepartment(result.getString("department"));
                     user.setCity(result.getString("city"));
                     user.setRegion(result.getString("region"));
+                    user.setCountry(result.getString("country"));
                 }
             }
         } catch (SQLException e ) {
@@ -147,18 +148,19 @@ public class Company extends User {
         System.out.println("updateUser User class");
         Connection con = Database.getConnection();
         PreparedStatement preparedStatement = null;
-        String query = "UPDATE user SET email=?, password=?, timestamp=?," +
-                "status=?, username=?, country=?, region=?, city=? where id = ?";
+        String query = "UPDATE user SET email=?, timestamp=?," +
+                "status=?, username=?, country=?, region=?, city=?, department=? where id = ?";
         try {
             preparedStatement = con.prepareStatement(query);
             preparedStatement.setString(1,user.getEmail());
-            preparedStatement.setString(2, user.getPassword());
-            preparedStatement.setLong(3, Calendar.getInstance().getTime().getTime());
-            preparedStatement.setInt(4,1);
-            preparedStatement.setString(5, user.getUsername());
-            preparedStatement.setString(6, user.getCountry());
-            preparedStatement.setString(7, user.getRegion());
-            preparedStatement.setString(8, user.getCity());
+
+            preparedStatement.setLong(2, Calendar.getInstance().getTime().getTime());
+            preparedStatement.setInt(3,1);
+            preparedStatement.setString(4, user.getUsername());
+            preparedStatement.setString(5, user.getCountry());
+            preparedStatement.setString(6, user.getRegion());
+            preparedStatement.setString(7, user.getCity());
+            preparedStatement.setString(8, user.getDepartment());
             preparedStatement.setLong(9,user.getId());
             preparedStatement.execute();
         } catch (SQLException e ) {

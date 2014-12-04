@@ -17,8 +17,8 @@ public class CompanyPanel extends FieldPanel {
     Component parent;
 
     // Поля организациии
-    protected String[] names = {"username", "email", "password", "department", "city", "region", "country"};
-    protected String[] labels = {"Название/Имя пользователя", "Email", "Пароль", "Отделение","Город",
+    protected String[] names = {"username", "email", "department", "city", "region", "country"};
+    protected String[] labels = {"Название/Имя пользователя", "Email", "Отделение","Город",
             "Регион", "Страна"};
     protected Map<String, JTextField> controls = new HashMap<String, JTextField>();
     JButton saveCompanyButton;
@@ -49,6 +49,10 @@ public class CompanyPanel extends FieldPanel {
             controls.put(names[i],field);
             this.addField(labels[i], names[i], field, true);
         }
+        JTextField field = new JTextField("password");
+        this.addField("", "Пароль для нового пользователя", field, true);
+        controls.put("password", field );
+
         saveCompanyButton = new JButton("Сохранить");
         saveCompanyButton.addActionListener(action1);
         this.addField("", "", saveCompanyButton, false);
@@ -81,11 +85,14 @@ public class CompanyPanel extends FieldPanel {
             controls.get("region").setText(user.getRegion());
             controls.get("department").setText(user.getDepartment());
             controls.get("country").setText(user.getCountry());
+
+            this.remove(controls.get("password"));
+
             saveCompanyButton.addActionListener(new updateCompanyAction(user));
             saveCompanyButton.removeActionListener(action1);
+
             this.addGlue();
             this.repaint();
-
         }
     }
 
@@ -102,6 +109,9 @@ public class CompanyPanel extends FieldPanel {
             user.setDepartment(controls.get("department").getText());
             try {
                 if (Company.newUser(user)){
+                    CloseButtonDialog infodialog =
+                            new CloseButtonDialog((JFrame) findWindow(parent), "Успех",
+                                    new JLabel("Новая организация создана!"));
                     String args[] = {controls.get("email").getText()};
                     parent.setVisible(false);
                     MainFrame.main(args);
@@ -122,16 +132,13 @@ public class CompanyPanel extends FieldPanel {
 
             user.setUsername(controls.get("username").getText());
             user.setEmail(controls.get("email").getText());
-            user.setPassword(controls.get("password").getText());
+            //user.setPassword(controls.get("password").getText());
             user.setCountry(controls.get("country").getText());
             user.setRegion(controls.get("region").getText());
             user.setCity(controls.get("city").getText());
             user.setDepartment(controls.get("department").getText());
             try {
                 if (Company.updateUser(user)){
-                    CloseButtonDialog infodialog =
-                            new CloseButtonDialog((JFrame)parent, "Успех",
-                                    new JLabel("Новая организация создана!"));
                     parent.setVisible(false);
                     String args[] = {controls.get("email").getText()};
                     MainFrame.main(args);
@@ -139,6 +146,15 @@ public class CompanyPanel extends FieldPanel {
             } catch (Exception exc) {
                 System.out.println("saving user exception " + exc.getLocalizedMessage());
             }
+        }
+    }
+
+    public static Window findWindow(Component c) {
+        if (c instanceof JFrame) {
+            return (Window) c;
+        } else {
+            Container parent = c.getParent();
+            return parent == null ? null : findWindow(parent);
         }
     }
 }

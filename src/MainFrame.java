@@ -303,7 +303,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     protected void NewUserDialog(JFrame frame) {
         try {
             final CompanyDialog dialog = new CompanyDialog(frame, "Пользователи", new JPanel());
-            dialog.createNewUserDialog();
+            dialog.createNewUserDialog((Company) company);
             dialog.setVisible(true);
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());

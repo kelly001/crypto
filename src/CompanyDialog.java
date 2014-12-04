@@ -55,7 +55,7 @@ public class CompanyDialog extends CloseButtonDialog {
     public void createCompanyEditDialog() {
         this.panel.setLayout(new FlowLayout());
 
-        CompanyPanel companyPanel = new CompanyPanel(new User(), this);
+        CompanyPanel companyPanel = new CompanyPanel(new User(), frame);
 
         companyPanel.setValues(company);
         this.panel.add(companyPanel);
@@ -66,8 +66,8 @@ public class CompanyDialog extends CloseButtonDialog {
 
     public void createUserEditDialog(User user) {
         this.panel.setLayout(new FlowLayout());
-        UserPanel panel = new UserPanel((JFrame) frame);
-        panel.setControls();
+        UserPanel panel = new UserPanel(this);
+        panel.setControls(null);
         panel.setValues(user);
         this.panel.add(panel);
         this.pack();
@@ -75,10 +75,10 @@ public class CompanyDialog extends CloseButtonDialog {
         //this.setSize(size);
     }
 
-    public void createNewUserDialog() {
+    public void createNewUserDialog(Company company) {
         this.panel.setLayout(new FlowLayout());
-        UserPanel panel = new UserPanel((JFrame) frame);
-        panel.setControls();
+        UserPanel panel = new UserPanel(this);
+        panel.setControls(company);
         this.panel.add(panel);
         this.pack();
         this.setContentPane(panel);
