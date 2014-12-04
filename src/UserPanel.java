@@ -98,7 +98,8 @@ public class UserPanel extends FieldPanel {
                     String args[] = {controls.get("email").getText()};
                     parent.setVisible(true);
                     MainFrame.main(args);*/
-                    dispose();
+                    parent.dispose();
+
                     //parent.setVisible(true);
                 }
 

@@ -43,7 +43,9 @@ public class CompanyDialog extends CloseButtonDialog {
     public void setGUI() {
         //FieldPanel panel = new FieldPanel();
         this.panel.setLayout(new FlowLayout());
-        FieldPanel companyPanel = new CompanyPanel(company, (JFrame) frame);
+
+        FieldPanel companyPanel = new CompanyPanel(company, this);
+
         this.panel.add(companyPanel);
         this.pack();
         this.setContentPane(panel);
@@ -52,7 +54,9 @@ public class CompanyDialog extends CloseButtonDialog {
 
     public void createCompanyEditDialog() {
         this.panel.setLayout(new FlowLayout());
-        CompanyPanel companyPanel = new CompanyPanel(new User(), (JFrame) frame);
+
+        CompanyPanel companyPanel = new CompanyPanel(new User(), this);
+
         companyPanel.setValues(company);
         this.panel.add(companyPanel);
         this.pack();
