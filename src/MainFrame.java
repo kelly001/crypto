@@ -9,6 +9,7 @@ import database.User;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -188,6 +189,9 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                     // TODO сделать передачу сертификата, id сертификата лучше
                     createCertificateDialog((JFrame) w);
                 }
+                if (e.getActionCommand().contains("delete")) {
+                    deleteCertificateAction(company.getValidCertificate());
+                }
             } else if (e.getActionCommand().equals("users")) {
                     System.out.println("users menu");
                     Window w = findWindow((Component) e.getSource());
@@ -321,5 +325,23 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());
         }
+    }
+
+    private Boolean deleteCertificateAction(Certificate certificate) {
+        if (certificate != null && certificate.getStatus()) {
+            String path = "files/" + certificate.getFilename();
+            try {
+                Certificate.cancel(certificate.getId());
+
+                File certFile = new File(path);
+                if (certFile.exists() && certFile.isFile() && certFile.delete())
+                    return true;
+            } catch (SQLException sqle){
+                System.out.println("Update db exception catched: " + sqle.getLocalizedMessage());
+            } catch (Exception x) {
+                System.err.println("deleting certificete files exception catched: " + x.getLocalizedMessage());
+            }
+        }
+        return false;
     }
 }

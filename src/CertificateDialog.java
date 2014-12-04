@@ -3,8 +3,14 @@ import java.awt.*;
 import java.awt.Frame;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,18 +61,9 @@ public class CertificateDialog extends OkCancelDialog {
                     String id = null;
                     try{
                         id = user.getId().toString();
-                        /*
-                        //TODO load user's company from class
-                        //Certificate.loadByUser((Employer) user.getCompany().getId());
-                        User rootCompany =  User.loadByName(panel.getValues().get("organization"));
-                        Certificate rootCert = rootCompany.getValidCertificate();
-                        //get private key of organization
-                        PrivateKey CAkey = security.readPrivateKey(rootCert.getFilename());
-                        System.out.println(CAkey);
-                        */
                     } catch (NullPointerException ne){
                         System.out.println( "Get user id Null exception: " + ne.getLocalizedMessage());
-                        id = User.newUserId(user).toString();
+                        id = User.newUser(user).toString();
                     } catch (Exception e){
                         System.out.print(e.getLocalizedMessage());
                     } finally {
@@ -104,63 +101,22 @@ public class CertificateDialog extends OkCancelDialog {
         logger.log(Level.FINE, String.valueOf(dialog.isOkPressed()));
     }
 
+    public boolean removeCertificate (Certificate certificate) {
+        if (certificate != null && certificate.getStatus()) {
+            String path = "files/" + certificate.getFilename();
+            try {
+                Certificate.cancel(certificate.getId());
 
-    /*public class windowListener extends WindowAdapter{
-        public void windowClosed(WindowEvent we){
-            if (isOkPressed())
-            {
-                this.pressOK();
-                Security security = new Security();
-                X509Certificate rootcert = security.generateRootCertificate();
-                if (rootcert!=null) {
-                    this.saveRoot(String.valueOf(user.getId()));
-                    if (security.generateUserCertificate(rootcert))succeeded = true;
-                    this.save("1");
-                } else succeeded = false;
-                //dispose();
-                dialog.setVisible(false);
-            } else
-            {
-                dispose();
+                File certFile = new File(path);
+                if (certFile.exists() && certFile.isFile() && certFile.delete())
+                    return true;
+            } catch (SQLException e){
+                System.out.println("Update db exception catched: " + e.getLocalizedMessage());
+            } catch (Exception x) {
+                System.err.println("deleting certificete files exception catched: " + x.getLocalizedMessage());
             }
         }
-    }*/
-
-    //public abstract boolean hasChanged();
-
-    public static boolean showCertificateDialog(Frame frame, String title) throws Exception
-    {
-        final FieldPanel panel = new FieldPanel();
-        final JTextField tfName = new JTextField(20);
-        panel.addField("File Name", "Имя файла", tfName, true);
-
-        JButton btnCert = new JButton("Generate");
-        panel.addField("Genarete Keys", "Создание ключей, подпись файла", btnCert,false);
-        btnCert.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String name = tfName.getText();
-                System.out.println(name);
-                //Security certificate = new Security(name);
-
-            }
-        });
-        CertificateDialog dialog = new CertificateDialog(frame, new Certificate(),new User())
-        {
-            public boolean hasChanged()
-            {
-                return tfName.getText().equals("")?false:true;
-            }
-        };
-        dialog.setMainPanel(panel);
-        dialog.setSize(size);
-        dialog.setVisible(true);
-        /*if (dialog.isOkPressed())
-        {
-            panel.save();
-        }*/
-        logger.log(Level.FINE, String.valueOf(dialog.isOkPressed()));
-        return dialog.isOkPressed();
+        return false;
     }
 
     public boolean isSucceeded() {

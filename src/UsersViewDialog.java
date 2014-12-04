@@ -10,6 +10,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -54,14 +56,18 @@ public class UsersViewDialog extends CloseButtonDialog {
                     for (Certificate cert: certificates){
                         JButton button = new JButton("Edit");
                         button.addActionListener(new certAction(cert, user));
-                        panel.addField(cert.getInfo(), "Посмотреть сертификат сотрудника", button, true);
+                        panel.addField(cert.getInfo(), "Редактировать сертификат сотрудника", button, false);
+
+                        JButton cancelButton = new JButton("Отозвать");
+                        cancelButton.addActionListener(new certificateDeleteAction(cert));
+                        panel.addField(cert.getInfo(), "Отозвать сертификат сотрудника", cancelButton, false);
                     }
 
                 } else {
                     JButton button = new JButton();
                     button.setText("Generate");
                     button.addActionListener(new certAction(user));
-                    panel.addField("Нет сертификатов", "Посмотреть сертификат сотрудника", button, true);
+                    panel.addField("Нет сертификатов", "Создать сертификат сотрудника", button, true);
                 }
 
             }
@@ -76,10 +82,10 @@ public class UsersViewDialog extends CloseButtonDialog {
         this.pack();
     }
 
-    public class certAction implements ActionListener
-    {
+    public class certAction implements ActionListener {
         private final Certificate cert;
         private final User user;// = new Certificate();
+
         certAction(Certificate cert, User user) {
             super();
             this.cert = cert;
@@ -95,11 +101,39 @@ public class UsersViewDialog extends CloseButtonDialog {
         public void actionPerformed(ActionEvent e) {
             try {
                 final CertificateDialog dialog =
-                        new CertificateDialog(frame,cert, user);
+                        new CertificateDialog(frame, cert, user);
             } catch (Exception e1) {
-                System.out.println( e1.getLocalizedMessage());
+                System.out.println(e1.getLocalizedMessage());
             }
 
         }
+    }
 
-}}
+    public class certificateDeleteAction implements ActionListener {
+        private Certificate cert;
+        private Boolean succeeded = false;
+        certificateDeleteAction(Certificate cert) {
+            this.cert = cert;
+        }
+        public void actionPerformed(ActionEvent e) {
+            //CertificateDialog.removeCertificate(this.cert);
+            if (this.cert != null && this.cert.getStatus()) {
+                String path = "files/" + this.cert.getFilename();
+                try {
+                    Certificate.cancel(this.cert.getId());
+
+                    File certFile = new File(path);
+                    if (certFile.exists() && certFile.isFile() && certFile.delete())
+                        this.succeeded = true;
+                } catch (SQLException sqle){
+                    System.out.println("Update db exception catched: " + sqle.getLocalizedMessage());
+                } catch (Exception x) {
+                    System.err.println("deleting certificete files exception catched: " + x.getLocalizedMessage());
+                }
+            }
+        }
+        public boolean isSucceeded() {
+            return this.succeeded;
+        }
+    }
+}

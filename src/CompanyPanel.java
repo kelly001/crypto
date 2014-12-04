@@ -49,6 +49,8 @@ public class CompanyPanel extends FieldPanel {
             controls.put(names[i],field);
             this.addField(labels[i], names[i], field, true);
         }
+
+        // доступно только при создании нового
         JTextField field = new JTextField("password");
         this.addField("", "Пароль для нового пользователя", field, true);
         controls.put("password", field );
@@ -61,7 +63,7 @@ public class CompanyPanel extends FieldPanel {
 
     protected void setControls(User user) {
         System.out.println("set controls with company object");
-        String companyLabel = "Организация ООО \""+ user.getUsername() + "\"";
+        String companyLabel = "Организация \""+ user.getUsername() + "\"";
         this.addField(companyLabel, "label", new JPanel(), true);
 
         JTextField username = new JTextField(user.getUsername());
@@ -70,11 +72,11 @@ public class CompanyPanel extends FieldPanel {
 
         JTextField email = new JTextField(user.getEmail());
         email.setEditable(false);
-        this.addField("Почта пользователя", "Почтовый адрес пользователя", email, true);
+        this.addField("Почта пользователя", "Почтовый адрес (Email)", email, true);
 
         JTextField status = new JTextField(user.getStatus()?"Active":"Not");
         status.setEditable(false);
-        this.addField("Статус пользователя", "Статус пользователя", status, true);
+        this.addField("Статус пользователя", "Статус", status, true);
     }
 
     public void setValues(Company user) {

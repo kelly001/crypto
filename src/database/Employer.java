@@ -4,9 +4,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-/**
- * Created by Julia on 14.11.2014.
- */
 public class Employer extends User {
     private User company;
 
@@ -124,7 +121,7 @@ public class Employer extends User {
             preparedStatement.setNull(1,0);
             preparedStatement.setInt(2,2);
             preparedStatement.setString(3,user.getEmail());
-            preparedStatement.setString(4, User.getSecurePassword(user.getPassword()));
+            preparedStatement.setString(4, Database.getSecurePassword(user.getPassword()));
             preparedStatement.setLong(5, Calendar.getInstance().getTime().getTime());
             preparedStatement.setInt(6,1);
             preparedStatement.setString(7, user.getUsername());

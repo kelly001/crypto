@@ -74,7 +74,7 @@ public class LoginFrame extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    RegistrationDialog = new CompanyDialog(frame, "Пользователи", new JPanel());
+                    RegistrationDialog = new CompanyDialog(frame, "Регистрация нового пользователя", new JPanel());
                     RegistrationDialog.createNewUserDialog(null);
                     RegistrationDialog.setVisible(true);
                 } catch (Exception exc) {

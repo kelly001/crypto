@@ -6,6 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -80,7 +82,11 @@ public class MainPanel extends JPanel{
                 for (Certificate cert: certificates){
                     JButton button = new JButton("Edit");
                     button.addActionListener(new certAction(cert, user));
-                    certPanel.addField(cert.getInfo(), "Посмотреть сертификат сотрудника", button, true);
+                    certPanel.addField(cert.getInfo(), "Посмотреть сертификат сотрудника", button, false);
+
+                    JButton cancelButton = new JButton("Отозвать");
+                    cancelButton.addActionListener(new certificateDeleteAction(cert));
+                    certPanel.addField(cert.getInfo(), "Отозвать сертификат сотрудника", cancelButton, false);
                 }
 
             } else {
@@ -116,6 +122,34 @@ public class MainPanel extends JPanel{
                 System.out.println( "certAction actionPerfomed Exception: " + e1.getLocalizedMessage());
             }
 
+        }
+    }
+
+    public class certificateDeleteAction implements ActionListener {
+        private Certificate cert;
+        private Boolean succeeded = false;
+        certificateDeleteAction(Certificate cert) {
+            this.cert = cert;
+        }
+        public void actionPerformed(ActionEvent e) {
+            //CertificateDialog.removeCertificate(this.cert);
+            if (this.cert != null && this.cert.getStatus()) {
+                String path = "files/" + this.cert.getFilename();
+                try {
+                    Certificate.cancel(this.cert.getId());
+
+                    File certFile = new File(path);
+                    if (certFile.exists() && certFile.isFile() && certFile.delete())
+                        this.succeeded = true;
+                } catch (SQLException sqle){
+                    System.out.println("Update db exception catched: " + sqle.getLocalizedMessage());
+                } catch (Exception x) {
+                    System.err.println("deleting certificete files exception catched: " + x.getLocalizedMessage());
+                }
+            }
+        }
+        public boolean isSucceeded() {
+            return this.succeeded;
         }
     }
 }

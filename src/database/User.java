@@ -1,6 +1,5 @@
 package database;
 
-import javax.jws.soap.SOAPBinding;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -307,8 +306,8 @@ public class User {
         return true;
     }
 
-    public static Long newUserId (User user) {
-        System.out.println("newUser User class return long");
+    public static Long newUser (User user) {
+        System.out.println("newUser User class, returns id");
         Long risultat = null;
         try {
             Connection con = Database.getConnection();
@@ -320,7 +319,7 @@ public class User {
                 preparedStatement.setNull(1, 0);
                 preparedStatement.setInt(2, 2);
                 preparedStatement.setString(3, user.getEmail());
-                preparedStatement.setString(4, getSecurePassword(user.getPassword()));
+                preparedStatement.setString(4, Database.getSecurePassword(user.getPassword()));
                 preparedStatement.setLong(5, Calendar.getInstance().getTime().getTime());
                 preparedStatement.setInt(6, 1);
                 preparedStatement.setString(7, user.getUsername());
@@ -344,80 +343,4 @@ public class User {
         }
         return risultat;
     }
-
-    public static Boolean newUser (User user) throws SQLException {
-        System.out.println("newUser User class");
-        Connection con = Database.getConnection();
-        PreparedStatement preparedStatement = null;
-        String query = "insert into USER(id, type, email, password, timestamp," +
-                "status, username) values(?,?,?,?,?,?,?)";
-        try {
-            preparedStatement = con.prepareStatement(query);
-            preparedStatement.setNull(1,0);
-            preparedStatement.setInt(2,2);
-            preparedStatement.setString(3,user.getEmail());
-            preparedStatement.setString(4, getSecurePassword(user.getPassword()));
-            preparedStatement.setLong(5, Calendar.getInstance().getTime().getTime());
-            preparedStatement.setInt(6,1);
-            preparedStatement.setString(7, user.getUsername());
-            preparedStatement.execute();
-        } catch (SQLException e ) {
-            System.out.println(e.getLocalizedMessage());
-            return false;
-        }catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
-            return false;
-        } finally {
-            if (preparedStatement != null) { preparedStatement.close(); }
-        }
-        return true;
-    }
-
-    //Secure password
-
-    public static String getSecurePassword(String passwordToHash)
-    {
-        String generatedPassword = null;
-        try {
-            // Create MessageDigest instance for MD5
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            //Add password bytes to digest
-            md.update(getSalt().getBytes());
-            //Get the hash's bytes
-            byte[] bytes = md.digest(passwordToHash.getBytes());
-            //This bytes[] has bytes in decimal format;
-            //Convert it to hexadecimal format
-            StringBuilder sb = new StringBuilder();
-            for(int i=0; i< bytes.length ;i++)
-            {
-                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-            }
-            //Get complete hashed password in hex format
-            generatedPassword = sb.toString();
-        }
-        catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return generatedPassword;
-    }
-
-    //Add salt
-    public static String getSalt()
-    {
-        return "securesalt123!!!!!!";
-        /*
-        //Create array for salt
-        byte[] salt = new byte[16];
-        try {
-            //Always use a SecureRandom generator
-            SecureRandom sr = SecureRandom.getInstance("SHA1PRNG", "SUN");
-            //Get a random salt
-            sr.nextBytes(salt);
-        } catch (Exception e) {
-            System.out.println("getSalt exception: " + e.getLocalizedMessage());
-        }
-        return salt.toString();
-        */
-    }
-
 }

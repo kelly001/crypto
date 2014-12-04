@@ -64,7 +64,7 @@ public class UserPanel2 extends FieldPanel {
         //сделть отдельным окном смену пароля для пользователя с валидацией/подтверждением пароля
         //user.setPassword(password.getText());    todo where is password field????
         try {
-            if (Employer.newUser(user)){
+            if (Employer.newUser(user) != null){
                 CloseButtonDialog infodialog =
                         new CloseButtonDialog(null, "Успех",
                                 new JLabel("Новый пользователь создан!"));

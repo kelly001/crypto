@@ -20,9 +20,6 @@ public class CompanyDialog extends CloseButtonDialog {
     public static Dimension size = new Dimension(480,480);
     protected Frame frame;
     public Company company;
-    protected String[] labels = {"Название", "Отделение", "Имя пользователя", "Email", "Город",
-            "Регион", "Страна"};
-    protected ArrayList<JTextField> controls = new ArrayList<JTextField>();
     protected JPanel panel;
 
     public CompanyDialog(Frame parent, String title, JPanel panel) {

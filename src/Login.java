@@ -1,10 +1,7 @@
-/**
- * Created by new_name on 15.10.2014.
- */
-
-import database.Company;
-import database.Employer;
 import database.User;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class Login {
     protected static User user;
@@ -13,19 +10,9 @@ public class Login {
         // hardcoded username and password
         try {
             user = User.loadByEmail(username);
-            System.out.println(User.getSecurePassword(password));
-            System.out.println(user.getPassword());
-            if (user != null &&  user.getPassword().equals(User.getSecurePassword(password))) {
+            if (user != null &&  user.getPassword().equals(Login.getSecurePassword(password))) {
                 return true;
-            }/* else {
-                user = Employer.loadByEmail(username);
-                if (user != null && user.getPassword().equals(password)) {
-                    return true;
-                } else {
-                    user = Company.loadByEmail(username);
-                    if (user != null &&  user.getPassword().equals(password)) return true;
-                }
-            }*/
+            }
         } catch (NullPointerException e){
             e.printStackTrace();
             return false;
@@ -41,6 +28,37 @@ public class Login {
         return user.getId();
     }
 
+    //Secure password
+    public static String getSecurePassword(String passwordToHash)
+    {
+        String generatedPassword = null;
+        try {
+            // Create MessageDigest instance for MD5
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            //Add password bytes to digest
+            md.update(getSalt().getBytes());
+            //Get the hash's bytes
+            byte[] bytes = md.digest(passwordToHash.getBytes());
+            //This bytes[] has bytes in decimal format;
+            //Convert it to hexadecimal format
+            StringBuilder sb = new StringBuilder();
+            for(int i=0; i< bytes.length ;i++)
+            {
+                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+            }
+            //Get complete hashed password in hex format
+            generatedPassword = sb.toString();
+        }
+        catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return generatedPassword;
+    }
 
+    //Add salt
+    public static String getSalt()
+    {
+        return "securesalt123!!!!!!";
+    }
 
 }
