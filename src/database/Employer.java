@@ -1,5 +1,7 @@
 package database;
 
+import com.zpayment.Login;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,6 +40,7 @@ public class Employer extends User {
                 employer.setId(result.getLong("id"));
                 employer.setUsername(result.getString("username"));
                 employer.setPassword(result.getString("password"));
+                employer.setSalt(result.getString("salt"));
                 employer.setStatus(result.getBoolean("status"));
                 employer.setTimestamp(time);
                 employer.setCertificates(Certificate.loadByUser(result.getLong("id")));
@@ -71,6 +74,7 @@ public class Employer extends User {
                 user.setUsername(username);
                 user.setPassword(password);
                 user.setEmail(result.getString("email"));
+                user.setSalt(result.getString("salt"));
             }
         } catch (SQLException e ) {
             System.out.println(e.getLocalizedMessage());
@@ -97,7 +101,7 @@ public class Employer extends User {
                 String username = result.getString("username");//.isEmpty()?rs.getString("username"):"";
                 Boolean status = result.getBoolean("status");
                 Timestamp time = new Timestamp(result.getLong("timestamp"));
-                user = new User(result.getLong("id"), email, password, username, status, time);
+                user = new User(result.getLong("id"), email, password, result.getString("salt"), username, status, time);
                 System.out.println(user.getUsername() + " " + user.getId() + " " + user.getTimestamp());
             }
         } catch (SQLException e ) {
@@ -114,19 +118,20 @@ public class Employer extends User {
         System.out.println("newUser User class");
         Connection con = Database.getConnection();
         PreparedStatement preparedStatement = null;
-        String query = "insert into USER(id, type, email, password, timestamp," +
-                "status, username, company_id) values(?,?,?,?,?,?,?,?)";
+        String query = "insert into USER(id, type, email, password, salt, timestamp," +
+                "status, username, company_id) values(?,?,?,?,?,?,?,?,?)";
         try {
             preparedStatement = con.prepareStatement(query);
             preparedStatement.setNull(1,0);
             preparedStatement.setInt(2,2);
             preparedStatement.setString(3,user.getEmail());
-            preparedStatement.setString(4, Database.getSecurePassword(user.getPassword()));
-            preparedStatement.setLong(5, Calendar.getInstance().getTime().getTime());
-            preparedStatement.setInt(6,1);
-            preparedStatement.setString(7, user.getUsername());
-            if (user.getCompany()!= null) preparedStatement.setLong(8, user.getCompany().getId());
-                else preparedStatement.setNull(8,0);
+            preparedStatement.setString(4, Login.getSecurePassword(user.getPassword(), user.getSalt()));
+            preparedStatement.setString(5, user.getSalt());
+            preparedStatement.setLong(6, Calendar.getInstance().getTime().getTime());
+            preparedStatement.setInt(7,1);
+            preparedStatement.setString(8, user.getUsername());
+            if (user.getCompany()!= null) preparedStatement.setLong(9, user.getCompany().getId());
+                else preparedStatement.setNull(9,0);
             preparedStatement.execute();
         } catch (SQLException e ) {
             System.out.println(e.getLocalizedMessage());

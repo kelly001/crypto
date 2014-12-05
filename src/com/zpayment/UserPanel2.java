@@ -1,3 +1,5 @@
+package com.zpayment;
+
 import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.dialog.CloseButtonDialog;
 import database.Company;

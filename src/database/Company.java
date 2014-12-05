@@ -1,5 +1,7 @@
 package database;
 
+import com.zpayment.Login;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -17,9 +19,9 @@ public class Company extends User {
         this.employers = new ArrayList<User>();
     }
 
-    public Company(Long id, String email, String password, String username, Boolean status, Timestamp time,
+    public Company(Long id, String email, String password, String salt, String username, Boolean status, Timestamp time,
                    String Country, String Region, String City, String Department){
-        super(id,email,password,username,status,time);
+        super(id,email,password, salt,username,status,time);
 
     }
 
@@ -69,6 +71,7 @@ public class Company extends User {
                     user.setCity(result.getString("city"));
                     user.setRegion(result.getString("region"));
                     user.setCountry(result.getString("country"));
+                    user.setSalt(result.getString("salt"));
                 }
             }
         } catch (SQLException e ) {
@@ -98,6 +101,7 @@ public class Company extends User {
                 user.setId(result.getLong("id"));
                 user.setUsername(username);
                 user.setPassword(password);
+                user.setSalt(result.getString("salt"));
             }
         } catch (SQLException e ) {
             System.out.println(e.getLocalizedMessage());
@@ -114,20 +118,21 @@ public class Company extends User {
         System.out.println("newUser User class");
         Connection con = Database.getConnection();
         PreparedStatement preparedStatement = null;
-        String query = "insert into USER(id, type, email, password, timestamp," +
-                "status, username, country, region, city) values(?,?,?,?,?,?,?,?,?,?)";
+        String query = "insert into USER(id, type, email, password, salt, timestamp," +
+                "status, username, country, region, city) values(?,?,?,?,?,?,?,?,?,?,?)";
         try {
             preparedStatement = con.prepareStatement(query);
             preparedStatement.setNull(1,0);
             preparedStatement.setInt(2,1);
             preparedStatement.setString(3,user.getEmail());
-            preparedStatement.setString(4, Database.getSecurePassword(user.getPassword()));
-            preparedStatement.setLong(5, Calendar.getInstance().getTime().getTime());
-            preparedStatement.setInt(6,1);
-            preparedStatement.setString(7, user.getUsername());
-            preparedStatement.setString(8, user.getCountry());
-            preparedStatement.setString(9, user.getRegion());
-            preparedStatement.setString(10, user.getCity());
+            preparedStatement.setString(4, Login.getSecurePassword(user.getPassword(), user.getSalt()));
+            preparedStatement.setString(5,user.getSalt());
+            preparedStatement.setLong(6, Calendar.getInstance().getTime().getTime());
+            preparedStatement.setInt(7,1);
+            preparedStatement.setString(8, user.getUsername());
+            preparedStatement.setString(9, user.getCountry());
+            preparedStatement.setString(10, user.getRegion());
+            preparedStatement.setString(11, user.getCity());
             preparedStatement.execute();
         } catch (SQLException e ) {
             System.out.println(e.getLocalizedMessage());

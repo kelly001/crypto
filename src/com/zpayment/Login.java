@@ -1,7 +1,10 @@
+package com.zpayment;
+
 import database.User;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 public class Login {
     protected static User user;
@@ -10,7 +13,7 @@ public class Login {
         // hardcoded username and password
         try {
             user = User.loadByEmail(username);
-            if (user != null &&  user.getPassword().equals(Login.getSecurePassword(password))) {
+            if (user != null &&  user.getPassword().equals(Login.getSecurePassword(password, user.getSalt()))) {
                 return true;
             }
         } catch (NullPointerException e){
@@ -29,14 +32,14 @@ public class Login {
     }
 
     //Secure password
-    public static String getSecurePassword(String passwordToHash)
+    public static String getSecurePassword(String passwordToHash, String salt)
     {
         String generatedPassword = null;
         try {
             // Create MessageDigest instance for MD5
             MessageDigest md = MessageDigest.getInstance("MD5");
             //Add password bytes to digest
-            md.update(getSalt().getBytes());
+            md.update(salt.getBytes());
             //Get the hash's bytes
             byte[] bytes = md.digest(passwordToHash.getBytes());
             //This bytes[] has bytes in decimal format;
@@ -59,6 +62,21 @@ public class Login {
     public static String getSalt()
     {
         return "securesalt123!!!!!!";
+    }
+
+    public static String getRandomSalt()
+    {
+        byte[] salt = new byte[16];
+        try {
+        //Always use a SecureRandom generator
+        SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
+        //Get a random salt
+        sr.nextBytes(salt);
+        }
+        catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return salt.toString();
     }
 
 }

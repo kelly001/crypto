@@ -1,8 +1,8 @@
-import com.teacode.swing.CommonRB;
+package com.zpayment;
+
 import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.dialog.CloseButtonDialog;
 import database.Certificate;
-import database.Company;
 import database.Employer;
 import database.User;
 
@@ -116,7 +116,7 @@ public class UsersViewDialog extends CloseButtonDialog {
             this.cert = cert;
         }
         public void actionPerformed(ActionEvent e) {
-            //CertificateDialog.removeCertificate(this.cert);
+            //com.zpayment.CertificateDialog.removeCertificate(this.cert);
             if (this.cert != null && this.cert.getStatus()) {
                 String path = "files/" + this.cert.getFilename();
                 try {

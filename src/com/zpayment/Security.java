@@ -1,14 +1,11 @@
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+package com.zpayment;
+
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.x509.X509V1CertificateGenerator;
-import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.asn1.x500.X500Name;
 
@@ -44,7 +41,7 @@ class Security {
 
 
     public Security() {
-        System.out.println("Security class constructor - generate certificates API");
+        System.out.println("com.zpayment.Security class constructor - generate certificates API");
         Date startDate = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(startDate);

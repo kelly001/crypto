@@ -1,5 +1,7 @@
 package database;
 
+import com.zpayment.Login;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -15,6 +17,7 @@ public class User {
     private Integer type;
     private String email;
     private String password;
+    private String salt;
     private String username;
     private Timestamp timestamp;
     private Boolean status;
@@ -29,10 +32,12 @@ public class User {
         this.status = true;
         java.util.Date now = Calendar.getInstance().getTime();
         this.timestamp = new Timestamp(now.getTime());
+        this.salt = Login.getRandomSalt();
     }
 
     public User(Long id) {
         this.id = id;
+        this.salt = Login.getRandomSalt();
         java.util.Date now = Calendar.getInstance().getTime();
         //java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
         this.timestamp = new Timestamp(now.getTime());
@@ -41,11 +46,12 @@ public class User {
         //this.keys = new ArrayList<Key>();
     }
 
-    public User(Long id, String email, String password, String username, Boolean status, Timestamp time) {
+    public User(Long id, String email, String password, String salt, String username, Boolean status, Timestamp time) {
         this.id = id;
         this.type = 1;
         this.email = email;
         this.password = password;
+        this.salt = salt;
         this.username = username;
         this.status = status;
         this.timestamp = time;
@@ -85,6 +91,7 @@ public class User {
     public void setKeys(Key keys){
         this.keys.add(keys);
     }
+    public void setSalt(String salt) { this.salt = salt;}
 
     public Long getId() {
         return id;
@@ -111,6 +118,7 @@ public class User {
     public ArrayList<Key> keys() {
         return keys;
     }
+    public String getSalt() {return salt;}
 
     public Certificate getValidCertificate() {
         Certificate cert = null;
@@ -178,7 +186,7 @@ public class User {
                 String username = rs.getString("username");//.isEmpty()?rs.getString("username"):"";
                 Boolean status = rs.getBoolean("status");
                 Timestamp time = new Timestamp(rs.getLong("timestamp"));
-                User user = new User(rs.getLong("id"), email, password, username, status, time);
+                User user = new User(rs.getLong("id"), email, password, rs.getString("salt"), username, status, time);
                 users.add(user);
                 System.out.println(user.getUsername() + " " + user.getId() + " " + user.getTimestamp());
             }
@@ -209,6 +217,7 @@ public class User {
                 user.setId(result.getLong("id"));
                 user.setUsername(username);
                 user.setPassword(password);
+                user.setSalt(result.getString("salt"));
             }
         } catch (SQLException e ) {
             System.out.println(e.getLocalizedMessage());
@@ -237,7 +246,7 @@ public class User {
                 String username = result.getString("username");//.isEmpty()?rs.getString("username"):"";
                 Boolean status = result.getBoolean("status");
                 Timestamp time = new Timestamp(result.getLong("timestamp"));
-                user = new User(result.getLong("id"), email, password, username, status, time);
+                user = new User(result.getLong("id"), email, password, result.getString("salt"), username, status, time);
                 System.out.println(user.getUsername() + " " + user.getId() + " " + user.getTimestamp());
             }
         } catch (SQLException e ) {
@@ -269,6 +278,7 @@ public class User {
                 user.setUsername(username);
                 user.setPassword(password);
                 user.setEmail(result.getString("email"));
+                user.setSalt(result.getString("salt"));
             }
         } catch (SQLException e ) {
             System.out.println(e.getLocalizedMessage());
@@ -284,15 +294,16 @@ public class User {
         System.out.println("saveUser User class");
         Connection con = Database.getConnection();
         PreparedStatement preparedStatement = null;
-        String query = "UPDATE user SET email =?, timestamp=?, username=?, password=? WHERE id=?";
+        String query = "UPDATE user SET email =?, timestamp=?, username=?, password=?, salt=? WHERE id=?";
         try {
             preparedStatement = con.prepareStatement(query);
-            preparedStatement.setLong(5,user.getId());
+            preparedStatement.setLong(6,user.getId());
             preparedStatement.setString(1,user.getEmail());
             //preparedStatement.setString(4, user.getPassword());
             preparedStatement.setLong(2, Calendar.getInstance().getTime().getTime());
             preparedStatement.setString(3, user.getUsername());
-            preparedStatement.setString(4, user.getPassword());
+            preparedStatement.setString(4, Login.getSecurePassword(user.getPassword(), user.getSalt()));
+            preparedStatement.setString(5, user.getSalt());
             preparedStatement.execute();
         } catch (SQLException e ) {
             System.out.println(e.getLocalizedMessage());
@@ -312,17 +323,18 @@ public class User {
         try {
             Connection con = Database.getConnection();
             PreparedStatement preparedStatement = null;
-            String query = "insert into USER(id, type, email, password, timestamp," +
-                    "status, username) values(?,?,?,?,?,?,?)";
+            String query = "insert into USER(id, type, email, password, salt, timestamp," +
+                    "status, username) values(?,?,?,?,?,?,?,?)";
             try {
                 preparedStatement = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
                 preparedStatement.setNull(1, 0);
                 preparedStatement.setInt(2, 2);
                 preparedStatement.setString(3, user.getEmail());
-                preparedStatement.setString(4, Database.getSecurePassword(user.getPassword()));
-                preparedStatement.setLong(5, Calendar.getInstance().getTime().getTime());
-                preparedStatement.setInt(6, 1);
-                preparedStatement.setString(7, user.getUsername());
+                preparedStatement.setString(4, Login.getSecurePassword(user.getPassword(), user.getSalt()));
+                preparedStatement.setString(5, user.getSalt());
+                preparedStatement.setLong(6, Calendar.getInstance().getTime().getTime());
+                preparedStatement.setInt(7, 1);
+                preparedStatement.setString(8, user.getUsername());
                 preparedStatement.execute();
 
                 ResultSet rs = preparedStatement.getGeneratedKeys();

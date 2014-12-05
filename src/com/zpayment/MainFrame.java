@@ -1,6 +1,6 @@
+package com.zpayment;
+
 import com.teacode.swing.component.FieldPanel;
-import com.teacode.swing.dialog.CloseButtonDialog;
-import com.teacode.swing.dialog.OkCancelDialog;
 import database.Certificate;
 import database.Company;
 import database.Employer;
@@ -11,8 +11,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.logging.Logger;
 
 
 /**

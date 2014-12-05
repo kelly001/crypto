@@ -1,3 +1,5 @@
+package external;
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FontMetrics;
@@ -102,7 +104,7 @@ public class JLinkButton extends JButton {
     }
 
     private void setDefault() {
-        UIManager.getDefaults().put("LinkButtonUI", "BasicLinkButtonUI");
+        UIManager.getDefaults().put("LinkButtonUI", "external.BasicLinkButtonUI");
     }
 
     public String getUIClassID() {

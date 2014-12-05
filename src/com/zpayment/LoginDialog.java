@@ -1,3 +1,5 @@
+package com.zpayment;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
@@ -19,7 +21,7 @@ public class LoginDialog extends JDialog{
 
 
     public LoginDialog(Frame parent) {
-        super(parent, "Login", true);
+        super(parent, "com.zpayment.Login", true);
 
         succeeded = false;
 
@@ -63,7 +65,7 @@ public class LoginDialog extends JDialog{
         panel.add(pfPassword, cs);
         panel.setBorder(new LineBorder(Color.GRAY));
 
-        btnLogin = new JButton("Login");
+        btnLogin = new JButton("com.zpayment.Login");
 
         btnLogin.addActionListener(new AuthActionListener());
         btnCancel = new JButton("Cancel");
@@ -99,14 +101,14 @@ public class LoginDialog extends JDialog{
 
                 JOptionPane.showMessageDialog(LoginDialog.this,
                         "Hi " + getUsername() + "! You have successfully logged in.",
-                        "Login",
+                        "com.zpayment.Login",
                         JOptionPane.INFORMATION_MESSAGE);
                 succeeded = true;
                 dispose();
             } else {
                 JOptionPane.showMessageDialog(LoginDialog.this,
                         "Invalid username or password",
-                        "Login",
+                        "com.zpayment.Login",
                         JOptionPane.ERROR_MESSAGE);
                 succeeded = false;
 

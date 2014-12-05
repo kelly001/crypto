@@ -1,4 +1,4 @@
-/**
+package com.zpayment; /**
  * Created by new_name on 10.11.2014.
  */
 
@@ -15,6 +15,7 @@ import com.teacode.swing.component.FieldPanel;
 
 import database.Certificate;
 import database.User;
+import external.JLinkButton;
 
 public class MainPanel extends JPanel{
 
@@ -132,7 +133,7 @@ public class MainPanel extends JPanel{
             this.cert = cert;
         }
         public void actionPerformed(ActionEvent e) {
-            //CertificateDialog.removeCertificate(this.cert);
+            //com.zpayment.CertificateDialog.removeCertificate(this.cert);
             if (this.cert != null && this.cert.getStatus()) {
                 String path = "files/" + this.cert.getFilename();
                 try {

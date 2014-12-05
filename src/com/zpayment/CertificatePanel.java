@@ -1,4 +1,4 @@
-/**
+package com.zpayment; /**
  * Created by new_name on 06.11.2014.
  */
 import javax.swing.*;

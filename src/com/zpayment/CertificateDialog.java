@@ -1,35 +1,26 @@
-import javax.swing.*;
+package com.zpayment;
+
 import java.awt.*;
 import java.awt.Frame;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 
 import com.teacode.swing.dialog
         .OkCancelDialog;
-import com.teacode.swing.component.FieldPanel;
-import com.teacode.swing.exception.WWRuntimeException;
 import database.Certificate;
 import database.Company;
-import database.Employer;
 import database.User;
 
 public class CertificateDialog extends OkCancelDialog {
 
-    static Logger logger = Logger.getLogger("CertificateDialog log");
+    static Logger logger = Logger.getLogger("com.zpayment.CertificateDialog log");
     public static Dimension size = new Dimension(500,500);
     public boolean succeeded;
     private Frame frame;

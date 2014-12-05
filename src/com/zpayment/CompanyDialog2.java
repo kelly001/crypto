@@ -1,11 +1,11 @@
-import com.teacode.swing.component.FieldPanel;
+package com.zpayment;
+
 import com.teacode.swing.dialog.CloseButtonDialog;
 import database.Company;
 import database.User;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /**
@@ -42,7 +42,7 @@ public class CompanyDialog2 extends CloseButtonDialog {
             UserPanel2 up2 = (UserPanel2) panel;
             up2.save();
         }
-        //todo for CompanyPanel
+        //todo for com.zpayment.CompanyPanel
         //закрываем диалог
         super.dispose();
     }

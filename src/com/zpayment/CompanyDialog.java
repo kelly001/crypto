@@ -1,15 +1,12 @@
+package com.zpayment;
+
 import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.dialog.CloseButtonDialog;
 import database.Company;
 import database.User;
 
-import javax.jws.soap.SOAPBinding;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.logging.Logger;
 
 /**
