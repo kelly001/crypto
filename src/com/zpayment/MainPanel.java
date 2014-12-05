@@ -7,6 +7,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -67,7 +71,8 @@ public class MainPanel extends JPanel{
         c.gridy = 3;
         this.add(infoLabel,c);
 
-        JLinkButton btn = new JLinkButton("https://z-payment.com/");
+        final JLinkButton btn = new JLinkButton("Z-Payment.com");
+        btn.addActionListener(new URLAction("https://z-payment.com/"));
         c.gridwidth = 2;
         c.gridx = 3;
         c.gridy = 4;
@@ -81,13 +86,14 @@ public class MainPanel extends JPanel{
             ArrayList<Certificate> certificates  = Certificate.loadByUser(user.getId());
             if (certificates.size() > 0)   {
                 for (Certificate cert: certificates){
+                    certPanel.addField(cert.getInfo(), "Инфо", new JLabel(), false);
                     JButton button = new JButton("Edit");
                     button.addActionListener(new certAction(cert, user));
-                    certPanel.addField(cert.getInfo(), "Посмотреть сертификат сотрудника", button, false);
+                    certPanel.addField("", "Посмотреть сертификат сотрудника", button, false);
 
                     JButton cancelButton = new JButton("Отозвать");
-                    cancelButton.addActionListener(new certificateDeleteAction(cert));
-                    certPanel.addField(cert.getInfo(), "Отозвать сертификат сотрудника", cancelButton, false);
+                    cancelButton.addActionListener(new RemoveCertificateActionListener(cert));
+                    certPanel.addField("", "Отозвать сертификат сотрудника", cancelButton, false);
                 }
 
             } else {
@@ -126,31 +132,20 @@ public class MainPanel extends JPanel{
         }
     }
 
-    public class certificateDeleteAction implements ActionListener {
-        private Certificate cert;
-        private Boolean succeeded = false;
-        certificateDeleteAction(Certificate cert) {
-            this.cert = cert;
-        }
-        public void actionPerformed(ActionEvent e) {
-            //com.zpayment.CertificateDialog.removeCertificate(this.cert);
-            if (this.cert != null && this.cert.getStatus()) {
-                String path = "files/" + this.cert.getFilename();
-                try {
-                    Certificate.cancel(this.cert.getId());
+    private class URLAction implements ActionListener {
+        private String url;
 
-                    File certFile = new File(path);
-                    if (certFile.exists() && certFile.isFile() && certFile.delete())
-                        this.succeeded = true;
-                } catch (SQLException sqle){
-                    System.out.println("Update db exception catched: " + sqle.getLocalizedMessage());
-                } catch (Exception x) {
-                    System.err.println("deleting certificete files exception catched: " + x.getLocalizedMessage());
-                }
-            }
+        URLAction(String url) {
+            this.url = url;
         }
-        public boolean isSucceeded() {
-            return this.succeeded;
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                Desktop.getDesktop().browse(new URL(url).toURI());
+            } catch (Exception URIex) {
+                System.out.println(URIex.getLocalizedMessage());
+            }
         }
     }
 }

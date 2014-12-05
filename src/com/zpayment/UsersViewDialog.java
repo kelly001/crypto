@@ -54,13 +54,15 @@ public class UsersViewDialog extends CloseButtonDialog {
                 ArrayList<Certificate> certificates  = user.getCertificates();
                 if (certificates.size() > 0)   {
                     for (Certificate cert: certificates){
+                        panel.addField(cert.getInfo(), "Инфо", new JLabel(), false);
+
                         JButton button = new JButton("Edit");
                         button.addActionListener(new certAction(cert, user));
-                        panel.addField(cert.getInfo(), "Редактировать сертификат сотрудника", button, false);
+                        panel.addField("", "Редактировать сертификат сотрудника", button, false);
 
                         JButton cancelButton = new JButton("Отозвать");
-                        cancelButton.addActionListener(new certificateDeleteAction(cert));
-                        panel.addField(cert.getInfo(), "Отозвать сертификат сотрудника", cancelButton, false);
+                        cancelButton.addActionListener(new RemoveCertificateActionListener(cert));
+                        panel.addField("", "Отозвать сертификат сотрудника", cancelButton, false);
                     }
 
                 } else {

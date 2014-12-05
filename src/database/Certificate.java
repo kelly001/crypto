@@ -196,10 +196,11 @@ public class Certificate {
             Connection con = Database.getConnection();
             PreparedStatement preparedStatement = null;
             // select by user_id
-            String query = "select * from certificate where user_id = ?";
+            String query = "select * from certificate where user_id = ? and status = ?";
             try {
                 preparedStatement = con.prepareStatement(query);
                 preparedStatement.setLong(1, user_id);
+                preparedStatement.setBoolean(2, true);
                 ResultSet rs = preparedStatement.executeQuery();
 
                 while (rs.next()) {

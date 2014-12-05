@@ -188,7 +188,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                     createCertificateDialog((JFrame) w);
                 }
                 if (e.getActionCommand().contains("delete")) {
-                    deleteCertificateAction(company.getValidCertificate());
+                    new RemoveCertificateActionListener(company.getValidCertificate());
+                    this.repaint();
                 }
             } else if (e.getActionCommand().equals("users")) {
                     System.out.println("users menu");
