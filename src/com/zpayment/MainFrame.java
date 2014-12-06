@@ -40,6 +40,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         menuItem = new JMenuItem(name,
                 KeyEvent.VK_T);
         //menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
+       //menuItem.addActionListener(new RemoveUserActionListener());
         menuItem.getAccessibleContext().setAccessibleDescription(
                 "This doesn't really do anything");
 
@@ -188,8 +189,11 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                     createCertificateDialog((JFrame) w);
                 }
                 if (e.getActionCommand().contains("delete")) {
-                    new RemoveCertificateActionListener(company.getValidCertificate());
-                    this.repaint();
+                   if (company != null){
+                       Certificate companyCE = company.getValidCertificate();
+                       if (companyCE !=null) new RemoveCertificateActionListener(company.getValidCertificate());
+                   }
+                    // this.repaint(); не работает
                 }
             } else if (e.getActionCommand().equals("users")) {
                     System.out.println("users menu");
@@ -209,7 +213,11 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                     NewUserDialog((JFrame) w);
                 }
                 if (e.getActionCommand().contains("delete")) {
-                    //TODO get user's id
+                    /*TODO get user's id
+                    создаем какой-нибудь список ( ex. User UsersListDialog())
+                    который возвращает id пользователя
+                    */
+                    new RemoveUserActionListener(Company.loadUsers().get[0]); // костыль, первый пользователь
                 }
             }
         }else {
@@ -263,7 +271,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         System.out.println("create users dialog func");
         try {
             final FieldPanel panel = new FieldPanel();
-            final UsersViewDialog dialog = new UsersViewDialog(frame, "Сотрудники", panel);
+            final UsersViewDialog dialog = new UsersViewDialog(frame, panel);
             dialog.setUsers(company.getId());
             dialog.setControls(panel);
             dialog.setVisible(true);

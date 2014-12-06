@@ -5,9 +5,6 @@ import database.User;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * Created by new_name on 05.12.2014.
- */
 public class RemoveUserActionListener implements ActionListener {
 
     private User user;
@@ -18,6 +15,16 @@ public class RemoveUserActionListener implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent ewt) {
+        try {
+            if (user != null && user.getStatus()) {
+                User.delete(user.getId());
+            }
+        } catch (Exception exc) {
+            System.out.println("Cancel user action listener error: " + exc.getLocalizedMessage());
+        }
+    }
 
+    public boolean isSucceeded() {
+        return this.succeeded;
     }
 }

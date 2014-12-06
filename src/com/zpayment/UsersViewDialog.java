@@ -3,6 +3,7 @@ package com.zpayment;
 import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.dialog.CloseButtonDialog;
 import database.Certificate;
+import database.Company;
 import database.Employer;
 import database.User;
 
@@ -25,9 +26,10 @@ public class UsersViewDialog extends CloseButtonDialog {
     protected Frame frame;
     protected ArrayList<Employer> users;
     //protected FieldPanel panel = new FieldPanel();
+    private static String title = " Сотрудники компании.";
 
 
-    public UsersViewDialog(Frame parent, String title, FieldPanel panel) {
+    public UsersViewDialog(Frame parent, FieldPanel panel) {
         super(parent, title, panel);
         System.out.println("constructor");
         //final CloseButtonDialog dialog = this;
@@ -74,7 +76,20 @@ public class UsersViewDialog extends CloseButtonDialog {
 
             }
         } else {
-            panel.addField("Нет сотрудников", "Добавить нового сотрудника в компанию", new JButton("Добавить"), true);
+            JButton newEmp = new JButton("Добавить");
+            newEmp.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        final CompanyDialog dialog = new CompanyDialog(frame, "Пользователи", new JPanel());
+                        dialog.createNewUserDialog(null);
+                        dialog.setVisible(true);
+                    } catch (Exception userExp) {
+                        System.out.println( userExp.getLocalizedMessage());
+                    }
+                }
+            });
+            panel.addField("Нет сотрудников", "Добавить нового сотрудника в компанию", newEmp, true);
         }
 
 

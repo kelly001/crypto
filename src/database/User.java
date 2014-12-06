@@ -355,4 +355,32 @@ public class User {
         }
         return risultat;
     }
+
+    public static Boolean delete( Long user_id) {
+        try {
+            Connection con = Database.getConnection();
+            PreparedStatement preparedStatement = null;
+            // select by user_id
+            String query = "UPDATE user SET status = ? where id = ?";
+            try {
+                System.out.println("");
+                preparedStatement = con.prepareStatement(query);
+                preparedStatement.setInt(1, 0);
+                preparedStatement.setLong(2,user_id);
+                preparedStatement.execute();
+                return true;
+            } catch (SQLException e) {
+                System.out.println(e.getLocalizedMessage());
+            } catch (Exception e) {
+                System.out.println(e.getLocalizedMessage());
+            } finally {
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+            }
+        } catch (SQLException sqlexc) {
+            System.out.println("SQL error / set user status false : " + sqlexc.getLocalizedMessage());
+        }
+        return false;
+    }
 }
