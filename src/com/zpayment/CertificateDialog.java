@@ -60,7 +60,7 @@ public class CertificateDialog extends OkCancelDialog {
                     } finally {
                         if (user instanceof Company) {
                             panel.saveRoot(id);
-                            X509Certificate rootcert = security.generateRootCertificate();
+                            X509Certificate rootcert = security.generateRootCertificate(panel.getValues());
                         } else {
                             panel.save(id);
                             try {

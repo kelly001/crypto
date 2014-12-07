@@ -27,7 +27,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     private MainPanel panel;
 
     public MainFrame() {
-        super("Crypto App");
+        super("Добро пожаловать в Крипто!");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //set icon
         ImageIcon img = new ImageIcon("icon.jpg");
@@ -178,7 +178,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                 System.exit(1);
             } else if (e.getActionCommand().equals("logout")) {
                 // start login frame
-                LoginFrame new_frame = new LoginFrame("Авторизация");
+                LoginFrame new_frame = new LoginFrame();
                 new_frame.setVisible(true);
                 findWindow((Component) e.getSource()).dispose();
             } else if (e.getActionCommand().contains("certificate")) {
@@ -217,7 +217,12 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                     создаем какой-нибудь список ( ex. User UsersListDialog())
                     который возвращает id пользователя
                     */
-                    new RemoveUserActionListener(Company.loadUsers().get[0]); // костыль, первый пользователь
+                    try {
+                        new RemoveUserActionListener(Company.loadUsers().get(0)); // костыль, первый пользователь
+                    } catch (Exception ULExc) {
+                        System.out.println("Load company users exeption: " + ULExc.getLocalizedMessage());
+                    }
+
                 }
             }
         }else {

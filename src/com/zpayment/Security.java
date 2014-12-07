@@ -1,5 +1,6 @@
 package com.zpayment;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.operator.ContentSigner;
@@ -50,7 +51,7 @@ class Security {
 
     }
 
-    public X509Certificate generateRootCertificate() {
+    public X509Certificate generateRootCertificate(Map<String, String> values) {
         System.out.println("Generate root certificate function");
         X509Certificate rootCert = null;
         RootKP = GenKeys();
@@ -66,7 +67,7 @@ class Security {
         BigInteger RootSerial = BigInteger.valueOf(System.currentTimeMillis());
         try {
             // Rooot certificate
-            rootCert = generateX509CertificateRoot("CN=Root CA Certificate", RootSerial, startDate, nextYear, "SHA1withDSA", RootKP, "BC");
+            rootCert = generateX509CertificateRoot(values, RootSerial, startDate, nextYear, "SHA1withDSA", RootKP, "BC");
             if (rootCert!=null) {
                 System.out.println(rootCert);
                 //saveCert(rootCert, "sertmy");
@@ -154,7 +155,7 @@ class Security {
         values.put("organization", "ROOT");
 
         Security security = new Security();
-        X509Certificate rootcert = security.generateRootCertificate();
+        X509Certificate rootcert = security.generateRootCertificate(values);
             //rootcert.getSubjectDN().toString();
         if (rootcert!=null)
             security.generateUserCertificate(rootcert);
@@ -171,7 +172,8 @@ class Security {
             ContentSigner signer = new JcaContentSignerBuilder("SHA1withDSA").build(userKeys.getPrivate());
 
             X500Name subject = new X500Name("CN=Signed Certificate for " + values.get("username"));
-            org.bouncycastle.asn1.x500.X500Name issuerName = new X500Name("CN=Root CA Certificate of " + values.get("organization"));
+            X500Name issuerName = new X500Name("CN=Root CA Certificate of " + values.get("organization"));
+
             X509v3CertificateBuilder certBldr = null;
 
             // Чем подписывать сертификат - паблик ключ пользователя/компании? Нужно пользователем,
@@ -182,6 +184,10 @@ class Security {
                 for(ASN1ObjectIdentifier extension : map.keySet())
                     certBldr.addExtension(extension, map.get(extension).getKey(), map.get(extension).getValue());
             */
+            certBldr.addExtension(new ASN1ObjectIdentifier("nsComment"), true, values.get("comment").getBytes());
+            certBldr.addExtension(new ASN1ObjectIdentifier("nsCertType"), true, values.get("type").getBytes());
+            certBldr.addExtension(new ASN1ObjectIdentifier("basicConstraints"), true, "CA:FALSE".getBytes());
+            certBldr.addExtension(new ASN1ObjectIdentifier("keyUsage"), true, "digitalSignature, keyEncipherment".getBytes());
             X509Certificate cert = new JcaX509CertificateConverter().setProvider("BC").getCertificate(certBldr.build(signer));
             return cert;
         }
@@ -189,7 +195,8 @@ class Security {
     }
 
 
-    public static X509Certificate generateX509Certificate(String name, BigInteger serial, X509Certificate issuerCert, Date start , Date end, String signAlgorithm, KeyPair keys, String provider)
+    public static X509Certificate generateX509Certificate(String name, BigInteger serial, X509Certificate issuerCert,
+                                                         Date start , Date end, String signAlgorithm, KeyPair keys, String provider)
             throws IOException, OperatorCreationException, CertificateException
     {
         if(serial!=null && name!=null && issuerCert!=null && start!=null && end!=null && signAlgorithm !=null)
@@ -211,22 +218,23 @@ class Security {
         return null;
     }
 
-    public static X509Certificate generateX509CertificateRoot(String name, BigInteger serial, Date start , Date end, String signAlgorithm, KeyPair keys, String provider)
+    public static X509Certificate generateX509CertificateRoot(Map<String, String> values,BigInteger serial,
+                                                              Date start , Date end, String signAlgorithm, KeyPair keys, String provider)
             throws IOException, OperatorCreationException, CertificateException
     {
-        if(serial!=null && name!=null && start!=null && end!=null && signAlgorithm !=null)
+        if(serial!=null && start!=null && end!=null && signAlgorithm !=null)
         {
             //-----GENERATE THE X509 CERTIFICATE
             ContentSigner signer = new JcaContentSignerBuilder(signAlgorithm).build(keys.getPrivate());
 
-            X500Principal subject = new X500Principal(name);
+            X500Name subject = new X500Name("CN = CA Root certificate of  " + values.get("organization"));
             X509v3CertificateBuilder certBldr = null;
 
             certBldr = new JcaX509v3CertificateBuilder(subject, serial, start, end, subject, keys.getPublic());
-            /*if(map!=null)
-                for(ASN1ObjectIdentifier extension : map.keySet())
-                    certBldr.addExtension(extension, map.get(extension).getKey(), map.get(extension).getValue());
-            */
+            certBldr.addExtension(new ASN1ObjectIdentifier("nsComment"), true, values.get("comment").getBytes());
+            certBldr.addExtension(new ASN1ObjectIdentifier("nsCertType"), true, values.get("type").getBytes());
+            certBldr.addExtension(new ASN1ObjectIdentifier("basicConstraints"), true, "CA:FALSE".getBytes());
+            certBldr.addExtension(new ASN1ObjectIdentifier("keyUsage"), true, "digitalSignature, keyEncipherment".getBytes());
             X509Certificate cert = new JcaX509CertificateConverter().setProvider(provider).getCertificate(certBldr.build(signer));
             return cert;
         }

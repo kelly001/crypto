@@ -14,13 +14,13 @@ import javax.swing.JFrame;
 public class LoginFrame extends JFrame{
 
     private JFrame frame;
-    private JLabel infolabel;
     public LoginDialog dialog;
     public CompanyDialog RegistrationDialog;
     Dimension size = new Dimension(240, 160);
 
-    public LoginFrame(String name) {
-        super(name);
+    public LoginFrame() {
+        super("Добро пожаловать в Крипто!");
+        this.frame = this;
         //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
@@ -51,7 +51,7 @@ public class LoginFrame extends JFrame{
     }
 
     public static void main(String[] args) {
-        JFrame frame = new LoginFrame("Welcome!");
+        JFrame frame = new LoginFrame();
         frame.setVisible(true);
     }
 
@@ -70,8 +70,8 @@ public class LoginFrame extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    RegistrationDialog = new CompanyDialog(frame, "Регистрация нового пользователя", new JPanel());
-                    RegistrationDialog.createNewUserDialog(null);
+                    RegistrationDialog = new CompanyDialog(frame, "Регистрация новой компании", new JPanel());
+                    RegistrationDialog.setGUI();
                     RegistrationDialog.setVisible(true);
                 } catch (Exception exc) {
                     System.out.println( exc.getLocalizedMessage());

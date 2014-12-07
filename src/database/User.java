@@ -14,7 +14,7 @@ import java.util.Calendar;
 
 public class User {
     private Long id;
-    private Integer type;
+    private Integer type; // 1 - Company; 2 - User;
     private String email;
     private String password;
     private String salt;
