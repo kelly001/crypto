@@ -68,14 +68,13 @@ public class CertificateDialog extends OkCancelDialog {
                                 //Certificate.loadByUser((Employer) user.getCompany().getId());
                                 User rootCompany = User.loadByName(panel.getValues().get("organization"));
                                 Certificate rootCert = rootCompany.getValidCertificate();
-                                //get private key of organization
-                                PrivateKey CAkey = security.readPrivateKey(rootCert.getFilename());
-                                System.out.println(CAkey);
+                                // TODO load root certificate from file
+                                security.generateUserCertificate(panel.getValues());
                             } catch (Exception e) {
                                 System.out.println("Error to load root certificate: " + e.getLocalizedMessage());
                                 System.out.println("User saved, certificate saved to db, closing dialog..");
                             }
-                            security.generateUserCertificate(panel.getValues());
+
                         }
                     }
                 }

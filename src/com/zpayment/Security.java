@@ -2,17 +2,17 @@ package com.zpayment;
         import database.*;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERBMPString;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
+        import org.bouncycastle.asn1.DEROctetString;
+        import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
-import org.bouncycastle.asn1.x509.X509Extension;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+        import org.bouncycastle.asn1.x509.*;
+        import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
-import org.bouncycastle.openssl.PEMWriter;
+        import org.bouncycastle.crypto.engines.RC2Engine;
+        import org.bouncycastle.crypto.modes.CBCBlockCipher;
+        import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.OutputEncryptor;
@@ -27,8 +27,9 @@ import org.bouncycastle.pkcs.PKCS12SafeBagBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS12SafeBagBuilder;
 import org.bouncycastle.pkcs.jcajce.JcePKCS12MacCalculatorBuilder;
 import org.bouncycastle.pkcs.jcajce.JcePKCSPBEOutputEncryptorBuilder;
+        import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 
-import javax.security.auth.x500.X500Principal;
+        import javax.security.auth.x500.X500Principal;
 //import org.bouncycastle.asn1.DEREncodable;
 
 import java.io.*;
@@ -92,6 +93,9 @@ class Security {
                 savePemX509Certificate(rootCert, "RootCertificate");
                 savePublicKey(RootKP,values.get("filename")+"RootPublicKey");
                 savePrivateKey(RootKP,values.get("filename")+"RootPublicKey");
+                //TODO show message dialog to input password
+                transformToPKS12(rootCert, RootKP, "123456");
+
             }else { System.out.println("Root certificate is null ");}
         } catch (Exception e) {
             System.out.println("Generate root certificate error: " + e.getLocalizedMessage());
@@ -119,6 +123,7 @@ class Security {
                 System.out.println(signedCert);
                 savePemX509Certificate(signedCert,"UserCertificate");
                 savePublicKey(UserKP, "UserKey");
+                transformToPKS12(signedCert, UserKP,"123456");
                 return true;
             }else { System.out.println("User certificate is null ");}
         } catch (Exception e) {
@@ -171,13 +176,14 @@ class Security {
         final Map<String, String> values = new HashMap<String, String>();
         values.put("username", "USER");
         values.put("organization", "ROOT");
+        values.put("filename", "test");
 
         Security security = new Security();
         X509Certificate rootcert = security.generateRootCertificate(values);
             //rootcert.getSubjectDN().toString();
         if (rootcert!=null)
-            security.generateUserCertificate(rootcert);
-        Boolean user = security.generateUserCertificate(values);
+            security.generateUserCertificate(values);
+        //Boolean user = security.generateUserCertificate(values, rootcert);
     }
 
     public static X509Certificate generateX509Certificate(Map<String, String> values,
@@ -190,17 +196,18 @@ class Security {
             ContentSigner signer = new JcaContentSignerBuilder("SHA1withDSA").build(userKeys.getPrivate());
 
             X500NameBuilder namebuilder = new X500NameBuilder(X500Name.getDefaultStyle());
-            namebuilder.addRDN(BCStyle.C, values.get("country"));
-            namebuilder.addRDN(BCStyle.O, values.get("locality"));
-            namebuilder.addRDN(BCStyle.ST, values.get("state"));
-            namebuilder.addRDN(BCStyle.O, values.get("organization"));
-            namebuilder.addRDN(BCStyle.OU, values.get("department"));
-            namebuilder.addRDN(BCStyle.CN, values.get("username"));
-            namebuilder.addRDN(BCStyle.EmailAddress, values.get("email"));
+            namebuilder.addRDN(BCStyle.C, values.get("country")!=null?values.get("country"):"");
+            namebuilder.addRDN(BCStyle.O, values.get("locality")!=null?values.get("locality"):"");
+            namebuilder.addRDN(BCStyle.ST, values.get("state")!=null?values.get("state"):"");
+            namebuilder.addRDN(BCStyle.O, values.get("organization")!=null?values.get("organization"):"");
+            namebuilder.addRDN(BCStyle.OU, values.get("department")!=null?values.get("department"):"");
+            namebuilder.addRDN(BCStyle.CN, values.get("username")!=null?values.get("username"):"");
+            namebuilder.addRDN(BCStyle.EmailAddress, values.get("email")!=null?values.get("email"):"");
             X500Name subject  = namebuilder.build();
 
             //X500Name subject = new X500Name("CN=Signed Certificate for " + values.get("username"));
-            X500Name issuerName = new X500Name("CA=Root CA Certificate of " + values.get("organization"));
+            X500Name issuerName = new X500Name("CN = Root CA Certificate of " + (values.get("organization")!=null?values.get("organization"):""));
+
             X509v3CertificateBuilder certBldr = null;
 
             // Чем подписывать сертификат - паблик ключ пользователя/компании? Нужно пользователем,
@@ -210,7 +217,8 @@ class Security {
             certBldr.addExtension( X509Extension.basicConstraints, true, new BasicConstraints(false));
             certBldr.addExtension(X509Extension.keyUsage, true,
                     new KeyUsage(KeyUsage.keyCertSign|KeyUsage.digitalSignature));
-
+            //certBldr.addExtension(X509Extension.authorityKeyIdentifier, true,
+            //        new DEROctetString(new AuthorityKeyIdentifierStructure(issuerCert)));
             X509Certificate cert = new JcaX509CertificateConverter().setProvider("BC").getCertificate(certBldr.build(signer));
             return cert;
         }
@@ -251,17 +259,17 @@ class Security {
             X509v3CertificateBuilder certBldr = null;
 
             X500NameBuilder namebuilder = new X500NameBuilder(X500Name.getDefaultStyle());
-            namebuilder.addRDN(BCStyle.C, values.get("country"));
-            namebuilder.addRDN(BCStyle.O, values.get("locality"));
-            namebuilder.addRDN(BCStyle.ST, values.get("state")!=null?values.get("region"):"");
-            namebuilder.addRDN(BCStyle.O, values.get("organization"));
-            namebuilder.addRDN(BCStyle.OU, values.get("department"));
-            namebuilder.addRDN(BCStyle.CN, values.get("username"));
-            namebuilder.addRDN(BCStyle.EmailAddress, values.get("email"));
+            namebuilder.addRDN(BCStyle.C, values.get("country")!=null?values.get("country"):"");
+            namebuilder.addRDN(BCStyle.O, values.get("locality")!=null?values.get("locality"):"");
+            namebuilder.addRDN(BCStyle.ST, values.get("state")!=null?values.get("state"):"");
+            namebuilder.addRDN(BCStyle.O, values.get("organization")!=null?values.get("organization"):"");
+            namebuilder.addRDN(BCStyle.OU, values.get("department")!=null?values.get("department"):"");
+            namebuilder.addRDN(BCStyle.CN, values.get("username")!=null?values.get("username"):"");
+            namebuilder.addRDN(BCStyle.EmailAddress, values.get("email")!=null?values.get("email"):"");
             X500Name subject  = namebuilder.build();
 
             certBldr = new JcaX509v3CertificateBuilder(subject, serial, start, end, subject, keys.getPublic());
-            certBldr.addExtension( X509Extension.basicConstraints, true, new BasicConstraints(false));
+            certBldr.addExtension( X509Extension.basicConstraints, true, new BasicConstraints(true));
             certBldr.addExtension(X509Extension.keyUsage, true,
                     new KeyUsage(KeyUsage.keyCertSign|KeyUsage.digitalSignature));
             X509Certificate cert = new JcaX509CertificateConverter().setProvider(provider).getCertificate(certBldr.build(signer));
@@ -431,36 +439,35 @@ class Security {
             e.getLocalizedMessage();
         }
     }
-        private void transformToPKS12(X509Certificate user, KeyPair userKey,
-                                      X509Certificate root, KeyPair rootKey)
+        private void transformToPKS12(X509Certificate user, KeyPair userKey, String password)
                 throws NoSuchProviderException, KeyStoreException{
          try {
-             KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
-             PKCS12SafeBagBuilder eeCertBagBuilder = new JcaPKCS12SafeBagBuilder(root);
-             eeCertBagBuilder.addBagAttribute(PKCS12SafeBag.friendlyNameAttribute, new DERBMPString("User's Key"));
+             String filename = "files/" + user.getSubjectDN().toString() + ".p12";
+             PKCS12SafeBagBuilder eeCertBagBuilder = new JcaPKCS12SafeBagBuilder(user);
+             eeCertBagBuilder.addBagAttribute(PKCS12SafeBag.friendlyNameAttribute, new DERBMPString("User's Certificate"));
 
              JcaX509ExtensionUtils extUtils = new JcaX509ExtensionUtils();
-             SubjectKeyIdentifier pubKeyId = extUtils.createSubjectKeyIdentifier(rootKey.getPublic());
+             SubjectKeyIdentifier pubKeyId = extUtils.createSubjectKeyIdentifier(userKey.getPublic());
              eeCertBagBuilder.addBagAttribute(PKCS12SafeBag.localKeyIdAttribute, pubKeyId);
 
              //OutputEncryptor encOut = new JcePKCSPBEOutputEncryptorBuilder(NISTObjectIdentifiers.id_aes256_CBC).setProvider("BC").build(JcaUtils.KEY_PASSWD);
              PKCS12SafeBagBuilder keyBagBuilder = new JcaPKCS12SafeBagBuilder(userKey.getPrivate());
-
-             keyBagBuilder.addBagAttribute(PKCS12SafeBag.friendlyNameAttribute, new DERBMPString("Eric's Key"));
+             keyBagBuilder.addBagAttribute(PKCS12SafeBag.friendlyNameAttribute, new DERBMPString("User's Key"));
              keyBagBuilder.addBagAttribute(PKCS12SafeBag.localKeyIdAttribute, pubKeyId);
 
              PKCS12PfxPduBuilder builder = new PKCS12PfxPduBuilder();
              builder.addData(keyBagBuilder.build());
              builder.addEncryptedData(new JcePKCSPBEOutputEncryptorBuilder(
-                             PKCSObjectIdentifiers.pbeWithSHAAnd128BitRC2_CBC).setProvider("BC").build(JcaUtils.KEY_PASSWD),
-                     new PKCS12SafeBag[]{eeCertBagBuilder.build()});
+                             PKCSObjectIdentifiers.pbeWithSHAAnd128BitRC2_CBC).setProvider("BC").build(password.toCharArray()),
+                    eeCertBagBuilder.build());
 
-             PKCS12PfxPdu pfx = builder.build(new JcePKCS12MacCalculatorBuilder(NISTObjectIdentifiers.id_sha256), JcaUtils.KEY_PASSWD);
-             writeFile("key.p12", pfx.getEncoded());
+             PKCS12PfxPdu pfx = builder.build(new JcePKCS12MacCalculatorBuilder(), password.toCharArray());
+             writeFile(filename, pfx.getEncoded());
         } catch (IOException ioe) {System.out.println("IOException error: " + ioe.getLocalizedMessage());}
         catch (Exception exc ) {System.out.println("Generate p12 error: " + exc.getLocalizedMessage());}
     }
-    private void transformToPKS12(String user, String rootKey){
+
+    private void transformToPKS12_CommadLine(String user, String rootKey){
         try {
             String certificate = "files/" + user +"Certificate";
             String key = "files/"+rootKey+"PublicKey";
