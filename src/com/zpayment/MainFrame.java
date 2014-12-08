@@ -17,9 +17,9 @@ import java.sql.SQLException;
  * Created by new_name on 14.10.2014.
  */
 public class MainFrame extends JFrame implements ActionListener, ItemListener{
-
     Dimension size = new Dimension(640,480);
     public User company;// = new Company();
+    protected JFrame frame;
 
     private JMenuBar menuBar;
     private JMenu menu, certificateMenu, companyMenu, userMenu, viewMenu, infoMenu;
@@ -29,6 +29,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     public MainFrame() {
         super("Добро пожаловать в Крипто!");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.frame = this;
         //set icon
         ImageIcon img = new ImageIcon("icon.jpg");
         this.setIconImage(img.getImage());
@@ -265,7 +266,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     protected void createCertificateDialog(JFrame frame) {
         try {
             final CertificateDialog dialog =
-                    new CertificateDialog(frame, new Certificate(), company);
+                    new CertificateDialog(this.frame, new Certificate(), company);
             //System.out.println(dialog?"true":"false");
         } catch (Exception e) {
             System.out.println( "Create Certificate Dialog error: " + e.getLocalizedMessage());
@@ -276,7 +277,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         System.out.println("create users dialog func");
         try {
             final FieldPanel panel = new FieldPanel();
-            final UsersViewDialog dialog = new UsersViewDialog(frame, panel);
+            final UsersViewDialog dialog = new UsersViewDialog(frame, panel, (Company) company);
             dialog.setUsers(company.getId());
             dialog.setControls(panel);
             dialog.setVisible(true);

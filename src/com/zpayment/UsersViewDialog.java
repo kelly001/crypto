@@ -25,13 +25,15 @@ public class UsersViewDialog extends CloseButtonDialog {
     public static Dimension size = new Dimension(480,480);
     protected Frame frame;
     protected ArrayList<Employer> users;
+    protected Company company;
     //protected FieldPanel panel = new FieldPanel();
     private static String title = " Сотрудники компании.";
 
 
-    public UsersViewDialog(Frame parent, FieldPanel panel) {
+    public UsersViewDialog(Frame parent, FieldPanel panel, Company company) {
         super(parent, title, panel);
         System.out.println("constructor");
+        this.company = company;
         //final CloseButtonDialog dialog = this;
     }
 
@@ -82,7 +84,7 @@ public class UsersViewDialog extends CloseButtonDialog {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         final CompanyDialog dialog = new CompanyDialog(frame, "Пользователи", new JPanel());
-                        dialog.createNewUserDialog(null);
+                        dialog.createNewUserDialog(company);
                         dialog.setVisible(true);
                     } catch (Exception userExp) {
                         System.out.println( userExp.getLocalizedMessage());

@@ -49,7 +49,7 @@ public class CompanyPanel extends FieldPanel {
         }
 
         // доступно только при создании нового
-        JTextField field = new JTextField("password");
+        JTextField field = new JTextField("Пароль пользователя");
         this.addField("", "Пароль для нового пользователя", field, true);
         controls.put("password", field );
 
@@ -66,7 +66,7 @@ public class CompanyPanel extends FieldPanel {
 
         JTextField username = new JTextField(user.getUsername());
         username.setEditable(false);
-        this.addField("Имя пользователя", "Имя пользователя/название компании", username, true);
+        this.addField("Название компании:", "Название компании:", username, true);
 
         JTextField email = new JTextField(user.getEmail());
         email.setEditable(false);
