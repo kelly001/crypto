@@ -21,7 +21,7 @@ public class LoginDialog extends JDialog{
 
 
     public LoginDialog(Frame parent) {
-        super(parent, "com.zpayment.Login", true);
+        super(parent, "Авторизация", true);
 
         succeeded = false;
 
@@ -65,7 +65,7 @@ public class LoginDialog extends JDialog{
         panel.add(pfPassword, cs);
         panel.setBorder(new LineBorder(Color.GRAY));
 
-        btnLogin = new JButton("com.zpayment.Login");
+        btnLogin = new JButton("Войти");
 
         btnLogin.addActionListener(new AuthActionListener());
         btnCancel = new JButton("Cancel");
@@ -101,7 +101,7 @@ public class LoginDialog extends JDialog{
 
                 JOptionPane.showMessageDialog(LoginDialog.this,
                         "Hi " + getUsername() + "! You have successfully logged in.",
-                        "com.zpayment.Login",
+                        "Авторизация",
                         JOptionPane.INFORMATION_MESSAGE);
                 succeeded = true;
                 dispose();

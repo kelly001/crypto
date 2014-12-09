@@ -5,8 +5,10 @@ import org.bouncycastle.asn1.DERBMPString;
         import org.bouncycastle.asn1.DEROctetString;
         import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x500.X500NameBuilder;
+        import org.bouncycastle.asn1.x500.RDN;
+        import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
+        import org.bouncycastle.asn1.x500.style.IETFUtils;
         import org.bouncycastle.asn1.x509.*;
         import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
@@ -30,6 +32,7 @@ import org.bouncycastle.pkcs.jcajce.JcePKCSPBEOutputEncryptorBuilder;
         import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 
         import javax.security.auth.x500.X500Principal;
+        import javax.swing.*;
 //import org.bouncycastle.asn1.DEREncodable;
 
 import java.io.*;
@@ -94,7 +97,7 @@ class Security {
                 savePublicKey(RootKP,values.get("filename")+"RootPublicKey");
                 savePrivateKey(RootKP,values.get("filename")+"RootPublicKey");
                 //TODO show message dialog to input password
-                transformToPKS12(rootCert, RootKP, "123456");
+                transformToPKS12(rootCert, RootKP);
 
             }else { System.out.println("Root certificate is null ");}
         } catch (Exception e) {
@@ -121,9 +124,9 @@ class Security {
             X509Certificate signedCert = generateX509Certificate("CN=Signed Certificate for", signedSerial, rootCert, startDate, nextYear, "SHA1withDSA", UserKP, "BC");
             if (signedCert!=null) {
                 System.out.println(signedCert);
-                savePemX509Certificate(signedCert,"UserCertificate");
+                savePemX509Certificate(signedCert, "UserCertificate");
                 savePublicKey(UserKP, "UserKey");
-                transformToPKS12(signedCert, UserKP,"123456");
+                transformToPKS12(signedCert, UserKP);
                 return true;
             }else { System.out.println("User certificate is null ");}
         } catch (Exception e) {
@@ -163,6 +166,7 @@ class Security {
                 savePemX509Certificate(signedCert, values.get("filename"));
                 savePublicKey(UserKP, values.get("filename")+"PublicKey");
                 savePrivateKey(UserKP, values.get("filename")+"PrivateKey");
+                transformToPKS12(signedCert, UserKP);
                 return true;
             }else { System.out.println("User certificate is null ");}
         } catch (Exception e) {
@@ -439,10 +443,26 @@ class Security {
             e.getLocalizedMessage();
         }
     }
-        private void transformToPKS12(X509Certificate user, KeyPair userKey, String password)
+        private void transformToPKS12(X509Certificate user, KeyPair userKey)
                 throws NoSuchProviderException, KeyStoreException{
          try {
-             String filename = "files/" + user.getSubjectDN().toString() + ".p12";
+             //get user's name
+             X500Principal principal = user.getSubjectX500Principal();
+             X500Name x500name = new X500Name( principal.getName() );
+             RDN cn = x500name.getRDNs(BCStyle.CN)[0];
+             String username = IETFUtils.valueToString(cn.getFirst().getValue());
+             String filename = "files/" + username + ".p12";
+
+             // how input dialog to get password
+             String password =
+                     JOptionPane.showInputDialog("Введите пароль для контейнера сертификата:");
+             if(password == null)
+             {
+                 JOptionPane.showMessageDialog(null,
+                         "Будет использован стандартный пароль: certificate_password", "Password Required",
+                         JOptionPane.INFORMATION_MESSAGE);
+
+             }
              PKCS12SafeBagBuilder eeCertBagBuilder = new JcaPKCS12SafeBagBuilder(user);
              eeCertBagBuilder.addBagAttribute(PKCS12SafeBag.friendlyNameAttribute, new DERBMPString("User's Certificate"));
 
