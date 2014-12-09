@@ -5,11 +5,14 @@ import database.Certificate;
 import database.Company;
 import database.Employer;
 import database.User;
+import external.UrlUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.net.URI;
+import java.net.URL;
 import java.sql.SQLException;
 
 
@@ -36,7 +39,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     }
 
     private void addMenuItem(String name, ActionListener action, String id, JMenu menu) {
-
         //a group of JMenuItems
         menuItem = new JMenuItem(name,
                 KeyEvent.VK_T);
@@ -44,7 +46,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
        //menuItem.addActionListener(new RemoveUserActionListener());
         menuItem.getAccessibleContext().setAccessibleDescription(
                 "This doesn't really do anything");
-
         menuItem.setActionCommand(id);
         menuItem.addActionListener(action);
         menuItem.addItemListener(this);
@@ -107,13 +108,23 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
         infoMenu = new JMenu("Помощь");
         infoMenu.setMnemonic(KeyEvent.VK_F5);
-        infoMenu.setEnabled(false);
-        addMenuItem("О компании",this, "company", infoMenu);
-        addMenuItem("Справка", this, "help", infoMenu);
+        JMenuItem company = new JMenuItem("О компании");
+        company.addActionListener(new URLAction("https://z-payment.com/"));
+        infoMenu.add(company);
+        JMenuItem help = new JMenuItem("Как пользоваться программой");
+        help.addActionListener(new URLAction(new File("docs/index.html")));
+        infoMenu.add(help);
+        JMenuItem WinHelp = new JMenuItem("Установка сертификата Windows");
+        WinHelp.addActionListener(new URLAction(new File("docs/windows.html")));
+        infoMenu.add(WinHelp);
+        JMenuItem bugs = new JMenuItem("Для разработчиков");
+        bugs.addActionListener(new URLAction(new File("docs/Bugs.html")));
+        infoMenu.add(bugs);
+        addMenuItem("Установка сертификата в Chrome", new URLAction("http://russvet24.ru/services/2134/"), "browserhelp", infoMenu);
+        addMenuItem("Установка сертификата в FireFox", new URLAction("http://russvet24.ru/services/2132/"), "browserhelp", infoMenu);
         menuBar.add(viewMenu);
         menuBar.add(infoMenu);
         setJMenuBar(menuBar);
-
     }
 
     public void setCompany(String name) {
@@ -225,6 +236,19 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                     }
 
                 }
+            } else if (e.getActionCommand().contains("help")) {
+                /*switch (e.getActionCommand()) {
+                    case "mainhelp":
+                        break;
+                    case "windowshelp":
+                        break;
+                    case "browserhelp":
+                        break;
+                    case "bugs":
+                        break;
+                    default:
+                        break;
+                }*/
             }
         }else {
             System.out.println("source is not a Component");
@@ -340,21 +364,35 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         }
     }
 
-    private Boolean deleteCertificateAction(Certificate certificate) {
-        if (certificate != null && certificate.getStatus()) {
-            String path = "files/" + certificate.getFilename();
-            try {
-                Certificate.cancel(certificate.getId());
+    private class URLAction implements ActionListener {
+        private URI url;
 
-                File certFile = new File(path);
-                if (certFile.exists() && certFile.isFile() && certFile.delete())
-                    return true;
-            } catch (SQLException sqle){
-                System.out.println("Update db exception catched: " + sqle.getLocalizedMessage());
-            } catch (Exception x) {
-                System.err.println("deleting certificete files exception catched: " + x.getLocalizedMessage());
+        URLAction(String url) {
+            try {
+                this.url = new URL(url).toURI();
+            } catch (Exception e) {
+                System.out.println("Open url exception: " + e.getLocalizedMessage());
             }
         }
-        return false;
+
+        URLAction(File url) {
+            this.url = url.toURI();
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+                if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE))
+                    desktop.browse(url);
+            } catch (Exception URIex) {
+                System.out.println("Open url exception: " + URIex.getLocalizedMessage());
+                // Notify the user of the failure
+                String msg = "This program just tried to open a webpage." + "\n"
+                        + "The URL has been copied to your clipboard, simply paste into your browser to access."+
+                        "Webpage: " + url;
+                JOptionPane.showMessageDialog(null, msg, "URL Error", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
     }
 }

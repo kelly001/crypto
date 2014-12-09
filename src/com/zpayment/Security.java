@@ -95,7 +95,7 @@ class Security {
                 //saveCert(rootCert, "sertmy");
                 savePemX509Certificate(rootCert, "RootCertificate");
                 savePublicKey(RootKP,values.get("filename")+"RootPublicKey");
-                savePrivateKey(RootKP,values.get("filename")+"RootPublicKey");
+                savePrivateKey(RootKP,values.get("filename")+"RootPrivateKey");
                 //TODO show message dialog to input password
                 transformToPKS12(rootCert, RootKP);
 
