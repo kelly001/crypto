@@ -72,7 +72,7 @@
       <include name="jre/lib/plugin.jar"/>
       <include name="jre/lib/resources.jar"/>
       <include name="jre/lib/rt.jar"/>
-      <include name="jre/lib/ext/access-bridge.jar"/>
+      <include name="jre/lib/ext/access-bridge-64.jar"/>
       <include name="jre/lib/ext/cldrdata.jar"/>
       <include name="jre/lib/ext/dnsns.jar"/>
       <include name="jre/lib/ext/jaccess.jar"/>
@@ -127,32 +127,48 @@
   
   <target name="init.artifacts">
     <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
-    <property name="artifact.output.crypto:jar" value="${basedir}/out/artifacts/Crypto_jar"/>
+    <property name="artifact.output.crypto:jar" value="${basedir}/out/artifacts/crypto_jar"/>
+    <property name="artifact.output.crypto:jar2" value="${basedir}/out/artifacts/crypto_jar2"/>
     <mkdir dir="${artifacts.temp.dir}"/>
-    <property name="temp.jar.path.Crypto.jar" value="${artifacts.temp.dir}/Crypto.jar"/>
+    <property name="temp.jar.path.crypto.jar" value="${artifacts.temp.dir}/crypto.jar"/>
+    <property name="temp.jar.path.crypto.jar2" value="${artifacts.temp.dir}/1/crypto.jar"/>
+    <mkdir dir="${artifacts.temp.dir}/1"/>
   </target>
   
-  <target name="artifact.crypto:jar" depends="init.artifacts" description="Build &#39;Crypto:jar&#39; artifact">
-    <property name="artifact.temp.output.crypto:jar" value="${artifacts.temp.dir}/Crypto_jar"/>
+  <target name="artifact.crypto:jar" depends="init.artifacts, compile.module.crypto" description="Build &#39;crypto:jar&#39; artifact">
+    <property name="artifact.temp.output.crypto:jar" value="${artifacts.temp.dir}/crypto_jar"/>
     <mkdir dir="${artifact.temp.output.crypto:jar}"/>
-    <jar destfile="${temp.jar.path.Crypto.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
-      <zipfileset file="${basedir}/lib/bcpkix-jdk15on-151.jar"/>
-      <zipfileset file="${basedir}/lib/teacode-common.jar"/>
-      <zipfileset file="${basedir}/lib/bcprov-jdk15on-151.jar"/>
-      <zipfileset file="${basedir}/lib/mysql-connector-java-5.1.34-bin.jar"/>
-      <zipfileset dir="${basedir}/files"/>
-      <zipfileset dir="${basedir}/docs"/>
-      <zipfileset file="${basedir}/data"/>
-      <zipfileset file="${basedir}/crypto_db.sql"/>
-      <zipfileset file="${basedir}/META-INF/MANIFEST.MF" prefix="META-INF"/>
+    <jar destfile="${temp.jar.path.crypto.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset dir="${crypto.output.dir}"/>
+      <zipfileset src="${basedir}/lib/bcpkix-jdk15on-151.jar"/>
+      <zipfileset src="${basedir}/lib/bcprov-jdk15on-151.jar"/>
+      <zipfileset src="${basedir}/lib/mysql-connector-java-5.1.34-bin.jar"/>
+      <zipfileset src="${basedir}/lib/teacode-common.jar"/>
     </jar>
-    <copy file="${temp.jar.path.Crypto.jar}" tofile="${artifact.temp.output.crypto:jar}/Crypto.jar"/>
+    <copy file="${temp.jar.path.crypto.jar}" tofile="${artifact.temp.output.crypto:jar}/crypto.jar"/>
   </target>
   
-  <target name="build.all.artifacts" depends="artifact.crypto:jar" description="Build all artifacts">
+  <target name="artifact.crypto:jar2" depends="init.artifacts, compile.module.crypto" description="Build &#39;crypto:jar2&#39; artifact">
+    <property name="artifact.temp.output.crypto:jar2" value="${artifacts.temp.dir}/crypto_jar2"/>
+    <mkdir dir="${artifact.temp.output.crypto:jar2}"/>
+    <jar destfile="${temp.jar.path.crypto.jar2}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset dir="${crypto.output.dir}"/>
+      <zipfileset src="${basedir}/lib/bcpkix-jdk15on-151.jar"/>
+      <zipfileset src="${basedir}/lib/bcprov-jdk15on-151.jar"/>
+      <zipfileset src="${basedir}/lib/mysql-connector-java-5.1.34-bin.jar"/>
+      <zipfileset src="${basedir}/lib/teacode-common.jar"/>
+    </jar>
+    <copy file="${temp.jar.path.crypto.jar2}" tofile="${artifact.temp.output.crypto:jar2}/crypto.jar"/>
+  </target>
+  
+  <target name="build.all.artifacts" depends="artifact.crypto:jar, artifact.crypto:jar2" description="Build all artifacts">
     <mkdir dir="${artifact.output.crypto:jar}"/>
     <copy todir="${artifact.output.crypto:jar}">
       <fileset dir="${artifact.temp.output.crypto:jar}"/>
+    </copy>
+    <mkdir dir="${artifact.output.crypto:jar2}"/>
+    <copy todir="${artifact.output.crypto:jar2}">
+      <fileset dir="${artifact.temp.output.crypto:jar2}"/>
     </copy>
     
     <!-- Delete temporary files -->

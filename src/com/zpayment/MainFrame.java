@@ -1,5 +1,6 @@
 package com.zpayment;
 
+import com.sun.org.apache.xpath.internal.SourceTree;
 import com.teacode.swing.component.FieldPanel;
 import database.Certificate;
 import database.Company;
@@ -22,7 +23,8 @@ import java.sql.SQLException;
 public class MainFrame extends JFrame implements ActionListener, ItemListener{
     Dimension size = new Dimension(640,480);
     public User company;// = new Company();
-    protected JFrame frame;
+    private MainFrame frame;
+    public LoginDialog login;
 
     private JMenuBar menuBar;
     private JMenu menu, certificateMenu, companyMenu, userMenu, viewMenu, infoMenu;
@@ -31,11 +33,42 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
     public MainFrame() {
         super("Добро пожаловать в Крипто!");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.frame = this;
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //set icon
         ImageIcon img = new ImageIcon("icon.jpg");
         this.setIconImage(img.getImage());
+
+        /*addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowActivated(WindowEvent e) {
+                System.out.println(login.toString());
+                if (login.isSucceeded()) {
+                    String user = login.getUsername();
+                    frame.setCompany(user);
+                    login.dispose();
+                    frame.setGUI();
+                    frame.setVisible(true);
+                }
+            }
+        }); */
+        login = new LoginDialog(frame);
+        login.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                System.out.println("!!!!");
+                if (login.isSucceeded()) {
+                    String user = login.getUsername();
+                    frame.setCompany(user);
+                    //login.dispose();
+                    frame.setGUI();
+                    frame.setVisible(true);
+                }
+            }
+        });
+
+        login.setVisible(true);
+
     }
 
     private void addMenuItem(String name, ActionListener action, String id, JMenu menu) {
@@ -127,9 +160,9 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         setJMenuBar(menuBar);
     }
 
-    public void setCompany(String name) {
+    public  void setCompany(String name) {
         try {
-            System.out.println(name);
+            System.out.println("setCompany function, user = " + name);
             company = Company.loadByEmail(name);
             if (company == null) this.setUser(name);
         } catch (Exception e) {
@@ -139,7 +172,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
     public void setUser(String name) {
         try {
-            System.out.println(name);
+            System.out.println("Set user function, user email = " + name);
             company = Company.loadByEmail(name);
         } catch (Exception e) {
             e.printStackTrace();
@@ -147,13 +180,13 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     }
 
     public void setGUI() {
-        MainPanel panel = new MainPanel(this);
+        MainPanel panel = new MainPanel(frame);
         panel.setGUI(company);
         setMenu();
-        this.setContentPane(panel);
-        this.setSize(size);
-        this.pack();
-        this.setVisible(true);
+        frame.setContentPane(panel);
+        frame.setSize(size);
+        frame.pack();
+        frame.setVisible(true);
     }
 
 
@@ -161,8 +194,12 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     //main func, first argument - company email
     public static void main(String[] arg) {
         MainFrame new_frame = new MainFrame();
-        if (arg.length>0) new_frame.setCompany(arg[0]);
-        new_frame.setGUI();
+        if (arg.length>0){
+            //login.dispose();
+            new_frame.setCompany(arg[0]);
+            new_frame.setGUI();
+            new_frame.setVisible(true);
+        }
     }
 
     public class MenuActionListener implements ActionListener
@@ -182,28 +219,32 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         //check menu id
         if (e.getSource() instanceof Component) {
             if (e.getActionCommand().equals("main")) {
-                String args[] = {company.getEmail()};
+                frame.setGUI();
+                frame.setVisible(true);
+/*                String args[] = {company.getEmail()};
                 MainFrame.main(args);
                 Window w = findWindow((Component)e.getSource());
-                w.dispose();
+                w.dispose();*/
             } else if (e.getActionCommand().equals("exit")) {
                 System.exit(1);
             } else if (e.getActionCommand().equals("logout")) {
                 // start login frame
-                LoginFrame new_frame = new LoginFrame();
-                new_frame.setVisible(true);
+                MainFrame new_frame = new MainFrame();
+                //new_frame.setVisible(true);
                 findWindow((Component) e.getSource()).dispose();
             } else if (e.getActionCommand().contains("certificate")) {
                 if (e.getActionCommand().contains("add") || e.getActionCommand().equals("certificate-update")) {
                     //find main
                     Window w = findWindow((Component) e.getSource());
                     // TODO сделать передачу сертификата, id сертификата лучше
-                    createCertificateDialog((JFrame) w);
+                    createCertificateDialog(frame);
                 }
                 if (e.getActionCommand().contains("delete")) {
                    if (company != null){
                        Certificate companyCE = company.getValidCertificate();
-                       if (companyCE !=null) new RemoveCertificateActionListener(company.getValidCertificate());
+                       if (companyCE !=null)
+                            new RemoveCertificateActionListener(company.getValidCertificate());
+
                    }
                     // this.repaint(); не работает
                 }
@@ -287,13 +328,23 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         MenuSelectionManager.defaultManager().clearSelectedPath();
     }
 
-    protected void createCertificateDialog(JFrame frame) {
+    protected void createCertificateDialog(final MainFrame frame) {
         try {
             final CertificateDialog dialog =
-                    new CertificateDialog(this.frame, new Certificate(), company);
+                    new CertificateDialog(frame, new Certificate(), company);
             //System.out.println(dialog?"true":"false");
+            dialog.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    frame.setGUI();
+                    frame.setVisible(true);
+                }
+            });
+
         } catch (Exception e) {
             System.out.println( "Create Certificate Dialog error: " + e.getLocalizedMessage());
+        } finally {
+            //update itself
         }
     }
 

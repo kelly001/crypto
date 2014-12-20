@@ -8,8 +8,8 @@
   
   <property name="compiler.args.crypto" value="-encoding UTF-8 -source 1.6 ${compiler.args}"/>
   
-  <property name="crypto.output.dir" value="${module.crypto.basedir}/out/production/Crypto"/>
-  <property name="crypto.testoutput.dir" value="${module.crypto.basedir}/out/test/Crypto"/>
+  <property name="crypto.output.dir" value="${module.crypto.basedir}/out/production/crypto"/>
+  <property name="crypto.testoutput.dir" value="${module.crypto.basedir}/out/test/crypto"/>
   
   <path id="crypto.module.bootclasspath">
     <!-- Paths to be included in compilation bootclasspath -->
@@ -53,9 +53,9 @@
   </path>
   
   
-  <target name="compile.module.crypto" depends="compile.module.crypto.production,compile.module.crypto.tests" description="Compile module Crypto"/>
+  <target name="compile.module.crypto" depends="compile.module.crypto.production,compile.module.crypto.tests" description="Compile module crypto"/>
   
-  <target name="compile.module.crypto.production" depends="register.custom.compilers" description="Compile module Crypto; production classes">
+  <target name="compile.module.crypto.production" depends="register.custom.compilers" description="Compile module crypto; production classes">
     <mkdir dir="${crypto.output.dir}"/>
     <javac2 destdir="${crypto.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.crypto}/javac">
       <compilerarg line="${compiler.args.crypto}"/>
@@ -73,7 +73,7 @@
     </copy>
   </target>
   
-  <target name="compile.module.crypto.tests" depends="register.custom.compilers,compile.module.crypto.production" description="compile module Crypto; test classes" unless="skip.tests"/>
+  <target name="compile.module.crypto.tests" depends="register.custom.compilers,compile.module.crypto.production" description="compile module crypto; test classes" unless="skip.tests"/>
   
   <target name="clean.module.crypto" description="cleanup module">
     <delete dir="${crypto.output.dir}"/>

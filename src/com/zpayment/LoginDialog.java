@@ -1,5 +1,7 @@
 package com.zpayment;
 
+import external.JLinkButton;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
@@ -19,28 +21,15 @@ public class LoginDialog extends JDialog{
     private String username = "";
 
 
-
     public LoginDialog(Frame parent) {
         super(parent, "Авторизация", true);
-
         succeeded = false;
-
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(WindowEvent e) {
-                //this.refreshMainView();
-                System.out.println("closed dialog");
-                //System.out.println(succeeded);
-                dispose();
-            }
-        });
-
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints cs = new GridBagConstraints();
 
         cs.fill = GridBagConstraints.HORIZONTAL;
 
-        lbUsername = new JLabel("Email: ");
+        lbUsername = new JLabel("Логин (Email): ");
         cs.gridx = 0;
         cs.gridy = 0;
         cs.gridwidth = 1;
@@ -52,7 +41,7 @@ public class LoginDialog extends JDialog{
         cs.gridwidth = 2;
         panel.add(tfUsername, cs);
 
-        lbPassword = new JLabel("Password: ");
+        lbPassword = new JLabel("Пароль: ");
         cs.gridx = 0;
         cs.gridy = 1;
         cs.gridwidth = 1;
@@ -65,27 +54,39 @@ public class LoginDialog extends JDialog{
         panel.add(pfPassword, cs);
         panel.setBorder(new LineBorder(Color.GRAY));
 
+        // Controls
+        JPanel bp = new JPanel();
         btnLogin = new JButton("Войти");
-
         btnLogin.addActionListener(new AuthActionListener());
-        btnCancel = new JButton("Cancel");
-        btnCancel.addActionListener(new ActionListener() {
 
+        btnCancel = new JButton("Отмена");
+        btnCancel.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
         });
-        JPanel bp = new JPanel();
+
+        JLinkButton registrationLink = new JLinkButton("Регистрация");
+        registrationLink.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    CompanyDialog RegistrationDialog = new CompanyDialog(null, "Регистрация", new JPanel());
+                    RegistrationDialog.setGUI();
+                    RegistrationDialog.setVisible(true);
+                    succeeded = false;
+                    //dispose();
+                } catch (Exception exc) {
+                    System.out.println( exc.getLocalizedMessage());
+                }
+            }
+        });
+
+
         bp.add(btnLogin);
         bp.add(btnCancel);
-        btnCancel.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
-
-
+        bp.add(registrationLink);
         getContentPane().add(panel, BorderLayout.CENTER);
         getContentPane().add(bp, BorderLayout.PAGE_END);
 
@@ -98,11 +99,11 @@ public class LoginDialog extends JDialog{
         public void actionPerformed(ActionEvent e) {
 
             if (Login.authenticate(getUsername(), getPassword())) {
-
-                JOptionPane.showMessageDialog(LoginDialog.this,
+                /*JOptionPane.showMessageDialog(LoginDialog.this,
                         "Hi " + getUsername() + "! You have successfully logged in.",
                         "Авторизация",
-                        JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.INFORMATION_MESSAGE);*/
+
                 succeeded = true;
                 dispose();
             } else {
@@ -113,13 +114,19 @@ public class LoginDialog extends JDialog{
                 succeeded = false;
 
             }
+            //dispose();
         }
+
     }
 
 
     public String getUsername() {
-        if (!tfUsername.getText().trim().equals(""))
-            username = tfUsername.getText().trim();
+        if (username == null || username.equals("")) {
+            if (!tfUsername.getText().trim().equals(""))
+                username = tfUsername.getText().trim();
+
+        }
+        System.out.println("username="+username);
         return username;
     }
 
@@ -127,7 +134,16 @@ public class LoginDialog extends JDialog{
         return new String(pfPassword.getPassword());
     }
 
-    public boolean isSucceeded() {
+    public Boolean isSucceeded() {
+        /*if (succeeded) return this.getUsername();
+            else return null;*/
         return succeeded;
     }
+
+
+    public void dispose() {
+        getUsername();
+        super.dispose();
+    }
+
 }

@@ -79,9 +79,7 @@ public class CertificateDialog extends OkCancelDialog {
                     }
                 }
                 dialog.dispose();
-                frame.repaint();
-
-            }
+                 }
         });
         //createControls(panel);
         getContentPane().add(panel);
