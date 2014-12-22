@@ -363,7 +363,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
     protected void createCompanyDialog(JFrame frame) {
         try {
-            final CompanyDialog dialog = new CompanyDialog(frame, "Информация о компании", new JPanel());
+            final CompanyDialog dialog = new CompanyDialog(frame, "Информация о компании");
             dialog.setCompany(company.getEmail());
             dialog.setGUI();
             dialog.setVisible(true);
@@ -376,7 +376,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
     protected void createEditCompanyDialog(JFrame frame) {
         try {
-            final CompanyDialog dialog = new CompanyDialog(frame, "Информация о компании", new JPanel());
+            final CompanyDialog dialog = new CompanyDialog(frame, "Информация о компании");
             dialog.setCompany(company.getEmail());
             dialog.createCompanyEditDialog();
             dialog.setVisible(true);
@@ -387,7 +387,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
     protected void EditUserDialog(JFrame frame) {
         try {
-            final CompanyDialog dialog = new CompanyDialog(frame, "Пользователи", new JPanel());
+            final CompanyDialog dialog = new CompanyDialog(frame, "Пользователи");
             dialog.createUserEditDialog(company);
             dialog.setVisible(true);
         } catch (Exception e) {
@@ -397,7 +397,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
     protected void NewUserDialog(JFrame frame) {
         try {
-            final CompanyDialog dialog = new CompanyDialog(frame, "Пользователи", new JPanel());
+            final CompanyDialog dialog = new CompanyDialog(frame, "Пользователи");
             dialog.createNewUserDialog((Company) company);
             dialog.setVisible(true);
         } catch (Exception e) {

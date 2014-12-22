@@ -83,7 +83,7 @@ public class UsersViewDialog extends CloseButtonDialog {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        final CompanyDialog dialog = new CompanyDialog(frame, "Пользователи", new JPanel());
+                        final CompanyDialog dialog = new CompanyDialog(frame, "Пользователи");
                         dialog.createNewUserDialog(company);
                         dialog.setVisible(true);
                     } catch (Exception userExp) {

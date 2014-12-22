@@ -49,7 +49,7 @@ public class CompanyPanel extends FieldPanel {
         }
 
         // доступно только при создании нового
-        JTextField field = new JTextField("Пароль пользователя");
+        JTextField field = new JTextField("Введите пароль");
         this.addField("", "Пароль для нового пользователя", field, true);
         controls.put("password", field );
 
@@ -112,9 +112,11 @@ public class CompanyPanel extends FieldPanel {
                     CloseButtonDialog infodialog =
                             new CloseButtonDialog((JFrame) findWindow(parent), "Успех",
                                     new JLabel("Новая организация создана!"));
-                    String args[] = {controls.get("email").getText()};
                     parent.setVisible(false);
-                    MainFrame.main(args);
+                    String args[] = {controls.get("email").getText()};
+                   /*if (parent instanceof CompanyDialog) parent.dispose();
+/*
+                    MainFrame.main(args);*/
                 }
             } catch (Exception exc) {
                 System.out.println("saving user exception " + exc.getLocalizedMessage());

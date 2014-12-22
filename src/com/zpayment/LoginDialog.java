@@ -72,10 +72,9 @@ public class LoginDialog extends JDialog{
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    CompanyDialog RegistrationDialog = new CompanyDialog(null, "Регистрация", new JPanel());
+                    CompanyDialog RegistrationDialog = new CompanyDialog(null, "Регистрация");
                     RegistrationDialog.setGUI();
                     RegistrationDialog.setVisible(true);
-                    succeeded = false;
                     //dispose();
                 } catch (Exception exc) {
                     System.out.println( exc.getLocalizedMessage());

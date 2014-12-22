@@ -17,11 +17,11 @@ public class CompanyDialog extends CloseButtonDialog {
     public static Dimension size = new Dimension(480,480);
     protected Frame frame;
     public Company company;
-    protected JPanel panel;
+    //protected JPanel panel;
 
-    public CompanyDialog(Frame parent, String title, JPanel panel) {
-        super(parent, title, panel);
-        this.panel = panel;
+    public CompanyDialog(Frame parent, String title) {
+        super(parent, title, new JPanel());
+        //this.panel = panel;
         this.frame = parent;
     }
 
@@ -36,46 +36,44 @@ public class CompanyDialog extends CloseButtonDialog {
 
     public void setGUI() {
         //FieldPanel panel = new FieldPanel();
-        this.panel.setLayout(new FlowLayout());
+        this.getContentPane().setLayout(new FlowLayout());
 
         FieldPanel companyPanel = new CompanyPanel(company, this);
-
-        this.panel.add(companyPanel);
+        this.getContentPane().add(companyPanel);
         this.pack();
-        this.setContentPane(panel);
+        //this.setContentPane(companyPanel);
         //this.setSize(size);
     }
 
     public void createCompanyEditDialog() {
-        this.panel.setLayout(new FlowLayout());
+        this.getContentPane().setLayout(new FlowLayout());
 
         CompanyPanel companyPanel = new CompanyPanel(new User(), frame);
-
         companyPanel.setValues(company);
-        this.panel.add(companyPanel);
+        this.getContentPane().add(companyPanel);
         this.pack();
-        this.setContentPane(panel);
+        //this.setContentPane(panel);
         //this.setSize(size);
     }
 
     public void createUserEditDialog(User user) {
-        this.panel.setLayout(new FlowLayout());
+        this.getContentPane().setLayout(new FlowLayout());
         UserPanel panel = new UserPanel(this);
         panel.setControls(null);
         panel.setValues(user);
-        this.panel.add(panel);
+        this.getContentPane().add(panel);
         this.pack();
-        this.setContentPane(panel);
+        //this.setContentPane(panel);
         //this.setSize(size);
     }
 
     public void createNewUserDialog(Company company) {
-        this.panel.setLayout(new FlowLayout());
+        this.getContentPane().setLayout(new FlowLayout());
         UserPanel panel = new UserPanel(this);
         panel.setControls(company);
-        this.panel.add(panel);
+        this.getContentPane().add(panel);
         this.pack();
-        this.setContentPane(panel);
+        //this.setContentPane(panel);
         //this.setSize(size);
     }
 
