@@ -49,12 +49,17 @@ public class MainPanel extends JPanel{
         this.add(certLabel, c);
 
         if (user != null) {
-            FieldPanel certPanel = this.certificatesGUI(user);
-            c.gridwidth = 3;
+            FieldPanel certInfoPanel = this.certificatesInfoGUI(user);
+            c.gridwidth = 2;
             c.gridx = 0;
             c.gridy = 2;
-            this.add(certPanel,c);
+            this.add(certInfoPanel,c);
 
+            FieldPanel certPanel = this.certificatesGUI(user);
+            c.gridwidth = 1;
+            c.gridx = 2;
+            c.gridy = 2;
+            this.add(certPanel,c);
         }
 
         JLabel infoLabel = new JLabel("Сссылки на Z-Payment: ");
@@ -65,10 +70,25 @@ public class MainPanel extends JPanel{
 
         final JLinkButton btn = new JLinkButton("Z-Payment.com");
         btn.addActionListener(new URLAction("https://z-payment.com/"));
-        c.gridwidth = 2;
+        c.gridwidth = 1;
         c.gridx = 2;
         c.gridy = 3;
         this.add(btn, c);
+    }
+
+
+    public FieldPanel certificatesInfoGUI (User user) {
+        FieldPanel certPanel = new FieldPanel();
+        try {
+            ArrayList<Certificate> certificates = Certificate.loadByUser(user.getId());
+            if (certificates.size() > 0) {
+                for (Certificate cert : certificates) {
+                    certPanel.addField(cert.getInfo(), "Инфо", new JLabel(), false);
+                }
+            }
+        } catch (Exception e){ //SQLException e) {
+        System.out.println("Load certficates SQLException in User constructor " + e.getLocalizedMessage());}
+        return certPanel;
     }
 
     public FieldPanel certificatesGUI (User user) {
@@ -78,8 +98,7 @@ public class MainPanel extends JPanel{
             ArrayList<Certificate> certificates  = Certificate.loadByUser(user.getId());
             if (certificates.size() > 0)   {
                 for (Certificate cert: certificates){
-                    certPanel.addField(cert.getInfo(), "Инфо", new JLabel(), false);
-                    JButton button = new JButton("Edit");
+                    JButton button = new JButton("Редактировать");
                     button.addActionListener(new certAction(cert, user));
                     certPanel.addField("", "Посмотреть сертификат сотрудника", button, false);
 
@@ -91,7 +110,7 @@ public class MainPanel extends JPanel{
             } else {
                 JButton getCertificateButton = new JButton("Добавить новый");
                 getCertificateButton.addActionListener(new certAction(user));
-                certPanel.addField("", "Добавить новый компании", getCertificateButton, false);
+                certPanel.addField("", "Добавить новый сертификат компании", getCertificateButton, false);
             }
         }catch (Exception e){ //SQLException e) {
             System.out.println("Load certficates SQLException in User constructor " + e.getLocalizedMessage());}

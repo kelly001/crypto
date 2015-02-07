@@ -96,7 +96,7 @@ public class CompanyPanel extends FieldPanel {
         }
     }
 
-    public class saveCompanyAction implements ActionListener {
+    public class  saveCompanyAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             Company user = new Company();
