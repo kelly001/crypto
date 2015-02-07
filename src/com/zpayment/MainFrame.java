@@ -108,6 +108,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         addMenuItem("Добавить", this, "certificate-add", certificateMenu);
         addMenuItem("Отозвать", this, "certificate-delete", certificateMenu);
 
+
         JMenu infor1Menu = new JMenu("Информация");
         addMenuItem("Редактирование", this, "company-edit", infor1Menu);
         addMenuItem("Просмотр", this, "company-view", infor1Menu);
@@ -154,7 +155,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         infoMenu.add(bugs);
         addMenuItem("Установка сертификата в Chrome", new URLAction("http://russvet24.ru/services/2134/"), "browserhelp", infoMenu);
         addMenuItem("Установка сертификата в FireFox", new URLAction("http://russvet24.ru/services/2132/"), "browserhelp", infoMenu);
-
         menuBar.add(infoMenu);
         setJMenuBar(menuBar);
     }

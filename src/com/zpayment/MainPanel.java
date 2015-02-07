@@ -57,8 +57,6 @@ public class MainPanel extends JPanel{
 
         }
 
-
-
         JLabel infoLabel = new JLabel("Сссылки на Z-Payment: ");
         c.gridwidth = 2;
         c.gridx = 1;
