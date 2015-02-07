@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="crypto" default="all">
+  
+  
+  <property file="crypto.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="700m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/SCCS/**"/>
+    <exclude name="**/RCS/**"/>
+    <exclude name="**/rcs/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/.pyc/**"/>
+    <exclude name="**/.pyo/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/*.lib/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/.bundle/**"/>
+    <exclude name="**/*.rbc/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.zip"/>
+    <include name="*.apk"/>
+    <include name="*.war"/>
+    <include name="*.egg"/>
+    <include name="*.ear"/>
+    <include name="*.ane"/>
+    <include name="*.swc"/>
+    <include name="*.jar"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <exclude name="**/?*.java"/>
+    <exclude name="**/?*.form"/>
+    <exclude name="**/?*.class"/>
+    <exclude name="**/?*.groovy"/>
+    <exclude name="**/?*.scala"/>
+    <exclude name="**/?*.flex"/>
+    <exclude name="**/?*.kt"/>
+    <exclude name="**/?*.clj"/>
+  </patternset>
+  
+  <!-- JDK definitions -->
+  
+  <property name="jdk.bin.1.8" value="${jdk.home.1.8}/bin"/>
+  <path id="jdk.classpath.1.8">
+    <fileset dir="${jdk.home.1.8}">
+      <include name="jre/lib/charsets.jar"/>
+      <include name="jre/lib/deploy.jar"/>
+      <include name="jre/lib/javaws.jar"/>
+      <include name="jre/lib/jce.jar"/>
+      <include name="jre/lib/jfr.jar"/>
+      <include name="jre/lib/jfxswt.jar"/>
+      <include name="jre/lib/jsse.jar"/>
+      <include name="jre/lib/management-agent.jar"/>
+      <include name="jre/lib/plugin.jar"/>
+      <include name="jre/lib/resources.jar"/>
+      <include name="jre/lib/rt.jar"/>
+      <include name="jre/lib/ext/access-bridge-64.jar"/>
+      <include name="jre/lib/ext/cldrdata.jar"/>
+      <include name="jre/lib/ext/dnsns.jar"/>
+      <include name="jre/lib/ext/jaccess.jar"/>
+      <include name="jre/lib/ext/jfxrt.jar"/>
+      <include name="jre/lib/ext/localedata.jar"/>
+      <include name="jre/lib/ext/nashorn.jar"/>
+      <include name="jre/lib/ext/sunec.jar"/>
+      <include name="jre/lib/ext/sunjce_provider.jar"/>
+      <include name="jre/lib/ext/sunmscapi.jar"/>
+      <include name="jre/lib/ext/sunpkcs11.jar"/>
+      <include name="jre/lib/ext/zipfs.jar"/>
+    </fileset>
+  </path>
+  
+  <property name="project.jdk.home" value="${jdk.home.1.8}"/>
+  <property name="project.jdk.bin" value="${jdk.bin.1.8}"/>
+  <property name="project.jdk.classpath" value="jdk.classpath.1.8"/>
+  
+  
+  <!-- Project Libraries -->
+  
+  <path id="library.lib.classpath">
+    <pathelement location="${basedir}/lib/bcpkix-jdk15on-151.jar"/>
+    <pathelement location="${basedir}/lib/bcprov-jdk15on-151.jar"/>
+    <pathelement location="${basedir}/lib/mysql-connector-java-5.1.34-bin.jar"/>
+    <pathelement location="${basedir}/lib/teacode-common.jar"/>
+  </path>
+  <!-- Register Custom Compiler Taskdefs -->
+  <property name="javac2.home" value="${idea.home}/lib"/>
+  <path id="javac2.classpath">
+    <pathelement location="${javac2.home}/javac2.jar"/>
+    <pathelement location="${javac2.home}/jdom.jar"/>
+    <pathelement location="${javac2.home}/asm4-all.jar"/>
+    <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
+  </path>
+  <target name="register.custom.compilers">
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
+    <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
+  </target>
+  
+  <!-- Modules -->
+  
+  <import file="${basedir}/module_crypto.xml"/>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.crypto" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, compile.module.crypto" description="build all modules"/>
+  
+  <target name="init.artifacts">
+    <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+    <property name="artifact.output.crypto:jar" value="${basedir}/out/artifacts/crypto_jar"/>
+    <property name="artifact.output.crypto:jar2" value="${basedir}/out/artifacts/crypto_jar2"/>
+    <mkdir dir="${artifacts.temp.dir}"/>
+    <property name="temp.jar.path.crypto.jar" value="${artifacts.temp.dir}/crypto.jar"/>
+    <property name="temp.jar.path.crypto.jar2" value="${artifacts.temp.dir}/1/crypto.jar"/>
+    <mkdir dir="${artifacts.temp.dir}/1"/>
+  </target>
+  
+  <target name="artifact.crypto:jar" depends="init.artifacts, compile.module.crypto" description="Build &#39;crypto:jar&#39; artifact">
+    <property name="artifact.temp.output.crypto:jar" value="${artifacts.temp.dir}/crypto_jar"/>
+    <mkdir dir="${artifact.temp.output.crypto:jar}"/>
+    <jar destfile="${temp.jar.path.crypto.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset dir="${crypto.output.dir}"/>
+      <zipfileset src="${basedir}/lib/bcpkix-jdk15on-151.jar"/>
+      <zipfileset src="${basedir}/lib/bcprov-jdk15on-151.jar"/>
+      <zipfileset src="${basedir}/lib/mysql-connector-java-5.1.34-bin.jar"/>
+      <zipfileset src="${basedir}/lib/teacode-common.jar"/>
+    </jar>
+    <copy file="${temp.jar.path.crypto.jar}" tofile="${artifact.temp.output.crypto:jar}/crypto.jar"/>
+  </target>
+  
+  <target name="artifact.crypto:jar2" depends="init.artifacts, compile.module.crypto" description="Build &#39;crypto:jar2&#39; artifact">
+    <property name="artifact.temp.output.crypto:jar2" value="${artifacts.temp.dir}/crypto_jar2"/>
+    <mkdir dir="${artifact.temp.output.crypto:jar2}"/>
+    <jar destfile="${temp.jar.path.crypto.jar2}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset dir="${crypto.output.dir}"/>
+      <zipfileset src="${basedir}/lib/bcpkix-jdk15on-151.jar"/>
+      <zipfileset src="${basedir}/lib/bcprov-jdk15on-151.jar"/>
+      <zipfileset src="${basedir}/lib/mysql-connector-java-5.1.34-bin.jar"/>
+      <zipfileset src="${basedir}/lib/teacode-common.jar"/>
+    </jar>
+    <copy file="${temp.jar.path.crypto.jar2}" tofile="${artifact.temp.output.crypto:jar2}/crypto.jar"/>
+  </target>
+  
+  <target name="build.all.artifacts" depends="artifact.crypto:jar, artifact.crypto:jar2" description="Build all artifacts">
+    <mkdir dir="${artifact.output.crypto:jar}"/>
+    <copy todir="${artifact.output.crypto:jar}">
+      <fileset dir="${artifact.temp.output.crypto:jar}"/>
+    </copy>
+    <mkdir dir="${artifact.output.crypto:jar2}"/>
+    <copy todir="${artifact.output.crypto:jar2}">
+      <fileset dir="${artifact.temp.output.crypto:jar2}"/>
+    </copy>
+    
+    <!-- Delete temporary files -->
+    <delete dir="${artifacts.temp.dir}"/>
+  </target>
+  
+  <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+</project>

@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Class-Path: bcpkix-jdk15on-151.jar bcprov-jdk15on-151.jar mysql-connec
+ tor-java-5.1.34-bin.jar teacode-common.jar
+Main-Class: com.zpayment.MainFrame
+
