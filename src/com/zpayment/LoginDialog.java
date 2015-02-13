@@ -1,5 +1,6 @@
 package com.zpayment;
 
+import com.teacode.swing.component.FieldPanel;
 import external.JLinkButton;
 
 import javax.swing.*;
@@ -72,8 +73,9 @@ public class LoginDialog extends JDialog{
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
+                    //FieldPanel companyPanel = new CompanyPanel(company, this);
                     CompanyDialog RegistrationDialog = new CompanyDialog(null, "Регистрация");
-                    RegistrationDialog.setGUI();
+                    //RegistrationDialog.setGUI();
                     RegistrationDialog.setVisible(true);
                     //dispose();
                 } catch (Exception exc) {

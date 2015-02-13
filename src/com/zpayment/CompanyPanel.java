@@ -49,13 +49,13 @@ public class CompanyPanel extends FieldPanel {
         }
 
         // доступно только при создании нового
-        JTextField field = new JTextField("Введите пароль");
-        this.addField("", "Пароль для нового пользователя", field, true);
+        JTextField field = new JTextField();
+        this.addField("Введите пароль:", "Пароль для нового пользователя", field, true);
         controls.put("password", field );
 
-        saveCompanyButton = new JButton("Сохранить");
+      /*  saveCompanyButton = new JButton("Сохранить");
         saveCompanyButton.addActionListener(action1);
-        this.addField("", "", saveCompanyButton, false);
+        this.addField("", "", saveCompanyButton, false);*/
     }
 
 

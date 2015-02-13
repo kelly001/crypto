@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.SocketTimeoutException;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -28,6 +29,7 @@ public class CompanyDialog extends OkCancelDialog {
         super(parent, title, "Сохранить");
         //this.panel = panel;
         this.frame = parent;
+        this.setGUI();
     }
 
     public void setCompany(String name) {
@@ -42,11 +44,12 @@ public class CompanyDialog extends OkCancelDialog {
     public void setGUI() {
         //FieldPanel panel = new FieldPanel();
         this.getContentPane().setLayout(new FlowLayout());
-
+        System.out.println("CompanyDialog setGUI");
         FieldPanel companyPanel = new CompanyPanel(company, this);
-        this.getContentPane().add(companyPanel);
+        this.setMainPanel(companyPanel);
+        //this.getContentPane().add(companyPanel);
         this.ok.addActionListener(new SaveCompanyAction(company));
-        this.pack();
+        this.packAndCenter();
         //this.setContentPane(companyPanel);
         //this.setSize(size);
     }
