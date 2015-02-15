@@ -192,7 +192,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
     //main func, first argument - company email
     public static void main(String[] arg) {
-        MainFrame new_frame = new MainFrame();
+        com.zpayment.MainFrame new_frame = new com.zpayment.MainFrame();
         if (arg.length>0){
             //login.dispose();
             new_frame.setCompany(arg[0]);

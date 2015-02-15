@@ -2,3 +2,6 @@
 .idea/
 .out/
 .files/
+*.iml
+*.properties
+*.xml
