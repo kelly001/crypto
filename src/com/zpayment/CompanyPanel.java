@@ -2,6 +2,7 @@ package com.zpayment;
 
 import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.dialog.CloseButtonDialog;
+import com.teacode.swing.dialog.OkCancelDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,19 +24,25 @@ public class CompanyPanel extends FieldPanel {
     ActionListener action1 = new saveCompanyAction();
 
     public CompanyPanel(User user, Component parent) {
-        System.out.println("Users view panel");
+        System.out.println("Company Panel constructor");
         this.parent = parent;
         //FieldPanel panel = new FieldPanel();
         if (user instanceof Company) {
-            this.setControls(user);
+            this.setControls((Company) user);
         } else {
             this.setControls();
         }
         //panel.addGlue();
+        if (parent instanceof OkCancelDialog) {
+            System.out.println("Parent - OkCancelDialog");
+            OkCancelDialog dialog = (OkCancelDialog) parent;
+            saveCompanyButton = dialog.getOkButton();
+        }
         this.addGlue();
     }
 
     public void setControls() {
+        System.out.println("Company Panel setControls()");
         final JLabel label = new JLabel();
         String companyLabel = "Новая организация";
         this.addField(companyLabel, "label", label, true);
@@ -54,13 +61,13 @@ public class CompanyPanel extends FieldPanel {
         controls.put("password", field );
 
       /*  saveCompanyButton = new JButton("Сохранить");
-        saveCompanyButton.addActionListener(action1);
         this.addField("", "", saveCompanyButton, false);*/
+        saveCompanyButton.addActionListener(action1);
     }
 
 
-    protected void setControls(User user) {
-        System.out.println("set controls with company object");
+    protected void setControls(Company user) {
+        System.out.println("CompanyPanel setControls(Company)");
         String companyLabel = "Организация \""+ user.getUsername() + "\"";
         this.addField(companyLabel, "label", new JPanel(), true);
 
@@ -78,6 +85,8 @@ public class CompanyPanel extends FieldPanel {
     }
 
     public void setValues(Company user) {
+        System.out.println("Company Panel setValues");
+        System.out.println(user);
         if (user != null) {
             controls.get("username").setText(user.getUsername());
             controls.get("email").setText(user.getEmail());
@@ -86,8 +95,11 @@ public class CompanyPanel extends FieldPanel {
             controls.get("department").setText(user.getDepartment());
             controls.get("country").setText(user.getCountry());
 
-            this.remove(controls.get("password"));
-
+            try {
+                this.remove(controls.get("password"));
+            } catch (Exception   e) {
+                System.out.println("saving user exception " + e.getLocalizedMessage());
+            }
             saveCompanyButton.addActionListener(new updateCompanyAction(user));
             saveCompanyButton.removeActionListener(action1);
 
@@ -99,6 +111,7 @@ public class CompanyPanel extends FieldPanel {
     public class  saveCompanyAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+            System.out.println("Company Panel saveCompanyAction");
             Company user = new Company();
             user.setUsername(controls.get("username").getText());
             user.setEmail(controls.get("email").getText());
@@ -131,7 +144,7 @@ public class CompanyPanel extends FieldPanel {
         }
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            System.out.println("Company Panel updateCompanyAction");
             user.setUsername(controls.get("username").getText());
             user.setEmail(controls.get("email").getText());
             //user.setPassword(controls.get("password").getText());

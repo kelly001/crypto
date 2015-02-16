@@ -27,12 +27,14 @@ public class CompanyDialog extends OkCancelDialog {
 
     public CompanyDialog(Frame parent, String title) {
         super(parent, title, "Сохранить");
+        System.out.println("CompanyDialog constructor");
         //this.panel = panel;
         this.frame = parent;
-        this.setGUI();
+        //this.setGUI();
     }
 
     public void setCompany(String name) {
+        System.out.println("CompanyDialog setCompany");
         try {
             System.out.println(name);
             company = Company.loadByEmail(name);
@@ -43,7 +45,7 @@ public class CompanyDialog extends OkCancelDialog {
 
     public void setGUI() {
         //FieldPanel panel = new FieldPanel();
-        this.getContentPane().setLayout(new FlowLayout());
+        //this.getContentPane().setLayout(new FlowLayout());
         System.out.println("CompanyDialog setGUI");
         FieldPanel companyPanel = new CompanyPanel(company, this);
         this.setMainPanel(companyPanel);
@@ -55,22 +57,23 @@ public class CompanyDialog extends OkCancelDialog {
     }
 
     public void createCompanyEditDialog() {
-        this.getContentPane().setLayout(new FlowLayout());
-
-        CompanyPanel companyPanel = new CompanyPanel(new User(), frame);
+        //this.getContentPane().setLayout(new FlowLayout());
+        System.out.println("CompanyDialog createCompanyEditDialog");
+        //CompanyPanel companyPanel = new CompanyPanel(new User(), frame);
+        CompanyPanel companyPanel = new CompanyPanel(company, this);
         companyPanel.setValues(company);
-        this.ok.addActionListener(new SaveCompanyAction(new Company()));
-        this.getContentPane().add(companyPanel);
-
+        this.setMainPanel(companyPanel);
+        //this.ok.addActionListener(new SaveCompanyAction(new Company()));
+        //this.ok.addActionListener(new companyPanel.saveCompanyAction());
         this.pack();
         //this.setContentPane(panel);
         //this.setSize(size);
     }
 
     public void createUserEditDialog(User user) {
-        this.getContentPane().setLayout(new FlowLayout());
+        System.out.println("CompanyDialog createUserEditDialog");
+        //this.getContentPane().setLayout(new FlowLayout());
         UserPanel panel = new UserPanel(this);
-
         panel.setControls(null);
         panel.setValues(user);
         this.ok.addActionListener(new saveUserAction((Employer) user));
@@ -81,7 +84,8 @@ public class CompanyDialog extends OkCancelDialog {
     }
 
     public void createNewUserDialog(Company company) {
-        this.getContentPane().setLayout(new FlowLayout());
+        System.out.println("CompanyDialog createNewUserDialog");
+        //this.getContentPane().setLayout(new FlowLayout());
         UserPanel panel = new UserPanel(this);
         panel.setControls(company);
         this.ok.addActionListener(new SaveCompanyAction(company));
