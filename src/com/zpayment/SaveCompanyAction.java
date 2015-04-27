@@ -18,6 +18,7 @@ public class SaveCompanyAction implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
+
             if (Company.newUser(user)){
 
                 //parent.setVisible(false);

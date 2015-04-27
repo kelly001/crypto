@@ -75,7 +75,7 @@ public class LoginDialog extends JDialog{
                 try {
                     //FieldPanel companyPanel = new CompanyPanel(company, this);
                     CompanyDialog RegistrationDialog = new CompanyDialog(null, "Регистрация");
-                    //RegistrationDialog.setGUI();
+                    RegistrationDialog.setGUI();
                     RegistrationDialog.setVisible(true);
                     //dispose();
                 } catch (Exception exc) {
@@ -113,6 +113,7 @@ public class LoginDialog extends JDialog{
                         "com.zpayment.Login",
                         JOptionPane.ERROR_MESSAGE);
                 succeeded = false;
+                username = "";
 
             }
             //dispose();

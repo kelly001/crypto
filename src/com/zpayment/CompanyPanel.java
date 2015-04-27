@@ -61,8 +61,8 @@ public class CompanyPanel extends FieldPanel {
         controls.put("password", field );
 
       /*  saveCompanyButton = new JButton("Сохранить");
-        this.addField("", "", saveCompanyButton, false);*/
-        saveCompanyButton.addActionListener(action1);
+        this.addField("", "", saveCompanyButton, false);
+        saveCompanyButton.addActionListener(action1);*/
     }
 
 
@@ -108,7 +108,21 @@ public class CompanyPanel extends FieldPanel {
         }
     }
 
-    public class  saveCompanyAction implements ActionListener {
+    public Company getCompany () {
+        System.out.println("Company Panel getCompany");
+        Company user = new Company();
+        user.setUsername(controls.get("username").getText());
+        user.setEmail(controls.get("email").getText());
+        user.setPassword(controls.get("password").getText());
+        user.setCountry(controls.get("country").getText());
+        user.setRegion(controls.get("region").getText());
+        user.setCity(controls.get("city").getText());
+        user.setDepartment(controls.get("department").getText());
+        System.out.println(user);
+        return user;
+    }
+
+    public class saveCompanyAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             System.out.println("Company Panel saveCompanyAction");

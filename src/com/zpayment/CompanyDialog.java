@@ -47,10 +47,10 @@ public class CompanyDialog extends OkCancelDialog {
         //FieldPanel panel = new FieldPanel();
         //this.getContentPane().setLayout(new FlowLayout());
         System.out.println("CompanyDialog setGUI");
-        FieldPanel companyPanel = new CompanyPanel(company, this);
+        CompanyPanel companyPanel = new CompanyPanel(company, this);
         this.setMainPanel(companyPanel);
         //this.getContentPane().add(companyPanel);
-        this.ok.addActionListener(new SaveCompanyAction(company));
+        this.ok.addActionListener(new SaveCompanyAction(companyPanel.getCompany()));
         this.packAndCenter();
         //this.setContentPane(companyPanel);
         //this.setSize(size);

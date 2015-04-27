@@ -135,10 +135,10 @@ public class Company extends User {
             preparedStatement.setString(11, user.getCity());
             preparedStatement.execute();
         } catch (SQLException e ) {
-            System.out.println(e.getLocalizedMessage());
+            System.out.println("newUser User class exception: " +  e.getLocalizedMessage());
             return false;
         }catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
+            System.out.println("newUser User class exception: " + e.getLocalizedMessage());
             return false;
         } finally {
             if (preparedStatement != null) { preparedStatement.close(); }
@@ -166,10 +166,10 @@ public class Company extends User {
             preparedStatement.setLong(9,user.getId());
             preparedStatement.execute();
         } catch (SQLException e ) {
-            System.out.println(e.getLocalizedMessage());
+            System.out.println("updateUser User class exception: " + e.getLocalizedMessage());
             return false;
         }catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
+            System.out.println("updateUser User class exception: " +  e.getLocalizedMessage());
             return false;
         } finally {
             if (preparedStatement != null) { preparedStatement.close(); }

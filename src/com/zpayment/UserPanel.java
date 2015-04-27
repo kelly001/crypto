@@ -38,6 +38,7 @@ public class UserPanel extends FieldPanel {
             controls.put(names[i],field);
             this.addField(labels[i], names[i], field, true);
         }
+
         saveCompanyButton = new JButton("Сохранить");
         action1 = new saveUserAction(company);
         saveCompanyButton.addActionListener(action1);
