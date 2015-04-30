@@ -112,14 +112,18 @@ public class CompanyPanel extends FieldPanel {
         System.out.println("Company Panel getCompany");
         Company user = new Company();
         user.setUsername(controls.get("username").getText());
+        System.out.println(controls.get("username").getText());
         user.setEmail(controls.get("email").getText());
         user.setPassword(controls.get("password").getText());
         user.setCountry(controls.get("country").getText());
         user.setRegion(controls.get("region").getText());
         user.setCity(controls.get("city").getText());
         user.setDepartment(controls.get("department").getText());
-        System.out.println(user);
         return user;
+    }
+
+    public Map<String, JTextField> getControls() {
+        return this.controls;
     }
 
     public class saveCompanyAction implements ActionListener {

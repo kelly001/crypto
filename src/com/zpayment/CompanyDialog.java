@@ -50,7 +50,7 @@ public class CompanyDialog extends OkCancelDialog {
         CompanyPanel companyPanel = new CompanyPanel(company, this);
         this.setMainPanel(companyPanel);
         //this.getContentPane().add(companyPanel);
-        this.ok.addActionListener(new SaveCompanyAction(companyPanel.getCompany()));
+        this.ok.addActionListener(new SaveCompanyAction(companyPanel.getControls()));
         this.packAndCenter();
         //this.setContentPane(companyPanel);
         //this.setSize(size);
@@ -88,7 +88,7 @@ public class CompanyDialog extends OkCancelDialog {
         //this.getContentPane().setLayout(new FlowLayout());
         UserPanel panel = new UserPanel(this);
         panel.setControls(company);
-        this.ok.addActionListener(new SaveCompanyAction(company));
+        this.ok.addActionListener(new SaveUserAction(panel.getControls(), company));
         this.getContentPane().add(panel);
         this.pack();
         //this.setContentPane(panel);
