@@ -22,8 +22,8 @@ public class UserPanel extends FieldPanel {
     ActionListener action1;
 
     public UserPanel(Component parent) {
-        System.out.println("Users view panel");
-        this.parent = (JDialog) parent;
+        System.out.println("Users view panel 132");
+        if (parent instanceof JDialog) this.parent = (JDialog) parent;
     }
 
     public void setControls(Company company) {
@@ -39,17 +39,17 @@ public class UserPanel extends FieldPanel {
             this.addField(labels[i], names[i], field, true);
         }
 
-        saveCompanyButton = new JButton("Сохранить");
+        /* saveCompanyButton = new JButton("Сохранить");
         action1 = new saveUserAction(company);
         saveCompanyButton.addActionListener(action1);
-        this.addField("", "", saveCompanyButton, false);
+        this.addField("", "", saveCompanyButton, false); */
         this.addGlue();
     }
 
 
     protected void setControls(User user) {
         System.out.println("set controls with user object");
-
+        System.out.println(user);
         JTextField username = new JTextField(user.getUsername());
         username.setEditable(false);
         this.addField("Имя пользователя", "Имя пользователя", username, true);

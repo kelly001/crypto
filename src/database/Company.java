@@ -75,9 +75,9 @@ public class Company extends User {
                 }
             }
         } catch (SQLException e ) {
-            System.out.println(e.getLocalizedMessage());
+            System.out.println("loadByEmail Company error: " + e.getLocalizedMessage());
         }catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
+            System.out.println("loadByEmail Company error: "+e.getLocalizedMessage());
         } finally {
             if (stmt != null) { stmt.close(); }
         }

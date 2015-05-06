@@ -147,7 +147,7 @@ public class Certificate {
     public String getCountry() {return this.country;}
 
     public String getInfo() {
-        String label = "Сертификат " + this.getUsername() + " от " + this.getTimestamp() + " числа";
+        String label = "Сертификат " + this.getUsername() + " от " + this.getTimestamp();
         return label;
     }
 

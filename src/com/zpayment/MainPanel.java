@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import com.teacode.swing.component.FieldPanel;
 
 import database.Certificate;
+import database.Company;
 import database.User;
 import external.JLinkButton;
 
@@ -35,12 +36,18 @@ public class MainPanel extends JPanel{
         this.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
-
-        FieldPanel companyPanel = new CompanyPanel(user, frame);
         c.gridwidth = 3;
         c.gridx = 0;
         c.gridy = 0;
-        this.add(companyPanel,c);
+
+        if (user instanceof Company) {
+            FieldPanel companyPanel = new CompanyPanel(user, frame);
+            this.add(companyPanel,c);
+        } else{// if (user != null) {
+            UserPanel companyPanel = new UserPanel(frame);
+            companyPanel.setControls(user);
+            this.add(companyPanel,c);
+        }
 
         JLabel certLabel = new JLabel("Сертификаты пользователя:");
         c.gridwidth = 3;

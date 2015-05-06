@@ -134,8 +134,9 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
             userMenu.add(infor1Menu);
         } else {
             addMenuItem("список сотрудников", this, "users", userMenu);
+            addMenuItem("Новый", this, "user-add", userMenu);
         }
-        addMenuItem("Новый", this, "user-add", userMenu);
+
         //addMenuItem("Удалить", this, "user-delete", userMenu);
         menuBar.add(userMenu);
 
@@ -172,7 +173,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     public void setUser(String name) {
         try {
             System.out.println("Set user function, user email = " + name);
-            company = Company.loadByEmail(name);
+            company = User.loadByEmail(name);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -186,6 +187,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         frame.setSize(size);
         frame.pack();
         frame.setVisible(true);
+        frame.toFront();
     }
 
 
@@ -257,7 +259,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                         createCompanyDialog((JFrame) w);
                 } else if (e.getActionCommand().contains("edit")) {
                         Window w = findWindow((Component) e.getSource());
-                        createEditCompanyDialog((JFrame) w);
+                        createEditCompanyDialog((MainFrame) w);
                 }
             } else if (e.getActionCommand().contains("user")) {
                 if (e.getActionCommand().contains("add")){
@@ -364,7 +366,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         try {
             final CompanyDialog dialog = new CompanyDialog(frame, "Информация о компании");
             dialog.setCompany(company.getEmail());
-            dialog.setGUI();
+            //dialog.setGUI();
+            dialog.createCompanyViewDialog();
             dialog.setVisible(true);
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());
@@ -373,12 +376,20 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
 
 
-    protected void createEditCompanyDialog(JFrame frame) {
+    protected void createEditCompanyDialog(final MainFrame frame) {
         try {
             final CompanyDialog dialog = new CompanyDialog(frame, "Информация о компании");
             dialog.setCompany(company.getEmail());
             dialog.createCompanyEditDialog();
             dialog.setVisible(true);
+            frame.dispose();
+            dialog.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    String[] arg = {company.getEmail()};
+                    frame.main(arg);
+                }
+            });
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());
         }

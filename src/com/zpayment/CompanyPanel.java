@@ -100,7 +100,7 @@ public class CompanyPanel extends FieldPanel {
             } catch (Exception   e) {
                 System.out.println("saving user exception " + e.getLocalizedMessage());
             }
-            saveCompanyButton.addActionListener(new updateCompanyAction(user));
+            //saveCompanyButton.addActionListener(new updateCompanyAction(user));
             saveCompanyButton.removeActionListener(action1);
 
             this.addGlue();
@@ -155,7 +155,7 @@ public class CompanyPanel extends FieldPanel {
         }
     }
 
-    public class updateCompanyAction implements ActionListener {
+    public  class updateCompanyAction implements ActionListener {
         private Company user;
         updateCompanyAction(Company user) {
             this.user = user;
@@ -190,4 +190,5 @@ public class CompanyPanel extends FieldPanel {
             return parent == null ? null : findWindow(parent);
         }
     }
+
 }

@@ -56,18 +56,27 @@ public class CompanyDialog extends OkCancelDialog {
         //this.setSize(size);
     }
 
+    public void createCompanyViewDialog() {
+        System.out.println("CompanyDialog createCompanyViewDialog");
+        CompanyPanel companyPanel = new CompanyPanel(company, this);
+        //companyPanel.setValues(company);
+        this.ok.setEnabled(false);
+        this.cancel.setEnabled(false);
+        this.setMainPanel(companyPanel);
+        this.packAndCenter();
+    }
+
     public void createCompanyEditDialog() {
         //this.getContentPane().setLayout(new FlowLayout());
         System.out.println("CompanyDialog createCompanyEditDialog");
         //CompanyPanel companyPanel = new CompanyPanel(new User(), frame);
-        CompanyPanel companyPanel = new CompanyPanel(company, this);
+        CompanyPanel companyPanel = new CompanyPanel(null, this);
         companyPanel.setValues(company);
+        this.ok.addActionListener( new UpdateUserAction(companyPanel.getControls(), company));// new SaveCompanyAction(companyPanel.getControls()));
         this.setMainPanel(companyPanel);
         //this.ok.addActionListener(new SaveCompanyAction(new Company()));
         //this.ok.addActionListener(new companyPanel.saveCompanyAction());
-        this.pack();
-        //this.setContentPane(panel);
-        //this.setSize(size);
+        this.packAndCenter();
     }
 
     public void createUserEditDialog(User user) {
