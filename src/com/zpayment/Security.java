@@ -284,6 +284,7 @@ class Security {
 
     public static boolean savePemX509Certificate(X509Certificate cert, String name) throws NoSuchAlgorithmException, NoSuchProviderException, CertificateEncodingException, SignatureException, InvalidKeyException, IOException
     {
+        name = name + ".pem";
         Writer writer = new FileWriter (new File("files/", name));
         if(cert!=null)
         {

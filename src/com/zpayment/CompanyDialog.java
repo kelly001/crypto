@@ -83,11 +83,12 @@ public class CompanyDialog extends OkCancelDialog {
         System.out.println("CompanyDialog createUserEditDialog");
         //this.getContentPane().setLayout(new FlowLayout());
         UserPanel panel = new UserPanel(this);
-        panel.setControls(null);
+        //panel.setControls(user);
         panel.setValues(user);
-        this.ok.addActionListener(new saveUserAction((Employer) user));
+        //panel.setValues(user);
+        this.ok.addActionListener(new UpdateUserAction(panel.getControls(), user));
         this.getContentPane().add(panel);
-        this.pack();
+        this.packAndCenter();
         //this.setContentPane(panel);
         //this.setSize(size);
     }

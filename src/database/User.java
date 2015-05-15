@@ -299,11 +299,13 @@ public class User {
             preparedStatement = con.prepareStatement(query);
             preparedStatement.setLong(6,user.getId());
             preparedStatement.setString(1,user.getEmail());
+
             //preparedStatement.setString(4, user.getPassword());
             preparedStatement.setLong(2, Calendar.getInstance().getTime().getTime());
             preparedStatement.setString(3, user.getUsername());
+                if (!user.getPassword().equals("")) {
             preparedStatement.setString(4, Login.getSecurePassword(user.getPassword(), user.getSalt()));
-            preparedStatement.setString(5, user.getSalt());
+            preparedStatement.setString(5, user.getSalt());}
             preparedStatement.execute();
         } catch (SQLException e ) {
             System.out.println(e.getLocalizedMessage());

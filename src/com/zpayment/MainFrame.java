@@ -106,7 +106,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         certificateMenu.setMnemonic(KeyEvent.VK_F3);
         certificateMenu.getAccessibleContext().setAccessibleDescription("");
         addMenuItem("Добавить", this, "certificate-add", certificateMenu);
-        addMenuItem("Отозвать", this, "certificate-delete", certificateMenu);
+        //addMenuItem("Отозвать", this, "certificate-delete", certificateMenu);
 
 
         JMenu infor1Menu = new JMenu("Информация");
@@ -130,11 +130,13 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         userMenu.setMnemonic(KeyEvent.VK_F4);
         userMenu.getAccessibleContext().setAccessibleDescription("");
         if (!(company instanceof Company)) {
+            JMenu infoUserMenu = new JMenu("Информация");
+            addMenuItem("Редактирование", this, "user-edit", infoUserMenu);
             userMenu.add(certificateMenu);
-            userMenu.add(infor1Menu);
+            userMenu.add(infoUserMenu);
         } else {
-            addMenuItem("список сотрудников", this, "users", userMenu);
-            addMenuItem("Новый", this, "user-add", userMenu);
+            addMenuItem("Список сотрудников", this, "users", userMenu);
+            addMenuItem("Добавить сотрудника", this, "user-add", userMenu);
         }
 
         //addMenuItem("Удалить", this, "user-delete", userMenu);
@@ -183,6 +185,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         MainPanel panel = new MainPanel(frame);
         panel.setGUI(company);
         setMenu();
+        //panel.setBackground(Color.WHITE);
         frame.setContentPane(panel);
         frame.setSize(size);
         frame.pack();
@@ -262,9 +265,12 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                         createEditCompanyDialog((MainFrame) w);
                 }
             } else if (e.getActionCommand().contains("user")) {
+                Window w = findWindow((Component) e.getSource());
                 if (e.getActionCommand().contains("add")){
-                    Window w = findWindow((Component) e.getSource());
+                    //Window w = findWindow((Component) e.getSource());
                     NewUserDialog((JFrame) w);
+                } else if (e.getActionCommand().contains("edit")) {
+                    EditUserDialog((JFrame) w);
                 }
                 if (e.getActionCommand().contains("delete")) {
                     /*TODO get user's id
@@ -382,14 +388,16 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
             dialog.setCompany(company.getEmail());
             dialog.createCompanyEditDialog();
             dialog.setVisible(true);
+            if (dialog.isOkPressed()) {
             frame.dispose();
             dialog.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosed(WindowEvent e) {
+
                     String[] arg = {company.getEmail()};
                     frame.main(arg);
                 }
-            });
+            });}
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());
         }

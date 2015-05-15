@@ -69,11 +69,11 @@ public class MainPanel extends JPanel{
             this.add(certPanel,c);
         }
 
-        JLabel infoLabel = new JLabel("Сссылки на Z-Payment: ");
+        /*JLabel infoLabel = new JLabel("Сссылки на Z-Payment: ");
         c.gridwidth = 1;
         c.gridx = 1;
         c.gridy = 3;
-        this.add(infoLabel,c);
+        this.add(infoLabel,c);*/
 
         final JLinkButton btn = new JLinkButton("Z-Payment.com");
         btn.addActionListener(new URLAction("https://z-payment.com/"));

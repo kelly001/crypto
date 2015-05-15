@@ -16,7 +16,7 @@ public class UserPanel extends FieldPanel {
 
     // Поля
     protected String[] names = {"username", "email", "password"};
-    protected String[] labels = {"Название/Имя пользователя", "Email", "Пароль"};
+    protected String[] labels = {"Название/Имя пользователя", "Почта пользователя", "Новый пароль"};
     protected Map<String, JTextField> controls = new HashMap<String, JTextField>();
     JButton saveCompanyButton;
     ActionListener action1;
@@ -66,10 +66,25 @@ public class UserPanel extends FieldPanel {
 
     public void setValues(User user) {
         if (user != null) {
+            /*JTextField username = new JTextField(user.getUsername());
+            this.addField("Имя пользователя", "Имя пользователя", username, true);
+
+            JTextField email = new JTextField(user.getEmail());
+            this.addField("Почта пользователя", "Почтовый адрес пользователя", email, true);*/
+            String[] names = {"username", "email", "password"};
+            for (int i=0; i < names.length; i++) {
+                JTextField field = new JTextField();
+                field.setName(names[i]);
+                field.setColumns(20);
+                field.setEditable(true);
+                controls.put(names[i],field);
+                this.addField(labels[i], names[i], field, true);
+            }
             controls.get("username").setText(user.getUsername());
             controls.get("email").setText(user.getEmail());
-            saveCompanyButton.addActionListener(new updateUserAction(user));
-            saveCompanyButton.removeActionListener(action1);
+            controls.get("password").setText("");
+            //saveCompanyButton.addActionListener(new updateUserAction(user));
+            //saveCompanyButton.removeActionListener(action1);
             this.addGlue();
             this.repaint();
         }

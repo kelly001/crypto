@@ -20,6 +20,11 @@ public class SaveUserAction implements ActionListener{
         this.company = comp;
     }
 
+    SaveUserAction(Map<String, JTextField> controls) {
+        this.controls = controls;
+        this.company = null;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         Employer user = new Employer();

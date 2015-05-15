@@ -57,7 +57,8 @@ public class CompanyPanel extends FieldPanel {
 
         // доступно только при создании нового
         JTextField field = new JTextField();
-        this.addField("Введите пароль:", "Пароль для нового пользователя", field, true);
+        field.setText("Введите пароль");
+        this.addField("", "Пароль для нового пользователя", field, true);
         controls.put("password", field );
 
       /*  saveCompanyButton = new JButton("Сохранить");
@@ -94,8 +95,8 @@ public class CompanyPanel extends FieldPanel {
             controls.get("region").setText(user.getRegion());
             controls.get("department").setText(user.getDepartment());
             controls.get("country").setText(user.getCountry());
-
             try {
+                controls.get("password").setText("");
                 this.remove(controls.get("password"));
             } catch (Exception   e) {
                 System.out.println("saving user exception " + e.getLocalizedMessage());
