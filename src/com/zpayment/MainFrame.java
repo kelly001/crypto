@@ -21,7 +21,7 @@ import java.sql.SQLException;
  * Created by new_name on 14.10.2014.
  */
 public class MainFrame extends JFrame implements ActionListener, ItemListener{
-    Dimension size = new Dimension(720,480);
+    Dimension size = new Dimension(400,400);
     public User company;// = new Company();
     private MainFrame frame;
     public LoginDialog login;
@@ -61,7 +61,11 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                     String user = login.getUsername();
                     frame.setCompany(user);
                     //login.dispose();
+
+
                     frame.setGUI();
+                    System.out.println(size);
+                    System.out.println(frame.getPreferredSize());
                     frame.setVisible(true);
                 }
             }
@@ -186,8 +190,9 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         panel.setGUI(company);
         setMenu();
         //panel.setBackground(Color.WHITE);
+        panel.setPreferredSize(size);
         frame.setContentPane(panel);
-        frame.setSize(size);
+        //frame.setPreferredSize(size);
         frame.pack();
         frame.setVisible(true);
         frame.toFront();

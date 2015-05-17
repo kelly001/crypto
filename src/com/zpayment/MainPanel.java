@@ -26,6 +26,8 @@ public class MainPanel extends JPanel{
 
     protected Logger logger = Logger.getLogger("Certificate panel");
     protected JFrame frame;
+    Integer width = 400;
+    Dimension size = new Dimension(width,400);
 
     public MainPanel (JFrame frame) {
         System.out.println("Main application panel");
@@ -87,6 +89,7 @@ public class MainPanel extends JPanel{
         c.gridx = 1;
         c.gridy =3;
         this.add(btn, c);
+        System.out.println(this.getPreferredSize());
     }
 
 
@@ -129,11 +132,16 @@ public class MainPanel extends JPanel{
                 }
 
                 JTable tbl = new JTable(tbldata, tblheader);
-                tbl.setFillsViewportHeight(true);
+                //tbl.setFillsViewportHeight(true);
                 int height = tbl.getRowHeight() * certificates.size() + tbl.getTableHeader().getPreferredSize().height;
+                tbl.setPreferredSize(new Dimension(width-20, height));
+
+
                 JScrollPane certPanel = new JScrollPane(tbl);
-                certPanel.createVerticalScrollBar();
+                //certPanel.createVerticalScrollBar();
                 certPanel.setPreferredSize(new Dimension(tbl.getPreferredSize().width, height));
+                System.out.print(tbl.getPreferredSize());
+                System.out.println(certPanel.getPreferredSize());
                 return certPanel;
             }   else {
                 return  new JScrollPane(new JLabel("Сертификатов нет")) ;
