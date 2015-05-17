@@ -56,7 +56,7 @@ public class MainPanel extends JPanel{
         this.add(certLabel, c);
 
         if (user != null) {
-            FieldPanel certInfoPanel = this.certificatesInfoGUI(user);
+            /*FieldPanel certInfoPanel = this.certificatesInfoGUI(user);
             c.gridwidth = 2;
             c.gridx = 0;
             c.gridy = 2;
@@ -65,6 +65,12 @@ public class MainPanel extends JPanel{
             FieldPanel certPanel = this.certificatesGUI(user);
             c.gridwidth = 1;
             c.gridx = 2;
+            c.gridy = 2;
+            this.add(certPanel,c);           */
+
+            JScrollPane certPanel = this.certificatesInfoTableGUI(user);
+            c.gridwidth = 4;
+            c.gridx = 0;
             c.gridy = 2;
             this.add(certPanel,c);
         }
@@ -78,8 +84,8 @@ public class MainPanel extends JPanel{
         final JLinkButton btn = new JLinkButton("Z-Payment.com");
         btn.addActionListener(new URLAction("https://z-payment.com/"));
         c.gridwidth = 1;
-        c.gridx = 2;
-        c.gridy = 3;
+        c.gridx = 1;
+        c.gridy =3;
         this.add(btn, c);
     }
 
@@ -96,6 +102,49 @@ public class MainPanel extends JPanel{
         } catch (Exception e){ //SQLException e) {
         System.out.println("Load certficates SQLException in User constructor " + e.getLocalizedMessage());}
         return certPanel;
+    }
+
+    public JScrollPane certificatesInfoTableGUI (User user) {
+        String [] tblheader = {"Владелец", "Компания (Root)", "Дата", "Статус", "Файл"};
+        String [][] tbldata;
+        try {
+            ArrayList<Certificate> certificates = Certificate.loadByUser(user.getId());
+            if (certificates.size() > 0) {
+                //tbldata = new String[certificates.size()][5];
+                tbldata = new String[certificates.size()][5];
+                //ArrayList <String> tbldata = new ArrayList<String>();
+                int i = 0;
+                for (Certificate cert : certificates) {
+                    // получение статуса сертифика - отозван/нет
+                    String status = "отозван";
+                    if (cert.getStatus()) status = "активный";
+                    String [] userData = {
+                            cert.getUsername(),
+                            cert.getOrganization(),
+                            cert.getFormatTime(),
+                            status,
+                            cert.getFilename()};
+                    tbldata [i] = userData;
+                    i +=1;
+                }
+
+                JTable tbl = new JTable(tbldata, tblheader);
+                tbl.setFillsViewportHeight(true);
+                int height = tbl.getRowHeight() * certificates.size() + tbl.getTableHeader().getPreferredSize().height;
+                JScrollPane certPanel = new JScrollPane(tbl);
+                certPanel.createVerticalScrollBar();
+                certPanel.setPreferredSize(new Dimension(tbl.getPreferredSize().width, height));
+                return certPanel;
+            }   else {
+                return  new JScrollPane(new JLabel("Сертификатов нет")) ;
+               /* tbldata = new String[1][5];
+                String str [] = {"нет сертификатов","","","",""};
+                tbldata [1] = str;        */
+            }
+        } catch (Exception e){ //SQLException e) {
+            System.out.println("Load certficates SQLException in User constructor " + e.getLocalizedMessage());
+            return new JScrollPane(new JLabel("Сертификатов нет")) ;
+        }
     }
 
     public FieldPanel certificatesGUI (User user) {

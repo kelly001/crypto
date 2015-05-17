@@ -1,6 +1,7 @@
 package database;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -147,8 +148,13 @@ public class Certificate {
     public String getCountry() {return this.country;}
 
     public String getInfo() {
-        String label = "Сертификат " + this.getUsername() + " от " + this.getTimestamp();
+        String date = new SimpleDateFormat("MM/dd/yyyy").format(this.getTimestamp());
+        String label = "Пользователь: " + this.getUsername() + " Дата: " + date;
         return label;
+    }
+
+    public String getFormatTime() {
+       return new SimpleDateFormat("MM/dd/yyyy").format(this.getTimestamp());
     }
 
     public static ArrayList<Certificate> load() throws SQLException {

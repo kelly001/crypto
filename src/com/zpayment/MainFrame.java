@@ -21,7 +21,7 @@ import java.sql.SQLException;
  * Created by new_name on 14.10.2014.
  */
 public class MainFrame extends JFrame implements ActionListener, ItemListener{
-    Dimension size = new Dimension(640,480);
+    Dimension size = new Dimension(720,480);
     public User company;// = new Company();
     private MainFrame frame;
     public LoginDialog login;
