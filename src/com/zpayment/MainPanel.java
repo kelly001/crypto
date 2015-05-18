@@ -51,24 +51,18 @@ public class MainPanel extends JPanel{
             this.add(companyPanel,c);
         }
 
-        /*JLabel certLabel = new JLabel("Сертификаты пользователя:");
-        c.gridwidth = 3;
-        c.gridx = 0;
-        c.gridy = 1;
-        this.add(certLabel, c);*/
-
         if (user != null) {
             /*FieldPanel certInfoPanel = this.certificatesInfoGUI(user);
             c.gridwidth = 2;
             c.gridx = 0;
             c.gridy = 2;
-            this.add(certInfoPanel,c); */
+            this.add(certInfoPanel,c);
 
             JPanel certBtnPanel = this.certificatesBtn(user);
             c.gridwidth = 2;
             c.gridx = 0;
             c.gridy = 2;
-            this.add(certBtnPanel,c);
+            this.add(certBtnPanel,c);         */
 
             JPanel certPanel = this.certificatesInfoTableGUI(user);
             c.gridwidth = 4;
@@ -77,12 +71,6 @@ public class MainPanel extends JPanel{
             //certPanel.setVisible(False);
             this.add(certPanel,c);
         }
-
-        /*JLabel infoLabel = new JLabel("Сссылки на Z-Payment: ");
-        c.gridwidth = 1;
-        c.gridx = 1;
-        c.gridy = 3;
-        this.add(infoLabel,c);*/
 
         final JLinkButton btn = new JLinkButton("Z-Payment.com");
         btn.addActionListener(new URLAction("https://z-payment.com/"));
@@ -134,7 +122,7 @@ public class MainPanel extends JPanel{
                 }
 
                 JTable tbl = new JTable(tbldata, tblheader);
-                int height = tbl.getRowHeight() * (certificates.size()+2) + tbl.getTableHeader().getPreferredSize().height ;
+                int height = tbl.getRowHeight() * (certificates.size()+1) + tbl.getTableHeader().getPreferredSize().height ;
                 tbl.setPreferredSize(new Dimension(width-50, height));
                 JScrollPane certPanel = new JScrollPane(tbl);
                 //certPanel.createVerticalScrollBar();
@@ -142,6 +130,9 @@ public class MainPanel extends JPanel{
                 System.out.println(certPanel.getPreferredSize());
                 resultPane.add(new JLabel("Сертификаты пользователя:"));
                 resultPane.add(certPanel);
+
+                JPanel certBtnPanel = this.certificatesBtn(user);
+                resultPane.add(certBtnPanel);
             }   else {
                 JLabel certLabel = new JLabel("У пользователя нет сертификатов");
                 resultPane.add(certLabel);
