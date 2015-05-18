@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 /**
  * Created by new_name on 11.11.2014.
  */
-public class UsersViewDialog extends CloseButtonDialog {
+public class UsersViewDialog extends JDialog { //CloseButtonDialog {
 
     static Logger logger = Logger.getLogger("Users View Dialog log");
     public static Dimension size = new Dimension(480,480);
@@ -31,7 +31,7 @@ public class UsersViewDialog extends CloseButtonDialog {
 
 
     public UsersViewDialog(Frame parent, FieldPanel panel, Company company) {
-        super(parent, title, panel);
+        super(parent, title);
         System.out.println("constructor");
         this.company = company;
         //final CloseButtonDialog dialog = this;

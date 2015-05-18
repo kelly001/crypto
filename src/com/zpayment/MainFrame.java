@@ -61,10 +61,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                     String user = login.getUsername();
                     frame.setCompany(user);
                     //login.dispose();
-
-
                     frame.setGUI();
-                    System.out.println(size);
                     System.out.println(frame.getPreferredSize());
                     frame.setVisible(true);
                 }
@@ -121,10 +118,10 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         companyMenu = new JMenu("Компания");
         companyMenu.setMnemonic(KeyEvent.VK_F2);
         companyMenu.getAccessibleContext().setAccessibleDescription("");
-        companyMenu.add(infor1Menu);
-        companyMenu.add(certificateMenu);
-        //companyMenu.add(userMenu);
-        //addMenuItem("Сертификат", this, "company-certificate", companyMenu);
+        //companyMenu.add(infor1Menu);
+        //companyMenu.add(certificateMenu);
+        addMenuItem("Редактирование информации", this, "company-edit", companyMenu);
+        addMenuItem("Добавить сертификат", this, "certificate-add", companyMenu);
         menuBar.add(companyMenu);
 
         if (!(company instanceof Company)) companyMenu.setEnabled(false);
@@ -136,8 +133,10 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         if (!(company instanceof Company)) {
             JMenu infoUserMenu = new JMenu("Информация");
             addMenuItem("Редактирование", this, "user-edit", infoUserMenu);
-            userMenu.add(certificateMenu);
-            userMenu.add(infoUserMenu);
+            addMenuItem("Редактирование информации", this, "user-edit", userMenu);
+            addMenuItem("Добавить сертификат", this, "certificate-add", userMenu);
+            //userMenu.add(certificateMenu);
+            //userMenu.add(infoUserMenu);
         } else {
             addMenuItem("Список сотрудников", this, "users", userMenu);
             addMenuItem("Добавить сотрудника", this, "user-add", userMenu);
@@ -190,9 +189,10 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         panel.setGUI(company);
         setMenu();
         //panel.setBackground(Color.WHITE);
-        panel.setPreferredSize(size);
-        frame.setContentPane(panel);
-        //frame.setPreferredSize(size);
+        JPanel pane = new JPanel(new BorderLayout());
+        pane.add(panel,BorderLayout.PAGE_START);
+        frame.setContentPane(pane);
+        frame.setPreferredSize(size);
         frame.pack();
         frame.setVisible(true);
         frame.toFront();

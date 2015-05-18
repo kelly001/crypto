@@ -51,11 +51,11 @@ public class MainPanel extends JPanel{
             this.add(companyPanel,c);
         }
 
-        JLabel certLabel = new JLabel("Сертификаты пользователя:");
+        /*JLabel certLabel = new JLabel("Сертификаты пользователя:");
         c.gridwidth = 3;
         c.gridx = 0;
         c.gridy = 1;
-        this.add(certLabel, c);
+        this.add(certLabel, c);*/
 
         if (user != null) {
             /*FieldPanel certInfoPanel = this.certificatesInfoGUI(user);
@@ -70,10 +70,11 @@ public class MainPanel extends JPanel{
             c.gridy = 2;
             this.add(certPanel,c);           */
 
-            JScrollPane certPanel = this.certificatesInfoTableGUI(user);
+            JPanel certPanel = this.certificatesInfoTableGUI(user);
             c.gridwidth = 4;
             c.gridx = 0;
-            c.gridy = 2;
+            c.gridy = 1;
+            //certPanel.setVisible(False);
             this.add(certPanel,c);
         }
 
@@ -107,13 +108,14 @@ public class MainPanel extends JPanel{
         return certPanel;
     }
 
-    public JScrollPane certificatesInfoTableGUI (User user) {
+    public JPanel certificatesInfoTableGUI (User user) {
+        JPanel resultPane = new JPanel();
+        resultPane.setLayout(new BoxLayout(resultPane, BoxLayout.PAGE_AXIS));
         String [] tblheader = {"Владелец", "Компания (Root)", "Дата", "Статус", "Файл"};
         String [][] tbldata;
         try {
             ArrayList<Certificate> certificates = Certificate.loadByUser(user.getId());
             if (certificates.size() > 0) {
-                //tbldata = new String[certificates.size()][5];
                 tbldata = new String[certificates.size()][5];
                 //ArrayList <String> tbldata = new ArrayList<String>();
                 int i = 0;
@@ -132,27 +134,23 @@ public class MainPanel extends JPanel{
                 }
 
                 JTable tbl = new JTable(tbldata, tblheader);
-                //tbl.setFillsViewportHeight(true);
-                int height = tbl.getRowHeight() * certificates.size() + tbl.getTableHeader().getPreferredSize().height;
-                tbl.setPreferredSize(new Dimension(width-20, height));
-
-
+                int height = tbl.getRowHeight() * (certificates.size()+2) + tbl.getTableHeader().getPreferredSize().height ;
+                tbl.setPreferredSize(new Dimension(width-50, height));
                 JScrollPane certPanel = new JScrollPane(tbl);
                 //certPanel.createVerticalScrollBar();
                 certPanel.setPreferredSize(new Dimension(tbl.getPreferredSize().width, height));
-                System.out.print(tbl.getPreferredSize());
                 System.out.println(certPanel.getPreferredSize());
-                return certPanel;
+                resultPane.add(new JLabel("Сертификаты пользователя:"));
+                resultPane.add(certPanel);
             }   else {
-                return  new JScrollPane(new JLabel("Сертификатов нет")) ;
-               /* tbldata = new String[1][5];
-                String str [] = {"нет сертификатов","","","",""};
-                tbldata [1] = str;        */
+                JLabel certLabel = new JLabel("У пользователя нет сертификатов");
+                resultPane.add(certLabel);
             }
         } catch (Exception e){ //SQLException e) {
             System.out.println("Load certficates SQLException in User constructor " + e.getLocalizedMessage());
-            return new JScrollPane(new JLabel("Сертификатов нет")) ;
+            resultPane.add(new JLabel("Не удалось загрузить сертификаты"));
         }
+        return resultPane;
     }
 
     public FieldPanel certificatesGUI (User user) {
