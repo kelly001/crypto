@@ -26,8 +26,8 @@ public class MainPanel extends JPanel{
 
     protected Logger logger = Logger.getLogger("Certificate panel");
     protected JFrame frame;
-    Integer width = 400;
-    Dimension size = new Dimension(width,400);
+    Integer width = 460;
+    Dimension size = new Dimension(width,460);
 
     public MainPanel (JFrame frame) {
         System.out.println("Main application panel");
@@ -62,13 +62,13 @@ public class MainPanel extends JPanel{
             c.gridwidth = 2;
             c.gridx = 0;
             c.gridy = 2;
-            this.add(certInfoPanel,c);
+            this.add(certInfoPanel,c); */
 
-            FieldPanel certPanel = this.certificatesGUI(user);
-            c.gridwidth = 1;
-            c.gridx = 2;
+            JPanel certBtnPanel = this.certificatesBtn(user);
+            c.gridwidth = 2;
+            c.gridx = 0;
             c.gridy = 2;
-            this.add(certPanel,c);           */
+            this.add(certBtnPanel,c);
 
             JPanel certPanel = this.certificatesInfoTableGUI(user);
             c.gridwidth = 4;
@@ -177,6 +177,22 @@ public class MainPanel extends JPanel{
         }catch (Exception e){ //SQLException e) {
             System.out.println("Load certficates SQLException in User constructor " + e.getLocalizedMessage());}
         return certPanel;
+    }
+
+    public JPanel certificatesBtn (User user) {
+
+        JButton button = new JButton("Редактировать");
+        //button.addActionListener(new certAction(cert, user));
+        JButton cancelButton = new JButton("Отозвать");
+        //cancelButton.addActionListener(new RemoveCertificateActionListener(cert));
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        panel.add(Box.createHorizontalGlue());
+        panel.add(button);
+        panel.add(cancelButton);
+        return  panel;
     }
 
     public class certAction implements ActionListener
