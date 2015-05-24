@@ -46,7 +46,7 @@ public class CertificatePanel extends FieldPanel {
            JTextField field = new JTextField();
            field.setName(names[i]);
            controls.put(names[i], field);
-           panel.addField(names[i], names[i], field, true);
+           panel.addField(labels[i], labels[i], field, true);
        }
        panel.addGlue();
        logger.log(Level.FINE, "create Controls");

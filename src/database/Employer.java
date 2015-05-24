@@ -40,6 +40,7 @@ public class Employer extends User {
                 employer.setId(result.getLong("id"));
                 employer.setUsername(result.getString("username"));
                 employer.setPassword(result.getString("password"));
+                employer.setEmail(result.getString("email"));
                 employer.setSalt(result.getString("salt"));
                 employer.setStatus(result.getBoolean("status"));
                 employer.setTimestamp(time);

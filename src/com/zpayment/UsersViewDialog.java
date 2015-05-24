@@ -1,5 +1,6 @@
 package com.zpayment;
 
+import com.sun.org.apache.bcel.internal.generic.JSR;
 import com.teacode.swing.component.FieldPanel;
 import com.teacode.swing.dialog.CloseButtonDialog;
 import database.Certificate;
@@ -8,6 +9,8 @@ import database.Employer;
 import database.User;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,7 +30,7 @@ public class UsersViewDialog extends JDialog { //CloseButtonDialog {
     protected ArrayList<Employer> users;
     protected Company company;
     //protected FieldPanel panel = new FieldPanel();
-    private static String title = " Сотрудники компании.";
+    private static String title = " Сотрудники компании";
 
 
     public UsersViewDialog(Frame parent, FieldPanel panel, Company company) {
@@ -47,12 +50,15 @@ public class UsersViewDialog extends JDialog { //CloseButtonDialog {
         }
     }
 
-    public void setControls(FieldPanel panel) {
-        final JLabel label = new JLabel();
-        panel.addField("Сотрудники", "label", label, true);
+    public void setControls(final FieldPanel panel) {
         if (users.size() != 0) {
+            final DefaultListModel listModel = new DefaultListModel();
+            int i = 1;
             for (User user: users) {
-                //final JLabel label = new JLabel();
+                String userStr = "#" + i + " " + user.getUsername() + " " + user.getEmail();
+                listModel.addElement(userStr);
+                i += 1;
+                /*
                 panel.addField(user.getUsername(), "Фамилия, Имя, Отчество сотрудника", new JLabel(), false);
                 panel.addField("Сертификаты пользователя:", "label", new JLabel(), true);
                 ArrayList<Certificate> certificates  = user.getCertificates();
@@ -75,8 +81,24 @@ public class UsersViewDialog extends JDialog { //CloseButtonDialog {
                     button.addActionListener(new certAction(user));
                     panel.addField("Нет сертификатов", "Создать сертификат сотрудника", button, true);
                 }
+                */
 
             }
+            final JList usersList = new JList(listModel);
+            usersList.setFocusable(true);
+            usersList.addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent e) {
+                    if (usersList.getSelectedIndex() >= 0) {
+                        //userCertificatesList(panel, usersList.getSelectedIndex());
+                        System.out.println(usersList.getSelectedIndex());
+                    }
+                }
+            });
+            JScrollPane usersPanel = new JScrollPane(usersList);
+            int rowHeight = usersList.getFixedCellHeight()>0? usersList.getFixedCellHeight():10;
+            int height = (rowHeight * 2) * users.size();
+             usersPanel.setPreferredSize(new Dimension((int) size.getWidth(),height));
+            panel.addField("Список сотрудников:", "Сотрудники компании", usersPanel, true);
         } else {
             JButton newEmp = new JButton("Добавить");
             newEmp.addActionListener(new ActionListener() {
@@ -99,6 +121,43 @@ public class UsersViewDialog extends JDialog { //CloseButtonDialog {
         this.getContentPane().add(panel);
         this.setSize(size);
         this.pack();
+    }
+
+    public void userCertificatesList(FieldPanel panel, int userIndex) {
+        int i = 1;
+        for (User user: users) {
+            if (userIndex == i) {
+                ArrayList<Certificate> certificates  = user.getCertificates();
+
+                if (certificates.size() > 0) {
+                    String [] tblheader = {"Владелец", "Компания (Root)", "Дата", "Статус", "Файл"};
+                    String [][] tbldata = new String[certificates.size()][5];
+                    int certIndex = 0;
+                    for (Certificate cert : certificates) {
+                        String status = "отозван";
+                        if (cert.getStatus()) status = "активный";
+                        String [] userData = {
+                                cert.getUsername(),
+                                cert.getOrganization(),
+                                cert.getFormatTime(),
+                                status,
+                                cert.getFilename()};
+                        tbldata [certIndex] = userData;
+                        certIndex +=1;
+
+                        JTable tbl = new JTable(tbldata, tblheader);
+                        int height = tbl.getRowHeight() * (certificates.size()+1) + tbl.getTableHeader().getPreferredSize().height ;
+                        tbl.setPreferredSize(new Dimension((int) size.getWidth()-50, height));
+                        JScrollPane certPanel = new JScrollPane(tbl);
+                        certPanel.setPreferredSize(new Dimension(tbl.getPreferredSize().width, height));
+                        panel.addField("Сертификаты пользователя", "", certPanel, true);
+                    }
+                } else {
+                    panel.addField("", "", new JLabel("Нет сертификатов"), true);
+                }
+            }
+            i += 1;
+        }
     }
 
     public class certAction implements ActionListener {

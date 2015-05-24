@@ -44,8 +44,6 @@ public class CompanyPanel extends FieldPanel {
     public void setControls() {
         System.out.println("Company Panel setControls()");
         final JLabel label = new JLabel();
-        String companyLabel = "Новая организация";
-        this.addField(companyLabel, "label", label, true);
         for (int i=0; i < names.length; i++) {
             JTextField field = new JTextField();
             field.setName(names[i]);

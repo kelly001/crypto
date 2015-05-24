@@ -28,8 +28,8 @@ public class UserPanel extends FieldPanel {
 
     public void setControls(Company company) {
         final JLabel label = new JLabel();
-        String companyLabel = "Новый пользователь";
-        this.addField(companyLabel, "label", label, true);
+        //String companyLabel = "Новый пользователь";
+        //this.addField(companyLabel, "label", label, true);
         for (int i=0; i < names.length; i++) {
             JTextField field = new JTextField();
             field.setName(names[i]);

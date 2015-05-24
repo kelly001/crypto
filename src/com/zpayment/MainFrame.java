@@ -102,13 +102,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         addMenuItem("Выход", this, "exit", menu);
         menuBar.add(menu);
 
-        //Build the cert menu.
-        certificateMenu = new JMenu("Сертификат");
-        certificateMenu.setMnemonic(KeyEvent.VK_F3);
-        certificateMenu.getAccessibleContext().setAccessibleDescription("");
-        addMenuItem("Добавить", this, "certificate-add", certificateMenu);
-        //addMenuItem("Отозвать", this, "certificate-delete", certificateMenu);
-
 
         JMenu infor1Menu = new JMenu("Информация");
         addMenuItem("Редактирование", this, "company-edit", infor1Menu);
@@ -119,7 +112,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         companyMenu.setMnemonic(KeyEvent.VK_F2);
         companyMenu.getAccessibleContext().setAccessibleDescription("");
         //companyMenu.add(infor1Menu);
-        //companyMenu.add(certificateMenu);
         addMenuItem("Редактирование информации", this, "company-edit", companyMenu);
         addMenuItem("Добавить сертификат", this, "certificate-add", companyMenu);
         menuBar.add(companyMenu);
@@ -131,12 +123,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         userMenu.setMnemonic(KeyEvent.VK_F4);
         userMenu.getAccessibleContext().setAccessibleDescription("");
         if (!(company instanceof Company)) {
-            JMenu infoUserMenu = new JMenu("Информация");
-            addMenuItem("Редактирование", this, "user-edit", infoUserMenu);
             addMenuItem("Редактирование информации", this, "user-edit", userMenu);
             addMenuItem("Добавить сертификат", this, "certificate-add", userMenu);
-            //userMenu.add(certificateMenu);
-            //userMenu.add(infoUserMenu);
         } else {
             addMenuItem("Список сотрудников", this, "users", userMenu);
             addMenuItem("Добавить сотрудника", this, "user-add", userMenu);
@@ -363,7 +351,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     protected void createUsersDialog(JFrame frame) {
         System.out.println("create users dialog func");
         try {
-            final FieldPanel panel = new FieldPanel();
+            //final JPanel panel = new JPanel();
+            FieldPanel panel = new FieldPanel();
             final UsersViewDialog dialog = new UsersViewDialog(frame, panel, (Company) company);
             dialog.setUsers(company.getId());
             dialog.setControls(panel);
