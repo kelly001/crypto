@@ -11,6 +11,7 @@ import database.User;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,11 +33,16 @@ public class UsersViewDialog extends JDialog { //CloseButtonDialog {
     //protected FieldPanel panel = new FieldPanel();
     private static String title = " Сотрудники компании";
 
+    TableModel certificateTableModel;
+    JTable certTbl = new JTable();
+    JScrollPane certPanel = new JScrollPane(certTbl);
+
 
     public UsersViewDialog(Frame parent, FieldPanel panel, Company company) {
         super(parent, title);
         System.out.println("constructor");
         this.company = company;
+        //certificateTableModel = new UserCertificateTableModel();
         //final CloseButtonDialog dialog = this;
     }
 
@@ -89,15 +95,15 @@ public class UsersViewDialog extends JDialog { //CloseButtonDialog {
             usersList.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     if (usersList.getSelectedIndex() >= 0) {
-                        //userCertificatesList(panel, usersList.getSelectedIndex());
+                        userCertificatesList(panel, usersList.getSelectedIndex());
                         System.out.println(usersList.getSelectedIndex());
                     }
                 }
             });
             JScrollPane usersPanel = new JScrollPane(usersList);
-            int rowHeight = usersList.getFixedCellHeight()>0? usersList.getFixedCellHeight():10;
-            int height = (rowHeight * 2) * users.size();
-             usersPanel.setPreferredSize(new Dimension((int) size.getWidth(),height));
+            //int rowHeight = usersList.getFixedCellHeight()>0? usersList.getFixedCellHeight():10;
+            //int height = (rowHeight * 2) * users.size();
+             usersPanel.setMinimumSize(new Dimension(100,100));
             panel.addField("Список сотрудников:", "Сотрудники компании", usersPanel, true);
         } else {
             JButton newEmp = new JButton("Добавить");
@@ -130,9 +136,11 @@ public class UsersViewDialog extends JDialog { //CloseButtonDialog {
                 ArrayList<Certificate> certificates  = user.getCertificates();
 
                 if (certificates.size() > 0) {
+                    certificateTableModel = new UserCertificateTableModel(certificates);
                     String [] tblheader = {"Владелец", "Компания (Root)", "Дата", "Статус", "Файл"};
                     String [][] tbldata = new String[certificates.size()][5];
-                    int certIndex = 0;
+                    certTbl.setModel(certificateTableModel);
+                    /*int certIndex = 0;
                     for (Certificate cert : certificates) {
                         String status = "отозван";
                         if (cert.getStatus()) status = "активный";
@@ -144,14 +152,12 @@ public class UsersViewDialog extends JDialog { //CloseButtonDialog {
                                 cert.getFilename()};
                         tbldata [certIndex] = userData;
                         certIndex +=1;
-
-                        JTable tbl = new JTable(tbldata, tblheader);
-                        int height = tbl.getRowHeight() * (certificates.size()+1) + tbl.getTableHeader().getPreferredSize().height ;
-                        tbl.setPreferredSize(new Dimension((int) size.getWidth()-50, height));
-                        JScrollPane certPanel = new JScrollPane(tbl);
-                        certPanel.setPreferredSize(new Dimension(tbl.getPreferredSize().width, height));
-                        panel.addField("Сертификаты пользователя", "", certPanel, true);
-                    }
+                        }*/
+                    int height = certTbl.getRowHeight() * (certificates.size()+1) + certTbl.getTableHeader().getPreferredSize().height ;
+                    certTbl.setPreferredSize(new Dimension((int) size.getWidth()-50, height));
+                    certPanel.setPreferredSize(new Dimension(certTbl.getPreferredSize().width, height));
+                    panel.addField("", "" , new JLabel("Сертификаты пользователя:"), true);
+                    panel.addField("", "", certPanel, true);
                 } else {
                     panel.addField("", "", new JLabel("Нет сертификатов"), true);
                 }
