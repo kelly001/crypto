@@ -354,8 +354,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
             //final JPanel panel = new JPanel();
             FieldPanel panel = new FieldPanel();
             final UsersViewDialog dialog = new UsersViewDialog(frame, panel, (Company) company);
-            dialog.setUsers(company.getId());
-            dialog.setControls(panel);
+            /*dialog.setUsers(company.getId());
+            dialog.setControls(panel);*/
             dialog.setVisible(true);
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());

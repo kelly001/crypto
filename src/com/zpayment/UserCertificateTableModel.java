@@ -15,7 +15,12 @@ public class UserCertificateTableModel implements TableModel {
     private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
     private ArrayList<Certificate> certificates;
 
+
     public UserCertificateTableModel(ArrayList <Certificate> certificates) {
+        this.certificates = certificates;
+    }
+
+    public void setCertificates(ArrayList <Certificate> certificates) {
         this.certificates = certificates;
     }
 
@@ -30,6 +35,7 @@ public class UserCertificateTableModel implements TableModel {
     public int getColumnCount() {
         return 4;
     }
+
 
     public String getColumnName(int columnIndex) {
         switch (columnIndex) {
