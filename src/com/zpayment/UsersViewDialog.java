@@ -117,7 +117,7 @@ public class UsersViewDialog extends JDialog { //CloseButtonDialog {
             JScrollPane usersPanel = new JScrollPane(usersList);
             //int rowHeight = usersList.getFixedCellHeight()>0? usersList.getFixedCellHeight():10;
             //int height = (rowHeight * 2) * users.size();
-             usersPanel.setMinimumSize(new Dimension(100, 400));
+             usersPanel.setMinimumSize(new Dimension(400, 100));
             panel.addField("Список сотрудников:", "Сотрудники компании", usersPanel, true);
             panel.addField("", "" , new JLabel("Сертификаты сотрудников:"), true);
         } else {
@@ -146,8 +146,9 @@ public class UsersViewDialog extends JDialog { //CloseButtonDialog {
                 certificateTableModel  = new UserCertificateTableModel(certificates);
                 certTbl.setModel(certificateTableModel);
                 int height = certTbl.getRowHeight() * (certificates.size()+1) + certTbl.getTableHeader().getPreferredSize().height ;
-                certTbl.setPreferredSize(new Dimension((int) size.getWidth()-50, height));
-                certPanel.setPreferredSize(new Dimension(certTbl.getPreferredSize().width, height));
+                certTbl.setMinimumSize(new Dimension((int) size.getWidth()-50, height));
+                certPanel.setMinimumSize(new Dimension(certTbl.getPreferredSize().width, height+10));
+                System.out.println(height+" cert table height");
                 //panel.addField("", "", certPanel, true);
                 /*if (certificates.size() > 0) {
                     certificateTableModel = new UserCertificateTableModel(certificates);

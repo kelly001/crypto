@@ -126,9 +126,12 @@ public class MainPanel extends JPanel{
                 tbl.setPreferredSize(new Dimension(width-50, height));
                 JScrollPane certPanel = new JScrollPane(tbl);
                 //certPanel.createVerticalScrollBar();
-                certPanel.setPreferredSize(new Dimension(tbl.getPreferredSize().width, height));
+                certPanel.setPreferredSize(new Dimension(width-50, height));
                 System.out.println(certPanel.getPreferredSize());
-                resultPane.add(new JLabel("Сертификаты пользователя:"));
+                System.out.println("высота" + height);
+                JLabel certLabel = new JLabel("Сертификаты пользователя:");
+                //certLabel.setHorizontalAlignment();
+                resultPane.add(certLabel);
                 resultPane.add(certPanel);
 
                 JPanel certBtnPanel = this.certificatesBtn(user);
