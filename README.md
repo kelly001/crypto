@@ -85,3 +85,7 @@ These issues remain for later phases; documenting them does not fix them.
 The modernization preserves Swing initially and separates build changes,
 behavioral tests, security fixes, and code refactoring. See the plan for scope
 and sequencing.
+
+Phase 0 findings and reproducible diagnostic commands are recorded in the
+[baseline report](docs/phase-0-baseline.md). Java 25 source compilation currently
+fails; see the report for confirmed blockers and unverified flows.
