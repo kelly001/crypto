@@ -26,7 +26,7 @@ The initial work documents the legacy baseline before changing application code.
 | `META-INF/`, `src/META-INF/` | Conflicting historical packaging manifests |
 | `files/` | Historical certificate, key, and PKCS#12 files |
 | `crypto_db.sql` | Legacy MySQL schema and account grants |
-| `docs/` | Original application help pages and modernization documentation |
+| `docs/` | Modernization plan, baseline report, and diagnostic |
 
 UI actions call models containing SQL directly. `Security` uses Bouncy Castle for
 certificate creation, key serialization, and PKCS#12 export. Company certificates
@@ -54,7 +54,8 @@ Schema import and initial account creation still require baseline verification.
 
 For legacy IDE setup, mark `src/` as the source root, add all four `lib/*.jar`
 files to the classpath, and use the repository root as the working directory so
-`icon.jpg`, `docs/`, and `files/` resolve. Use `com.zpayment.MainFrame` as the
+`icon.jpg` and `files/` resolve. The original HTML help pages have been removed;
+menu actions that open them still point to missing files. Use `com.zpayment.MainFrame` as the
 application entry point. The root manifest instead points to `LoginFrame` and
 should not be treated as authoritative.
 
