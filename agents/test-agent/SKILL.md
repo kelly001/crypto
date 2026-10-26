@@ -17,7 +17,9 @@ Follow root model-selection guidance; use a suitably capable model for crypto
 semantics. Reuse an available worker where practical. No further delegation
 without assignment. If unavailable, disclose it and perform the task directly.
 
-Leave changes unstaged; do not change branches, commit, push, or create PRs.
+Testing workers leave changes unstaged and do not change branches, commit, push,
+or create PRs. The coordinator may commit and push verified development-branch
+changes under root instructions.
 Keep production changes limited to assigned fixes or necessary testability seams;
 report unrelated defects rather than silently changing expected behavior.
 

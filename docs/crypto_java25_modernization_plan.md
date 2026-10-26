@@ -4,6 +4,10 @@ Repository: `kelly001/crypto`
 Current baseline: Java 8 bytecode (class-file version 52), largely Java 7-era coding style  
 Target: Java 25 LTS
 
+Implementation status: [Phases 1 and 2](phase-1-2-build.md) establish the Java 25
+Maven build, current dependencies, and focused compatibility checks. Remaining
+sections describe future work unless their completion is explicitly recorded.
+
 ## Goals
 
 Modernize the project so it:
@@ -166,7 +170,7 @@ JcaPEMWriter
 Review all imports in:
 
 ```text
-src/com/zpayment/Security.java
+src/main/java/com/zpayment/Security.java
 ```
 
 against the current Bouncy Castle API.

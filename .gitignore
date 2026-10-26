@@ -1,7 +1,21 @@
-#IDEA Project
+# IDE files
 .idea/
-.out/
-.files/
 *.iml
-*.properties
-*.xml
+
+# Build output and local tools
+/target/
+/out/
+/.build-tools/
+*.class
+*.jar
+
+# Local configuration and generated credentials (existing historical fixtures remain)
+.env
+.env.*
+!.env.example
+/files/
+*.p12
+*.key
+
+# Local agent scratch files
+/.agent-tmp/

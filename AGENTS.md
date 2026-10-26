@@ -12,6 +12,11 @@ keys, and PKCS#12 containers. Java 25 LTS is the modernization target. At the ti
 these instructions were added, there was no Maven/Gradle build, automated test
 suite, or CI. Do not claim planned infrastructure or configuration already works.
 
+Phases 1 and 2 now provide a Java 25 Maven build and focused JUnit compatibility
+tests; see `docs/phase-1-2-build.md`. Use `mvnw.cmd` on Windows or `sh ./mvnw` on
+Unix. Sources are under `src/main/java`, resources under `src/main/resources`,
+and tests under `src/test/java`. CI and the full Phase 3 suite remain future work.
+
 ## Working conventions
 
 - Work on a task-specific feature branch. Before edits, inspect status, branch,
@@ -20,9 +25,11 @@ suite, or CI. Do not claim planned infrastructure or configuration already works
   explicitly requested branch. Only the coordinating agent changes branches,
   before workers start.
 - Preserve user edits and staging decisions. Do not reset, clean, stash, overwrite
-  unrelated work, or rewrite history to obtain a clean checkout. Leave changes
-  unstaged unless asked otherwise; commits, pushes, merges, and PR creation require
-  the user's instruction.
+  unrelated work, or rewrite history to obtain a clean checkout. The coordinating
+  agent may stage, commit, and push completed, verified task changes on development
+  or feature branches to GitHub without asking again. Preserve unrelated staged
+  work and exclude scratch files and secrets. Merging or pushing to `main`/`master`,
+  force-pushing, and PR creation still require the user's instruction.
 - Use English by default for new comments, documentation, messages, and UI text.
   Translate existing Russian UI and application text into English where practical,
   including when touching related code. The final goal is a fully English UI and
@@ -62,17 +69,16 @@ output belong outside tracked source and must not contain secrets.
   Boot, JPA, microservices, or Java modules without a task-specific reason.
 - Establish a reproducible build and meaningful behavior tests before large
   refactoring or changing cryptographic defaults. Follow the plan's sequencing.
-- Do not delete bundled JARs before replacements are verified.
-  `teacode-common.jar` is actively used by the UI; inspect its consumers first.
+- Do not delete dependencies before replacements are verified. Phase 2 replaced
+  the bundled JARs with Maven dependencies and project-owned Swing helpers in
+  `com.zpayment.ui`; do not reintroduce manual JAR classpaths or `systemPath`.
 - Prefer try-with-resources for JDBC and files, explicit error handling, and
   `java.time` at domain boundaries. Use records for immutable inputs/DTOs rather
   than mechanically converting mutable entities. Use modern syntax for clarity.
-- Check `.gitignore` when introducing build/config files: its legacy `*.xml` and
-  `*.properties` rules can hide required files. Historical `out/` and `.class`
-  files are not a reproducible source build; do not overwrite them during checks.
-- Account for the tracked `RemoveCertificateActionListener.java` /
-  `removeCertificateActionListener.java` case collision on Windows. Handle any
-  correction deliberately rather than silently losing one version.
+- Keep build/config files visible to Git; the legacy broad XML/properties ignore
+  rules were removed in Phase 1. Build output belongs in ignored `target/`.
+- Use correctly cased source filenames on all platforms. Phase 1 consolidated the
+  identical case-colliding listener files as `RemoveCertificateActionListener.java`.
 
 ## Security and data
 
