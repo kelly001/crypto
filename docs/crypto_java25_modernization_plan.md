@@ -14,6 +14,8 @@ Modernize the project so it:
 - has automated tests around certificate, key, database, and PKCS#12 behavior;
 - uses modern Java features where they improve clarity and safety;
 - preserves the original application concept and Swing UI initially;
+- has a fully English UI and application text, translating existing Russian text incrementally;
+- initializes and upgrades databases through executable, versioned migrations instead of a legacy SQL dump;
 - is easy to run locally and suitable as a portfolio/refresher project.
 
 The first goal is **not** to rewrite the application or replace Swing. The migration should separate build/runtime modernization, security fixes, and code-style refactoring so regressions are easier to identify.
@@ -262,6 +264,9 @@ Test:
 
 Test:
 
+- schema initialization through the actual migration runner;
+- repeat migration execution with no pending changes;
+- upgrades from a supported previous schema with data preserved;
 - user creation;
 - company creation;
 - certificate persistence;
@@ -744,6 +749,34 @@ Do not over-engineer the exception hierarchy.
 
 # Phase 11 — Database Layer Cleanup
 
+## Versioned schema migrations
+
+Introduce migrations alongside the Maven/test foundation, before new database
+integration tests depend on schema setup; do not defer this prerequisite until
+repository extraction. Select a maintained migration tool such as Flyway or
+Liquibase and pin a version compatible with the chosen Java and MySQL versions.
+
+- Integrate an executable migration runner with Maven and document exact commands
+  for initializing a fresh database and upgrading an existing installation.
+- Derive the initial schema from reviewed legacy SQL and application requirements.
+  Keep `crypto_db.sql` as historical evidence rather than the supported setup path.
+- Separate database/account provisioning from schema changes. Do not carry over
+  `DROP DATABASE`, hardcoded credentials, or legacy account grants into migrations.
+- Store ordered migrations in version control. Treat applied migrations as
+  immutable and make subsequent changes in new migrations; validate their history.
+- Define an explicit adoption/baseline procedure for existing databases after
+  checking their schema. Do not automatically baseline an unknown nonempty database.
+- Run integration tests against disposable MySQL using the same migrations as
+  application setup. Verify fresh initialization, a second run with no pending
+  changes, and upgrades that preserve representative existing data.
+- Document failure recovery and backup requirements for schema changes; do not
+  assume MySQL DDL can always be rolled back transactionally.
+
+Completion requires working migration commands and passing integration tests,
+not merely adding migration files or documenting a proposed tool.
+
+## Repository extraction
+
 The current model classes contain SQL directly.
 
 Initially, keep the design simple but separate responsibilities.
@@ -1008,7 +1041,8 @@ The SQL schema and code contain old conventions and possible table-name inconsis
 
 Mitigation:
 
-- establish integration tests using a fresh database created from `crypto_db.sql`.
+- establish integration tests using a fresh database created by the versioned
+  migration runner; use `crypto_db.sql` only as historical schema evidence.
 
 ## Unknown custom library
 
@@ -1032,6 +1066,8 @@ The modernization is complete when:
 - core certificate and database behavior has automated tests;
 - obsolete crypto primitives are removed from default application behavior;
 - database credentials are externalized;
+- versioned database migrations support verified fresh setup and data-preserving upgrades;
+- UI and application text are fully English;
 - JDBC/file resources use safe lifecycle management;
 - core domain inputs use typed objects rather than arbitrary string maps;
 - the repository contains no generated build output or private key material;
