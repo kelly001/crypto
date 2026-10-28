@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 
 import com.zpayment.ui.FieldPanel;
@@ -139,7 +139,7 @@ public class MainPanel extends JPanel{
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                Desktop.getDesktop().browse(new URL(url).toURI());
+                Desktop.getDesktop().browse(new URI(url));
             } catch (Exception URIex) {
                 System.out.println(URIex.getLocalizedMessage());
             }

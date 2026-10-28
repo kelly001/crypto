@@ -10,7 +10,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.net.URI;
-import java.net.URL;
 
 public class MainFrame extends JFrame implements ActionListener, ItemListener{
     Dimension size = new Dimension(640,480);
@@ -314,7 +313,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
 
         URLAction(String url) {
             try {
-                this.url = new URL(url).toURI();
+                this.url = new URI(url);
             } catch (Exception e) {
                 System.out.println("Open url exception: " + e.getLocalizedMessage());
             }
