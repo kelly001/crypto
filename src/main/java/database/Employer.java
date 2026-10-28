@@ -11,11 +11,6 @@ public class Employer extends User {
 
     public Employer() {
         super();
-        /*this.company = new Company();
-        try {
-            this.company = Company.loadByUser(this.id);
-        } catch (SQLException e)
-        { System.out.println(e.getLocalizedMessage());}*/
     }
 
     public Employer(Long id) {
@@ -44,7 +39,7 @@ public class Employer extends User {
                 employer.setStatus(result.getBoolean("status"));
                 employer.setTimestamp(time);
                 employer.setCertificates(Certificate.loadByUser(result.getLong("id")));
-                //employer.setCompany(Company.loadById(company_id));
+
                 users.add(employer);
             }
         } catch (SQLException e ) {
@@ -55,63 +50,6 @@ public class Employer extends User {
             if (preparedStatement != null) { preparedStatement.close(); }
         }
         return users;
-    }
-
-    public static User loadByEmail (String name) throws SQLException{
-        User user = null;
-        Connection con = Database.getConnection();
-        String query = "select * from user where email = ?";
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setString(1, name);
-            ResultSet result = stmt.executeQuery();
-            while (result.next()) {
-                String password = result.getString("password");//.isEmpty()?rs.getString("password"):"";
-                String username = result.getString("username");//.isEmpty()?rs.getString("username"):"";
-                user = new User();
-                user.setId(result.getLong("id"));
-                user.setUsername(username);
-                user.setPassword(password);
-                user.setEmail(result.getString("email"));
-                user.setSalt(result.getString("salt"));
-            }
-        } catch (SQLException e ) {
-            System.out.println(e.getLocalizedMessage());
-        }catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
-        } finally {
-            if (stmt != null) { stmt.close(); }
-        }
-        return user;
-    }
-
-    public static User loadById(Long id) throws SQLException{
-        User user = null;
-        Connection con = Database.getConnection();
-        String query = "select * from user where id = ?";
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setLong(1, id);
-            ResultSet result = stmt.executeQuery();
-            while (result.next()) {
-                String email = result.getString("email");//.isEmpty()?rs.getString("email"):"";
-                String password = result.getString("password");//.isEmpty()?rs.getString("password"):"";
-                String username = result.getString("username");//.isEmpty()?rs.getString("username"):"";
-                Boolean status = result.getBoolean("status");
-                Timestamp time = new Timestamp(result.getLong("timestamp"));
-                user = new User(result.getLong("id"), email, password, result.getString("salt"), username, status, time);
-                System.out.println(user.getUsername() + " " + user.getId() + " " + user.getTimestamp());
-            }
-        } catch (SQLException e ) {
-            System.out.println(e.getLocalizedMessage());
-        }catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
-        } finally {
-            if (stmt != null) { stmt.close(); }
-        }
-        return user;
     }
 
     public static Boolean newUser (Employer user) throws SQLException {

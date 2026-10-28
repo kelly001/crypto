@@ -3,9 +3,7 @@ package com.zpayment;
 import com.zpayment.ui.FieldPanel;
 import database.Certificate;
 import database.Company;
-import database.Employer;
 import database.User;
-import external.UrlUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,44 +11,25 @@ import java.awt.event.*;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
-import java.sql.SQLException;
 
-
-/**
- * Created by new_name on 14.10.2014.
- */
 public class MainFrame extends JFrame implements ActionListener, ItemListener{
     Dimension size = new Dimension(640,480);
-    public User company;// = new Company();
+    public User company;
     private MainFrame frame;
     public LoginDialog login;
 
     private JMenuBar menuBar;
-    private JMenu menu, certificateMenu, companyMenu, userMenu, viewMenu, infoMenu;
+    private JMenu menu, certificateMenu, companyMenu, userMenu, infoMenu;
     private JMenuItem menuItem;
-    private MainPanel panel;
 
     public MainFrame() {
         super("Добро пожаловать в Крипто!");
         this.frame = this;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //set icon
+
         ImageIcon img = new ImageIcon(MainFrame.class.getResource("/icon.jpg"));
         this.setIconImage(img.getImage());
 
-        /*addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowActivated(WindowEvent e) {
-                System.out.println(login.toString());
-                if (login.isSucceeded()) {
-                    String user = login.getUsername();
-                    frame.setCompany(user);
-                    login.dispose();
-                    frame.setGUI();
-                    frame.setVisible(true);
-                }
-            }
-        }); */
         login = new LoginDialog(frame);
         login.addWindowListener(new WindowAdapter() {
             @Override
@@ -59,7 +38,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                 if (login.isSucceeded()) {
                     String user = login.getUsername();
                     frame.setCompany(user);
-                    //login.dispose();
+
                     frame.setGUI();
                     frame.setVisible(true);
                 }
@@ -67,15 +46,12 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         });
 
         login.setVisible(true);
-
     }
 
     private void addMenuItem(String name, ActionListener action, String id, JMenu menu) {
-        //a group of JMenuItems
         menuItem = new JMenuItem(name,
                 KeyEvent.VK_T);
-        //menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
-       //menuItem.addActionListener(new RemoveUserActionListener());
+
         menuItem.getAccessibleContext().setAccessibleDescription(
                 "This doesn't really do anything");
         menuItem.setActionCommand(id);
@@ -85,46 +61,36 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     }
 
     public void setMenu () {
-        //MENU
-        //Create the menu bar.
         menuBar = new JMenuBar();
 
-        //Build the first menu.
         menu = new JMenu("Меню");
         menu.setMnemonic(KeyEvent.VK_F1);
-        //addMenuItem("Сертификаты", this, "cert", menu);
-        //addMenuItem("Организация", this, "org", menu);
-        //addMenuItem("Ключи", this,"key", menu);
+
         addMenuItem("Главная", this, "main", menu);
         addMenuItem("Сменить пользователя", this, "logout", menu);
         addMenuItem("Выход", this, "exit", menu);
         menuBar.add(menu);
 
-        //Build the cert menu.
         certificateMenu = new JMenu("Сертификат");
         certificateMenu.setMnemonic(KeyEvent.VK_F3);
         certificateMenu.getAccessibleContext().setAccessibleDescription("");
         addMenuItem("Добавить", this, "certificate-add", certificateMenu);
         addMenuItem("Отозвать", this, "certificate-delete", certificateMenu);
 
-
         JMenu infor1Menu = new JMenu("Информация");
         addMenuItem("Редактирование", this, "company-edit", infor1Menu);
         addMenuItem("Просмотр", this, "company-view", infor1Menu);
 
-        //Build the company menu.
         companyMenu = new JMenu("Компания");
         companyMenu.setMnemonic(KeyEvent.VK_F2);
         companyMenu.getAccessibleContext().setAccessibleDescription("");
         companyMenu.add(infor1Menu);
         companyMenu.add(certificateMenu);
-        //companyMenu.add(userMenu);
-        //addMenuItem("Сертификат", this, "company-certificate", companyMenu);
+
         menuBar.add(companyMenu);
 
         if (!(company instanceof Company)) companyMenu.setEnabled(false);
 
-        //Build the users menu.
         userMenu = new JMenu("Пользователи");
         userMenu.setMnemonic(KeyEvent.VK_F4);
         userMenu.getAccessibleContext().setAccessibleDescription("");
@@ -135,7 +101,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
             addMenuItem("список сотрудников", this, "users", userMenu);
         }
         addMenuItem("Новый", this, "user-add", userMenu);
-        //addMenuItem("Удалить", this, "user-delete", userMenu);
+
         menuBar.add(userMenu);
 
         infoMenu = new JMenu("Помощь");
@@ -187,54 +153,31 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         frame.setVisible(true);
     }
 
-
-
-    //main func, first argument - company email
     public static void main(String[] arg) {
         com.zpayment.MainFrame new_frame = new com.zpayment.MainFrame();
         if (arg.length>0){
-            //login.dispose();
             new_frame.setCompany(arg[0]);
             new_frame.setGUI();
             new_frame.setVisible(true);
         }
     }
 
-    public class MenuActionListener implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e) {
-            System.out.println("Menu item action default custom");
-            System.out.println(e.getActionCommand());
-        }
-    }
-
     public void actionPerformed(ActionEvent e) {
-        //...Get information from the action event...
-        //...Display it in the text area...
         System.out.println("Menu item action default");
         System.out.println(e.getActionCommand());
 
-        //check menu id
         if (e.getSource() instanceof Component) {
             if (e.getActionCommand().equals("main")) {
                 frame.setGUI();
                 frame.setVisible(true);
-/*                String args[] = {company.getEmail()};
-                MainFrame.main(args);
-                Window w = findWindow((Component)e.getSource());
-                w.dispose();*/
             } else if (e.getActionCommand().equals("exit")) {
                 System.exit(1);
             } else if (e.getActionCommand().equals("logout")) {
-                // start login frame
-                MainFrame new_frame = new MainFrame();
-                //new_frame.setVisible(true);
+                new MainFrame();
+
                 findWindow((Component) e.getSource()).dispose();
             } else if (e.getActionCommand().contains("certificate")) {
                 if (e.getActionCommand().contains("add") || e.getActionCommand().equals("certificate-update")) {
-                    //find main
-                    Window w = findWindow((Component) e.getSource());
-                    // TODO сделать передачу сертификата, id сертификата лучше
                     createCertificateDialog(frame);
                 }
                 if (e.getActionCommand().contains("delete")) {
@@ -242,9 +185,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                        Certificate companyCE = company.getValidCertificate();
                        if (companyCE !=null)
                             new RemoveCertificateActionListener(company.getValidCertificate());
-
                    }
-                    // this.repaint(); не работает
                 }
             } else if (e.getActionCommand().equals("users")) {
                     System.out.println("users menu");
@@ -264,30 +205,12 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                     NewUserDialog((JFrame) w);
                 }
                 if (e.getActionCommand().contains("delete")) {
-                    /*TODO get user's id
-                    создаем какой-нибудь список ( ex. User UsersListDialog())
-                    который возвращает id пользователя
-                    */
                     try {
-                        new RemoveUserActionListener(Company.loadUsers().get(0)); // костыль, первый пользователь
+                        new RemoveUserActionListener(Company.loadUsers().get(0));
                     } catch (Exception ULExc) {
                         System.out.println("Load company users exeption: " + ULExc.getLocalizedMessage());
                     }
-
                 }
-            } else if (e.getActionCommand().contains("help")) {
-                /*switch (e.getActionCommand()) {
-                    case "mainhelp":
-                        break;
-                    case "windowshelp":
-                        break;
-                    case "browserhelp":
-                        break;
-                    case "bugs":
-                        break;
-                    default:
-                        break;
-                }*/
             }
         }else {
             System.out.println("source is not a Component");
@@ -307,8 +230,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
     }
 
     public void itemStateChanged(ItemEvent e) {
-        //...Get information from the item event...
-        //...Display it in the text area...
         MenuSelectionManager msm = (MenuSelectionManager) e.getSource();
         MenuElement[] path = msm.getSelectedPath();
         if (path.length == 0) {
@@ -330,7 +251,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         try {
             final CertificateDialog dialog =
                     new CertificateDialog(frame, new Certificate(), company);
-            //System.out.println(dialog?"true":"false");
+
             dialog.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosed(WindowEvent e) {
@@ -338,11 +259,8 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                     frame.setVisible(true);
                 }
             });
-
         } catch (Exception e) {
             System.out.println( "Create Certificate Dialog error: " + e.getLocalizedMessage());
-        } finally {
-            //update itself
         }
     }
 
@@ -370,8 +288,6 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         }
     }
 
-
-
     protected void createEditCompanyDialog(JFrame frame) {
         try {
             final CompanyDialog dialog = new CompanyDialog(frame, "Информация о компании");
@@ -383,30 +299,10 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
         }
     }
 
-    protected void EditUserDialog(JFrame frame) {
-        try {
-            final CompanyDialog dialog = new CompanyDialog(frame, "Пользователи");
-            dialog.createUserEditDialog(company);
-            dialog.setVisible(true);
-        } catch (Exception e) {
-            System.out.println( e.getLocalizedMessage());
-        }
-    }
-
     protected void NewUserDialog(JFrame frame) {
         try {
             final CompanyDialog dialog = new CompanyDialog(frame, "Пользователи");
             dialog.createNewUserDialog((Company) company);
-            dialog.setVisible(true);
-        } catch (Exception e) {
-            System.out.println( e.getLocalizedMessage());
-        }
-    }
-
-    protected void NewUserDialog2(JFrame frame) {
-        try {
-            final CompanyDialog2 dialog = new CompanyDialog2(frame, "Пользователи", new Employer(),(Company)company);
-            //dialog.createNewUserDialog((Company) company);
             dialog.setVisible(true);
         } catch (Exception e) {
             System.out.println( e.getLocalizedMessage());
@@ -436,7 +332,7 @@ public class MainFrame extends JFrame implements ActionListener, ItemListener{
                     desktop.browse(url);
             } catch (Exception URIex) {
                 System.out.println("Open url exception: " + URIex.getLocalizedMessage());
-                // Notify the user of the failure
+
                 String msg = "This program just tried to open a webpage." + "\n"
                         + "The URL has been copied to your clipboard, simply paste into your browser to access."+
                         "Webpage: " + url;

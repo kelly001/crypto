@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.net.URL;
 
@@ -13,14 +12,10 @@ import javax.swing.ButtonModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.metal.MetalButtonUI;
 
 public class JLinkButton extends JButton {
-    private static final String uiString = "LinkButtonUI";
-
     public static final int ALWAYS_UNDERLINE = 0;
 
     public static final int HOVER_UNDERLINE = 1;
@@ -44,15 +39,6 @@ public class JLinkButton extends JButton {
     private Action defaultAction;
 
     private boolean isLinkVisited;
-
-    public static void main(String[] a) {
-        JFrame f = new JFrame();
-        f.getContentPane().setLayout(new GridLayout(0,2));
-        f.getContentPane().add(new JLinkButton("www.java2s.com"));
-        f.getContentPane().add(new JLinkButton("www.java2s.com/ExampleCode/CatalogExampleCode.htm"));
-        f.setSize(600, 200);
-        f.setVisible(true);
-    }
 
     public JLinkButton() {
         this(null, null, null);
@@ -101,10 +87,6 @@ public class JLinkButton extends JButton {
 
     public void updateUI() {
         setUI(BasicLinkButtonUI.createUI(this));
-    }
-
-    private void setDefault() {
-        UIManager.getDefaults().put("LinkButtonUI", "external.BasicLinkButtonUI");
     }
 
     public String getUIClassID() {
@@ -258,8 +240,6 @@ class BasicLinkButtonUI extends MetalButtonUI {
                              String s) {
         JLinkButton bn = (JLinkButton) com;
         ButtonModel bnModel = bn.getModel();
-        Color color = bn.getForeground();
-        Object obj = null;
         if (bnModel.isEnabled()) {
             if (bnModel.isPressed())
                 bn.setForeground(bn.getActiveLinkColor());

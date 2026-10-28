@@ -1,19 +1,11 @@
-package com.zpayment; /**
- * Created by new_name on 10.11.2014.
- */
+package com.zpayment;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 import com.zpayment.ui.FieldPanel;
 
@@ -22,8 +14,6 @@ import database.User;
 import external.JLinkButton;
 
 public class MainPanel extends JPanel{
-
-    protected Logger logger = Logger.getLogger("Certificate panel");
     protected JFrame frame;
 
     public MainPanel (JFrame frame) {
@@ -76,7 +66,6 @@ public class MainPanel extends JPanel{
         this.add(btn, c);
     }
 
-
     public FieldPanel certificatesInfoGUI (User user) {
         FieldPanel certPanel = new FieldPanel();
         try {
@@ -86,13 +75,12 @@ public class MainPanel extends JPanel{
                     certPanel.addField(cert.getInfo(), "Инфо", new JLabel(), false);
                 }
             }
-        } catch (Exception e){ //SQLException e) {
+        } catch (Exception e){
         System.out.println("Load certficates SQLException in User constructor " + e.getLocalizedMessage());}
         return certPanel;
     }
 
     public FieldPanel certificatesGUI (User user) {
-        //Certificates GUI
         FieldPanel certPanel = new FieldPanel();
         try {
             ArrayList<Certificate> certificates  = Certificate.loadByUser(user.getId());
@@ -106,13 +94,12 @@ public class MainPanel extends JPanel{
                     cancelButton.addActionListener(new RemoveCertificateActionListener(cert));
                     certPanel.addField("", "Отозвать сертификат сотрудника", cancelButton, false);
                 }
-
             } else {
                 JButton getCertificateButton = new JButton("Добавить новый");
                 getCertificateButton.addActionListener(new certAction(user));
                 certPanel.addField("", "Добавить новый сертификат компании", getCertificateButton, false);
             }
-        }catch (Exception e){ //SQLException e) {
+        }catch (Exception e){
             System.out.println("Load certficates SQLException in User constructor " + e.getLocalizedMessage());}
         return certPanel;
     }
@@ -120,7 +107,7 @@ public class MainPanel extends JPanel{
     public class certAction implements ActionListener
     {
         private final Certificate cert;
-        private final User user;// = new Certificate();
+        private final User user;
         certAction(Certificate cert, User user) {
             super();
             this.cert = cert;
@@ -135,13 +122,10 @@ public class MainPanel extends JPanel{
 
         public void actionPerformed(ActionEvent e) {
             try {
-                final CertificateDialog dialog =
-                        new CertificateDialog(frame, cert, user);
-                //dialog.setVisible(true);
+                new CertificateDialog(frame, cert, user);
             } catch (Exception e1) {
                 System.out.println( "certAction actionPerfomed Exception: " + e1.getLocalizedMessage());
             }
-
         }
     }
 

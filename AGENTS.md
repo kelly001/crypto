@@ -109,7 +109,7 @@ Choose checks from the actual revision and changed behavior. Before Maven exists
 use the baseline report's source-compilation diagnostics in an isolated output
 directory. Known baseline blockers include the case collision and a JDK-internal
 import. `docs/baseline/LegacySmoke.java` probes historical binaries, not rebuilt
-source; standalone `Test` classes are not a regression suite.
+source. The unused standalone `Test` experiments have been removed.
 
 Once Maven and tests exist, use relevant targeted tests and `mvn test`; run
 `mvn clean verify` for integrated build changes when supported. The planned test

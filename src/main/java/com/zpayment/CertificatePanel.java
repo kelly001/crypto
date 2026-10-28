@@ -1,46 +1,29 @@
-package com.zpayment; /**
- * Created by new_name on 06.11.2014.
- */
+package com.zpayment;
+
 import javax.swing.*;
-import java.awt.*;
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.lang.reflect.Array;
-import java.sql.Time;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.zpayment.ui.OkCancelDialog;
 import com.zpayment.ui.FieldPanel;
 import database.Certificate;
 
 public class CertificatePanel extends FieldPanel {
-
     protected Logger logger = Logger.getLogger("Certificate panel");
-    protected Frame frame;
-    protected Map<String, JTextField> controls = new HashMap<String, JTextField>();
-    public static Dimension size = new Dimension(500,500);
-    protected String[] names = {"email", "username","filename", "organization", "department",  "locality" , "state","country"};//, "type", "comment"};
-    protected String[] labels = {"Email","Полное имя пользователя", "Имя файла", "Организация", "Отделение",   "Город",
-                    "Регион", "Страна"};//, "Тип сертификата", "Комментарий"};
-    private JButton btnCert;
 
-   public CertificatePanel (Frame frame) {
-       this.frame = frame;
+    protected Map<String, JTextField> controls = new HashMap<String, JTextField>();
+
+    protected String[] names = {"email", "username","filename", "organization", "department",  "locality" , "state","country"};
+
+   public CertificatePanel () {
        System.out.println("panel constructor");
        setControls(this);
    }
 
    protected void setControls(FieldPanel panel) {
        System.out.println("panel setControls");
-       //create and set controls
+
        for (int i=0; i < names.length; i++) {
            JTextField field = new JTextField();
            field.setName(names[i]);
@@ -50,7 +33,6 @@ public class CertificatePanel extends FieldPanel {
        panel.addGlue();
        logger.log(Level.FINE, "create Controls");
     }
-
 
     public void setValues(Certificate certificate) {
         if (certificate != null) {

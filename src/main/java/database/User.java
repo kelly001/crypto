@@ -2,19 +2,13 @@ package database;
 
 import com.zpayment.Login;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
 import java.sql.Timestamp;
-import java.security.cert.CertificateEncodingException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 
 public class User {
     private Long id;
-    private Integer type; // 1 - Company; 2 - User;
     private String email;
     private String password;
     private String salt;
@@ -22,10 +16,8 @@ public class User {
     private Timestamp timestamp;
     private Boolean status;
     private ArrayList<Certificate> certificates;
-    private ArrayList<Key> keys;
 
     public User() {
-        this.type=1;
         this.email = "";
         this.password = "";
         this.username = "";
@@ -39,16 +31,14 @@ public class User {
         this.id = id;
         this.salt = Login.getRandomSalt();
         java.util.Date now = Calendar.getInstance().getTime();
-        //java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
+
         this.timestamp = new Timestamp(now.getTime());
             this.certificates = Certificate.loadByUser(this.id);
             System.out.println("loaded certificates in constructor " + this.certificates.size());
-        //this.keys = new ArrayList<Key>();
     }
 
     public User(Long id, String email, String password, String salt, String username, Boolean status, Timestamp time) {
         this.id = id;
-        this.type = 1;
         this.email = email;
         this.password = password;
         this.salt = salt;
@@ -61,9 +51,7 @@ public class User {
     public void setId(Long id) {
         this.id = id;
     }
-    public void setType(Integer type) {
-        this.type = type;
-    }
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -82,21 +70,13 @@ public class User {
     public void setCertificates(ArrayList<Certificate> certificates){
         this.certificates = certificates;
     }
-    public void addCertificates(Certificate certificate){
-        this.certificates.add(certificate);
-    }
-    public void setKeys(ArrayList<Key> keys){
-        this.keys = keys;
-    }
-    public void setKeys(Key keys){
-        this.keys.add(keys);
-    }
+
     public void setSalt(String salt) { this.salt = salt;}
 
     public Long getId() {
         return id;
     }
-    public Integer getType() {return type; }
+
     public String getEmail() {
         return email;
     }
@@ -115,9 +95,7 @@ public class User {
     public ArrayList<Certificate> getCertificates() {
         return certificates;
     }
-    public ArrayList<Key> keys() {
-        return keys;
-    }
+
     public String getSalt() {return salt;}
 
     public Certificate getValidCertificate() {
@@ -125,7 +103,7 @@ public class User {
         try {
             Connection con = Database.getConnection();
             PreparedStatement preparedStatement = null;
-            // select by user_id
+
             String query = "select * from certificate where user_id = ? and status = ?";
             try {
                 preparedStatement = con.prepareStatement(query);
@@ -134,7 +112,6 @@ public class User {
                 ResultSet rs = preparedStatement.executeQuery();
 
                 while (rs.next()) {
-                    //Timestamp time = new Timestamp(rs.getLong("timestamp"));
                     Timestamp time = new Timestamp(rs.getLong("timestamp"));
                     cert = new Certificate();
                     cert.setId(rs.getLong("id"));
@@ -173,17 +150,12 @@ public class User {
         try {
             System.out.println("query exec");
 
-            PreparedStatement preparedStatement = null;
-            preparedStatement = con.prepareStatement(query);
-            ResultSet result2 = preparedStatement.executeQuery();
-
-
             stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                String email = rs.getString("email");//.isEmpty()?rs.getString("email"):"";
-                String password = rs.getString("password");//.isEmpty()?rs.getString("password"):"";
-                String username = rs.getString("username");//.isEmpty()?rs.getString("username"):"";
+                String email = rs.getString("email");
+                String password = rs.getString("password");
+                String username = rs.getString("username");
                 Boolean status = rs.getBoolean("status");
                 Timestamp time = new Timestamp(rs.getLong("timestamp"));
                 User user = new User(rs.getLong("id"), email, password, rs.getString("salt"), username, status, time);
@@ -211,8 +183,8 @@ public class User {
             stmt.setString(1, name);
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                String password = result.getString("password");//.isEmpty()?rs.getString("password"):"";
-                String username = result.getString("username");//.isEmpty()?rs.getString("username"):"";
+                String password = result.getString("password");
+                String username = result.getString("username");
                 user = new User();
                 user.setId(result.getLong("id"));
                 user.setUsername(username);
@@ -229,7 +201,6 @@ public class User {
         return user;
     }
 
-
     public static User loadById(Long id) throws SQLException{
         System.out.println("loadById User");
         User user = null;
@@ -241,9 +212,9 @@ public class User {
             stmt.setLong(1, id);
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                String email = result.getString("email");//.isEmpty()?rs.getString("email"):"";
-                String password = result.getString("password");//.isEmpty()?rs.getString("password"):"";
-                String username = result.getString("username");//.isEmpty()?rs.getString("username"):"";
+                String email = result.getString("email");
+                String password = result.getString("password");
+                String username = result.getString("username");
                 Boolean status = result.getBoolean("status");
                 Timestamp time = new Timestamp(result.getLong("timestamp"));
                 user = new User(result.getLong("id"), email, password, result.getString("salt"), username, status, time);
@@ -271,8 +242,8 @@ public class User {
             stmt.setString(1, name);
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                String password = result.getString("password");//.isEmpty()?rs.getString("password"):"";
-                String username = result.getString("username");//.isEmpty()?rs.getString("username"):"";
+                String password = result.getString("password");
+                String username = result.getString("username");
                 user = new User();
                 user.setId(result.getLong("id"));
                 user.setUsername(username);
@@ -288,33 +259,6 @@ public class User {
             if (stmt != null) { stmt.close(); }
         }
         return user;
-    }
-
-    public static Boolean saveUser (User user) throws SQLException {
-        System.out.println("saveUser User class");
-        Connection con = Database.getConnection();
-        PreparedStatement preparedStatement = null;
-        String query = "UPDATE user SET email =?, timestamp=?, username=?, password=?, salt=? WHERE id=?";
-        try {
-            preparedStatement = con.prepareStatement(query);
-            preparedStatement.setLong(6,user.getId());
-            preparedStatement.setString(1,user.getEmail());
-            //preparedStatement.setString(4, user.getPassword());
-            preparedStatement.setLong(2, Calendar.getInstance().getTime().getTime());
-            preparedStatement.setString(3, user.getUsername());
-            preparedStatement.setString(4, Login.getSecurePassword(user.getPassword(), user.getSalt()));
-            preparedStatement.setString(5, user.getSalt());
-            preparedStatement.execute();
-        } catch (SQLException e ) {
-            System.out.println(e.getLocalizedMessage());
-            return false;
-        }catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
-            return false;
-        } finally {
-            if (preparedStatement != null) { preparedStatement.close(); }
-        }
-        return true;
     }
 
     public static Long newUser (User user) {
@@ -360,7 +304,7 @@ public class User {
         try {
             Connection con = Database.getConnection();
             PreparedStatement preparedStatement = null;
-            // select by user_id
+
             String query = "UPDATE user SET status = ? where id = ?";
             try {
                 System.out.println("");

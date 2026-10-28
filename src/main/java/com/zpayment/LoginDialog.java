@@ -1,6 +1,5 @@
 package com.zpayment;
 
-import com.zpayment.ui.FieldPanel;
 import external.JLinkButton;
 
 import javax.swing.*;
@@ -8,9 +7,6 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.*;
 
-/**
- * Created by new_name on 17.10.2014.
- */
 public class LoginDialog extends JDialog{
     private JTextField tfUsername;
     private JPasswordField pfPassword;
@@ -20,7 +16,6 @@ public class LoginDialog extends JDialog{
     private JButton btnCancel;
     private boolean succeeded = false;
     private String username = "";
-
 
     public LoginDialog(Frame parent) {
         super(parent, "Авторизация", true);
@@ -55,7 +50,6 @@ public class LoginDialog extends JDialog{
         panel.add(pfPassword, cs);
         panel.setBorder(new LineBorder(Color.GRAY));
 
-        // Controls
         JPanel bp = new JPanel();
         btnLogin = new JButton("Войти");
         btnLogin.addActionListener(new AuthActionListener());
@@ -73,17 +67,14 @@ public class LoginDialog extends JDialog{
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    //FieldPanel companyPanel = new CompanyPanel(company, this);
                     CompanyDialog RegistrationDialog = new CompanyDialog(null, "Регистрация");
-                    //RegistrationDialog.setGUI();
+
                     RegistrationDialog.setVisible(true);
-                    //dispose();
                 } catch (Exception exc) {
                     System.out.println( exc.getLocalizedMessage());
                 }
             }
         });
-
 
         bp.add(btnLogin);
         bp.add(btnCancel);
@@ -98,13 +89,7 @@ public class LoginDialog extends JDialog{
     public class AuthActionListener implements ActionListener
     {
         public void actionPerformed(ActionEvent e) {
-
             if (Login.authenticate(getUsername(), getPassword())) {
-                /*JOptionPane.showMessageDialog(LoginDialog.this,
-                        "Hi " + getUsername() + "! You have successfully logged in.",
-                        "Авторизация",
-                        JOptionPane.INFORMATION_MESSAGE);*/
-
                 succeeded = true;
                 dispose();
             } else {
@@ -113,19 +98,14 @@ public class LoginDialog extends JDialog{
                         "com.zpayment.Login",
                         JOptionPane.ERROR_MESSAGE);
                 succeeded = false;
-
             }
-            //dispose();
         }
-
     }
-
 
     public String getUsername() {
         if (username == null || username.equals("")) {
             if (!tfUsername.getText().trim().equals(""))
                 username = tfUsername.getText().trim();
-
         }
         System.out.println("username="+username);
         return username;
@@ -136,15 +116,11 @@ public class LoginDialog extends JDialog{
     }
 
     public Boolean isSucceeded() {
-        /*if (succeeded) return this.getUsername();
-            else return null;*/
         return succeeded;
     }
-
 
     public void dispose() {
         getUsername();
         super.dispose();
     }
-
 }

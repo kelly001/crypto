@@ -282,7 +282,7 @@ Test:
 
 ### Existing inconsistencies to cover
 
-There appears to be a naming inconsistency between queries using:
+The historical baseline contained a naming inconsistency between queries using:
 
 ```sql
 certificate
@@ -294,7 +294,8 @@ and:
 certificates
 ```
 
-Add a test before correcting this so the expected database schema is explicit.
+The Java cleanup removed the unused plural-table lookup. Still establish the
+expected schema through migration-backed tests before changing live queries.
 
 ## Verification
 

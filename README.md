@@ -81,7 +81,8 @@ Escape, and close behavior without displaying application windows.
 Generated test keys live under `target/test-work/` and are deleted by the tests.
 These checks do not constitute the Phase 3 suite or prove secure algorithms,
 valid company-issued chains, PKCS#12 interoperability, or database correctness.
-The old classes named `Test` remain standalone experiments, not JUnit tests.
+The unused standalone `Test` experiments have been removed; runnable diagnostics
+remain under `docs/baseline/` and `docs/verification/`.
 
 ## Structure and dependencies
 
@@ -111,11 +112,15 @@ inconsistent salting, and historical committed private keys remain. This is not
 ready for production security use. Phase 2 updates library APIs and registers BC
 programmatically; it does not modernize those algorithms.
 
-The `certificate`/`certificates` table mismatch, private-key decoding bug, user
+The private-key decoding bug, user
 certificate issuer/signing mismatch, password-dialog cancellation bug, manual
 resource management, and swallowed exceptions remain for tested follow-up work.
 Revocation changes database state and attempts local file deletion; it is not a
 CRL/OCSP service. Help menu links still point to removed HTML files.
+
+The Java cleanup removed the unused plural-table certificate lookup, duplicate
+query execution, abandoned UI alternatives, and unused model/helper APIs. This
+does not establish correctness of the remaining live database flows.
 
 The [Phase 0 report](docs/phase-0-baseline.md) is a historical record. Its old source
 paths and binary diagnostics describe the pre-Maven revision; use that revision

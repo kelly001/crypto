@@ -110,3 +110,25 @@ here; obsolete cryptography and previously recorded behavior defects remain.
 
 Next: Phase 3's broader safety net, including actual versioned schema migrations
 and migration-backed database tests, before security or domain refactoring.
+
+## Java cleanup follow-up — 2026-10-28
+
+Reviewed application, test, and diagnostic Java sources. Removed commented-out
+implementations, generated author/date notes, redundant imports, unused fields
+and locals, uncalled helper/model methods, the two standalone `Test` experiments,
+the unused alternate company/user panels, and the unused browser utility/key model.
+Swing callbacks, both existing application launchers, test entry points, and the
+historical baseline diagnostic's private-key reader remain.
+
+Unused result holders were removed without dropping certificate generation or
+dialog construction. Removed the discarded duplicate query in `User.loadUsers`
+and the unused controls-map read after company creation. The unused
+`Certificate.loadById` plural-table query was removed, not repaired as a live API.
+
+The application now compiles 24 production sources. All eight compatibility tests
+and the packaged-JAR diagnostic pass. Eclipse compiler checks for unused imports,
+locals, private members, arguments, and dead code are clean for application and
+test sources. The historical diagnostic keeps its connection resource variable
+to guarantee closing the connection; that compiler warning is intentional.
+Analysis tooling remains local under ignored `.build-tools/` and adds no project
+dependency. No live database behavior was tested during this cleanup.

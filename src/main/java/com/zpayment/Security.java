@@ -41,34 +41,23 @@ import java.security.spec.X509EncodedKeySpec;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 /** Legacy certificate operations using the application-managed Bouncy Castle provider. */
 class Security {
-
     static {
         if (java.security.Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
             java.security.Security.addProvider(new BouncyCastleProvider());
         }
     }
 
-    public Signature dsa; // подписываемые данные
     private KeyPair RootKP;
     private KeyPair UserKP;
 
-    private byte[] realSig;
     private byte[] key;
-
 
     public Security() {
         System.out.println("com.zpayment.Security class constructor - generate certificates API");
-        Date startDate = new Date();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(startDate);
-        cal.add(Calendar.YEAR, 1); // to get previous year add -1
-        Date nextYear = cal.getTime();
-
     }
 
     public X509Certificate generateRootCertificate(Map<String, String> values) {
@@ -80,23 +69,20 @@ class Security {
         Date startDate = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(startDate);
-        cal.add(Calendar.YEAR, 1); // to get previous year add -1
+        cal.add(Calendar.YEAR, 1);
         Date nextYear = cal.getTime();
 
-        //создание и сохранение root сертификата
         BigInteger RootSerial = BigInteger.valueOf(System.currentTimeMillis());
         try {
-            // Rooot certificate
             rootCert = generateX509CertificateRoot(values, RootSerial, startDate, nextYear, "SHA1withDSA", RootKP, "BC");
             if (rootCert!=null) {
                 System.out.println(rootCert);
-                //saveCert(rootCert, "sertmy");
+
                 savePemX509Certificate(rootCert, "RootCertificate");
                 savePublicKey(RootKP,values.get("filename")+"RootPublicKey");
                 savePrivateKey(RootKP,values.get("filename")+"RootPrivateKey");
-                //TODO show message dialog to input password
-                transformToPKS12(rootCert, RootKP);
 
+                transformToPKS12(rootCert, RootKP);
             }else { System.out.println("Root certificate is null ");}
         } catch (Exception e) {
             System.out.println("Generate root certificate error: " + e.getLocalizedMessage());
@@ -105,57 +91,18 @@ class Security {
         return rootCert;
     }
 
-    public  boolean generateUserCertificate(X509Certificate rootCert) {
-        System.out.println("Generate user certificate by certificate function");
-
-        Date startDate = new Date();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(startDate);
-        cal.add(Calendar.YEAR, 1); // to get previous year add -1
-        Date nextYear = cal.getTime();
-
-        //creating signed certificate
-        BigInteger signedSerial = BigInteger.valueOf(System.currentTimeMillis());
-        UserKP = GenKeys();
-        saveEncKey(UserKP, "User");
-        try {
-            X509Certificate signedCert = generateX509Certificate("CN=Signed Certificate for", signedSerial, rootCert, startDate, nextYear, "SHA1withDSA", UserKP, "BC");
-            if (signedCert!=null) {
-                System.out.println(signedCert);
-                savePemX509Certificate(signedCert, "UserCertificate");
-                savePublicKey(UserKP, "UserKey");
-                transformToPKS12(signedCert, UserKP);
-                return true;
-            }else { System.out.println("User certificate is null ");}
-        } catch (Exception e) {
-            System.out.println("Generate signed certificate error: " + e.getLocalizedMessage());
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-
-     /*
-     * Создание сертификата пользователя с параметрами, передвавемыми в массиве с ключами - values
-     * Подпись секретным ключом компании, имя компании.
-     * Чем подписывать сертификат - паблик ключ пользователя/компании? Нужно пользователем,
-     * Компания - секртный ключ подписывает контейнер как то так
-     * TODO generate container with company private key
-     *
-     *  */
     public  boolean generateUserCertificate( Map<String, String> values) {
         System.out.println("Generate user certificate by key function");
 
         Date startDate = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(startDate);
-        cal.add(Calendar.YEAR, 1); // to get previous year add -1
+        cal.add(Calendar.YEAR, 1);
         Date nextYear = cal.getTime();
 
-        //creating signed certificate
         BigInteger signedSerial = BigInteger.valueOf(System.currentTimeMillis());
         UserKP = GenKeys();
-        //saveEncKey(UserKP, "User");
+
         try {
             X509Certificate signedCert = generateX509Certificate(values,
                     signedSerial, startDate, nextYear, UserKP);
@@ -174,27 +121,12 @@ class Security {
         return false;
     }
 
-    public static void main(String[] args) {
-        final Map<String, String> values = new HashMap<String, String>();
-        values.put("username", "USER");
-        values.put("organization", "ROOT");
-        values.put("filename", "test");
-
-        Security security = new Security();
-        X509Certificate rootcert = security.generateRootCertificate(values);
-            //rootcert.getSubjectDN().toString();
-        if (rootcert!=null)
-            security.generateUserCertificate(values);
-        //Boolean user = security.generateUserCertificate(values, rootcert);
-    }
-
     public static X509Certificate generateX509Certificate(Map<String, String> values,
             BigInteger serial, Date start , Date end, KeyPair userKeys)
             throws IOException, OperatorCreationException, CertificateException
     {
         if(serial!=null && start!=null && end!=null)
         {
-            //-----GENERATE THE X509 CERTIFICATE
             ContentSigner signer = new JcaContentSignerBuilder("SHA1withDSA").build(userKeys.getPrivate());
 
             X500NameBuilder namebuilder = new X500NameBuilder(X500Name.getDefaultStyle());
@@ -207,41 +139,16 @@ class Security {
             namebuilder.addRDN(BCStyle.EmailAddress, values.get("email")!=null?values.get("email"):"");
             X500Name subject  = namebuilder.build();
 
-            //X500Name subject = new X500Name("CN=Signed Certificate for " + values.get("username"));
+            // Legacy behavior: the user key signs this certificate despite the company issuer name.
             X500Name issuerName = new X500Name("CN = Root CA Certificate of " + (values.get("organization")!=null?values.get("organization"):""));
 
             X509v3CertificateBuilder certBldr = null;
 
-            // Чем подписывать сертификат - паблик ключ пользователя/компании? Нужно пользователем,
-            // Компания - секртный ключ подписывает контейнер как то так
-            // пока нет контейнера - паблик ключ компании
             certBldr = new JcaX509v3CertificateBuilder(issuerName, serial, start, end, subject, userKeys.getPublic());
             certBldr.addExtension( Extension.basicConstraints, true, new BasicConstraints(false));
             certBldr.addExtension(Extension.keyUsage, true,
                     new KeyUsage(KeyUsage.keyCertSign|KeyUsage.digitalSignature));
             X509Certificate cert = new JcaX509CertificateConverter().setProvider("BC").getCertificate(certBldr.build(signer));
-            return cert;
-        }
-        return null;
-    }
-
-
-    public static X509Certificate generateX509Certificate(String name, BigInteger serial, X509Certificate issuerCert,
-                                                         Date start , Date end, String signAlgorithm, KeyPair keys, String provider)
-            throws IOException, OperatorCreationException, CertificateException
-    {
-        if(serial!=null && name!=null && issuerCert!=null && start!=null && end!=null && signAlgorithm !=null)
-        {
-            //-----GENERATE THE X509 CERTIFICATE
-            ContentSigner signer = new JcaContentSignerBuilder(signAlgorithm).build(keys.getPrivate());
-            X500Name subject = new X500Name(name);
-            X509v3CertificateBuilder certBldr = null;
-            certBldr = new JcaX509v3CertificateBuilder(issuerCert, serial, start, end, subject, keys.getPublic());
-            certBldr.addExtension( Extension.basicConstraints, true, new BasicConstraints(false));
-            certBldr.addExtension(Extension.keyUsage, true,
-                    new KeyUsage(KeyUsage.keyCertSign|KeyUsage.digitalSignature));
-
-            X509Certificate cert = new JcaX509CertificateConverter().setProvider(provider).getCertificate(certBldr.build(signer));
             return cert;
         }
         return null;
@@ -253,9 +160,8 @@ class Security {
     {
         if(serial!=null && start!=null && end!=null && signAlgorithm !=null)
         {
-            //-----GENERATE THE X509 CERTIFICATE
             ContentSigner signer = new JcaContentSignerBuilder(signAlgorithm).build(keys.getPrivate());
-            //X500Name subject = new X500Name("CN = CA Root certificate of  " + values.get("organization"));
+
             X509v3CertificateBuilder certBldr = null;
 
             X500NameBuilder namebuilder = new X500NameBuilder(X500Name.getDefaultStyle());
@@ -321,18 +227,12 @@ class Security {
     }
 
     private KeyPair GenKeys () {
-        /* Generate a DSA signature */
         KeyPair pair = null;
         try {
-
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA", "BC");
             SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
             keyGen.initialize(1024, random);
             pair = keyGen.generateKeyPair();
-            /*
-            privKey = pair.getPrivate();
-            pubKey = pair.getPublic();
-            */
         } catch (Exception e) {
             System.err.println("Caught exception " + e.toString());
         }
@@ -343,39 +243,20 @@ class Security {
     private void saveEncKey(KeyPair keys, String filename) {
         try {
             byte[] key = keys.getPrivate().getEncoded();
-            //System.out.println(key.toString());
+
             FileOutputStream keyfos = new FileOutputStream(filename + "Key");
             keyfos.write(key);
             keyfos.close();
-            //writeFile(filename + "-key.pem", key);
         } catch (Exception e) {
             e.getLocalizedMessage();
         }
-        //writeFile(name, realSig);
-    }
-
-    public PublicKey readEncKey(String filename) {
-        try {
-            FileInputStream keyfis = new FileInputStream(filename);
-            //byte[] encKey = new byte[keyfis.available()];
-            key = new byte[keyfis.available()];
-            keyfis.read(key);
-            keyfis.close();
-        X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(key);
-        KeyFactory keyFactory = KeyFactory.getInstance("DSA", "BC");
-        return keyFactory.generatePublic(pubKeySpec);
-    } catch (InvalidKeySpecException e) {
-            System.err.println(e.getLocalizedMessage());
-    } catch (Exception e) {
-            System.err.println(e.getLocalizedMessage());
-    }
-        return null;
     }
 
     public PrivateKey readPrivateKey(String filename) {
+        // Retained for the historical baseline diagnostic; the legacy key-spec defect remains.
         try {
             FileInputStream keyfis = new FileInputStream(filename);
-            //byte[] encKey = new byte[keyfis.available()];
+
             key = new byte[keyfis.available()];
             keyfis.read(key);
             keyfis.close();
@@ -390,46 +271,6 @@ class Security {
         return null;
     }
 
-    public void verifySig(String filename){
-        try {
-            FileInputStream sigfis = new FileInputStream(filename);
-            byte[] sigToVerify = new byte[sigfis.available()];
-            sigfis.read(sigToVerify);
-            sigfis.close();
-        } catch (IOException e) {
-            System.err.println(e.getLocalizedMessage());
-        }
-    }
-
-    // подпись данных приватным ключом
-    // возвращает подписанные данные
-    public void signData (String name) {
-
-        try {
-            // объект для подписываемых данных
-            dsa = Signature.getInstance("SHA1withDSA", "BC");
-            dsa.initSign(RootKP.getPrivate());
-
-            //читаем файл для подписи
-            FileInputStream fis = new FileInputStream(name);
-            BufferedInputStream bufin = new BufferedInputStream(fis);
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = bufin.read(buffer)) >= 0) {
-                dsa.update(buffer, 0, len);
-            }
-            bufin.close();
-            realSig = dsa.sign();
-
-            /* save the signature in a file */
-            FileOutputStream sigfos = new FileOutputStream("data_signature");
-            sigfos.write(realSig);
-            sigfos.close();
-        } catch (Exception e) {
-            System.err.println(e.getLocalizedMessage());
-        }
-    }
-
     private void writeFile (String name, byte[] data) {
         try {
             FileOutputStream keyfos = new FileOutputStream(name);
@@ -442,14 +283,12 @@ class Security {
         private void transformToPKS12(X509Certificate user, KeyPair userKey)
                 throws NoSuchProviderException, KeyStoreException{
          try {
-             //get user's name
              X500Principal principal = user.getSubjectX500Principal();
              X500Name x500name = new X500Name( principal.getName() );
              RDN cn = x500name.getRDNs(BCStyle.CN)[0];
              String username = IETFUtils.valueToString(cn.getFirst().getValue());
              String filename = "files/" + username + ".p12";
 
-             // how input dialog to get password
              String password =
                      JOptionPane.showInputDialog("Enter a password for the certificate container:");
              if(password == null)
@@ -457,7 +296,6 @@ class Security {
                  JOptionPane.showMessageDialog(null,
                          "The default password will be used: certificate_password", "Password Required",
                          JOptionPane.INFORMATION_MESSAGE);
-
              }
              PKCS12SafeBagBuilder eeCertBagBuilder = new JcaPKCS12SafeBagBuilder(user);
              eeCertBagBuilder.addBagAttribute(PKCS12SafeBag.friendlyNameAttribute, new DERBMPString("User's Certificate"));
@@ -479,15 +317,5 @@ class Security {
              writeFile(filename, pfx.getEncoded());
         } catch (IOException ioe) {System.out.println("IOException error: " + ioe.getLocalizedMessage());}
         catch (Exception exc ) {System.out.println("Generate p12 error: " + exc.getLocalizedMessage());}
-    }
-
-    private void transformToPKS12_CommadLine(String user, String rootKey){
-        try {
-            String certificate = "files/" + user +"Certificate";
-            String key = "files/"+rootKey+"PublicKey";
-            String command = "openssl pkcs12 -export -in " + certificate +" -inkey "+key+" -out client.p12 -name \"Client certificate from our organization\"";
-            Runtime rt = Runtime.getRuntime();
-            Process pr = rt.exec(command);
-        } catch (Exception exc ) {System.out.println("Generate p12 error: " + exc.getLocalizedMessage());}
     }
 }
