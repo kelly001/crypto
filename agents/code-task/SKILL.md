@@ -15,7 +15,8 @@ for that task, not a separate user-visible chat or unrelated work.
    phases. Inspect current source/build files and Git status rather than assuming
    a phase has been completed.
 2. Establish the feature branch under the root rules before dispatch. Preserve
-   user edits and the index; leave work unstaged with no commits or pushes.
+   user edits and staging decisions. Workers leave edits unstaged for integration;
+   the coordinator may commit and push verified work under the root rules.
 3. Give one coding agent the concrete outcome, acceptance criteria, permitted
    files, relevant docs, branch constraint, and available verification commands.
    Follow root model-selection guidance. Split work only when ownership is independent;
@@ -26,7 +27,7 @@ for that task, not a separate user-visible chat or unrelated work.
 
 - Read the relevant code and instructions yourself. Stay within assigned scope;
   report ownership conflicts or necessary scope expansion to the coordinator.
-- Trace UI actions in `src/com/zpayment/`, persistence in `src/database/`, and
+- Trace UI actions in `src/main/java/com/zpayment/`, persistence in `src/main/java/database/`, and
   crypto in `Security.java`. Discover new locations if the Maven migration has
   moved them. Preserve existing workflows unless the task changes them.
 - Keep build migration separate from functional/security refactoring. Retain
@@ -49,4 +50,6 @@ for that task, not a separate user-visible chat or unrelated work.
 Return files changed, behavior, commands and actual results, and unresolved risks.
 The coordinator inspects the complete diff, resolves relevant issues, and performs
 necessary integration checks. Report unsupported/environment-blocked checks
-honestly. No automatic staging, commits, pushes, or PR creation.
+honestly. The coordinator may stage, commit, and push verified task changes on the
+development branch under root instructions. Workers do not perform Git mutations;
+merges to main/master and PR creation require the user's instruction.

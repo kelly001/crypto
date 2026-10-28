@@ -1,92 +1,131 @@
 # Crypto
 
-Crypto is a legacy Java desktop application for managing companies, employees,
-X.509 certificates, keys, and PKCS#12 containers. It was developed in 2014–2015,
-uses a Russian-language Swing interface, and stores account and certificate
-metadata in MySQL.
+Crypto is a Java desktop application for managing companies, employees, X.509
+certificates, keys, and PKCS#12 containers. Originally developed in 2014–2015,
+it retains its Swing UI and direct JDBC persistence while being modernized.
+The planned final UI is JavaFX; Phase 15 replaces Swing after the core services
+and regression tests are established.
+Existing application text is mostly Russian; a fully English application is the
+target, with incremental translation as code is updated.
 
-**Status: modernization in progress.** The application is still an IDE-managed
-codebase with bundled dependencies and historical build output. Java 25 LTS is
-the target, not an established build requirement or verified runtime today.
-There is no Maven/Gradle build, automated test suite, or CI configuration yet.
+**Status: Phases 1 and 2 implemented.** The project builds from source on Java 25
+with Maven, resolves dependencies from Maven Central, and includes focused build
+and dependency compatibility tests. Full behavioral tests, database migrations,
+security modernization, and CI remain future work. See the
+[phase report](docs/phase-1-2-build.md) and [modernization plan](docs/crypto_java25_modernization_plan.md).
 
-The [modernization plan](docs/crypto_java25_modernization_plan.md) describes future
-work; its completion criteria are not claims about the current implementation.
-The initial work documents the legacy baseline before changing application code.
+## Requirements and build
 
-## Current structure
+- JDK **25** (set `JAVA_HOME` to the JDK directory).
+- Network access to Maven Central on the first build.
+- A graphical desktop to run the Swing application.
+- A disposable MySQL instance for database flows. The upgraded driver targets
+  modern MySQL; compatibility with the original MySQL 5.5 dump is not established.
+
+The included Apache Maven wrapper pins Maven **3.10.0**, verifies its distribution
+SHA-256, and downloads it if needed. A separate Maven installation is unnecessary.
+
+From PowerShell at the repository root:
+
+```powershell
+$env:JAVA_HOME = 'C:\path\to\jdk-25'
+.\mvnw.cmd clean compile
+.\mvnw.cmd clean verify
+.\mvnw.cmd dependency:tree
+```
+
+On Linux/macOS, use `sh ./mvnw` in place of `.\mvnw.cmd`. The build requires Java
+25 and Maven 3.9.12 or later within the Maven 3 series. IDE users should import
+`pom.xml` and select JDK 25; no manual JAR classpath configuration is needed.
+
+## Run
+
+```powershell
+.\mvnw.cmd package
+& "$env:JAVA_HOME\bin\java.exe" -jar target\crypto-1.0-SNAPSHOT.jar
+```
+
+The JAR manifest selects `com.zpayment.MainFrame` and loads runtime dependencies
+from `target/dependency/`. Keep that directory beside the application JAR when
+copying the build. Bouncy Castle's signed JARs are kept intact rather than merged
+into an executable JAR. Icons are loaded from packaged classpath resources.
+
+Run in an isolated working directory with a writable `files/` directory for
+generated certificates/containers. Legacy code also writes some key files in the
+working directory. Never use committed demonstration keys for real credentials.
+
+The application still connects to `jdbc:mysql://localhost:3306/crypto`, with
+username/password `crypto`, hardcoded in `src/main/java/database/Database.java`.
+Environment variables are **not supported yet**. No database is needed to build
+or run the compatibility tests; they do not open a database connection.
+
+`crypto_db.sql` is historical schema evidence, not a modern migration system. It
+starts with `DROP DATABASE crypto`, contains old grant syntax, and has no seeded
+application users. Do not import it into a database you need. Executable,
+versioned migrations and verified fresh setup/data-preserving upgrades are
+planned alongside the database test foundation. Login and CRUD are not yet
+verified with the new driver against a running database.
+
+## Tests
+
+```powershell
+.\mvnw.cmd test
+# Additional dialog checks on a machine with a graphical desktop:
+.\mvnw.cmd '-Djava.awt.headless=false' '-Dtest=DialogCompatibilityTest' test
+```
+
+The default run is headless: six checks run and three dialog tests are skipped.
+Tests cover Java 25 bytecode, packaged resource availability, JDBC service
+discovery, BC provider registration, legacy certificate generation/PEM exports,
+and null exports that leave existing files untouched,
+and the replacement form layout. Desktop tests cover modal dialog OK, cancel,
+Escape, and close behavior without displaying application windows.
+
+Generated test keys live under `target/test-work/` and are deleted by the tests.
+These checks do not constitute the Phase 3 suite or prove secure algorithms,
+valid company-issued chains, PKCS#12 interoperability, or database correctness.
+The unused standalone `Test` experiments have been removed; runnable diagnostics
+remain under `docs/baseline/` and `docs/verification/`.
+
+## Structure and dependencies
 
 | Path | Purpose |
 | --- | --- |
-| `src/com/zpayment/` | Swing windows, login logic, certificate/key operations in `Security.java` |
-| `src/database/` | Models and direct JDBC persistence (`User`, `Company`, `Employer`, `Certificate`, `Key`) |
-| `src/external/` | Browser-link UI helpers |
-| `lib/` | Checked-in Bouncy Castle 1.51 provider/PKIX JARs, MySQL Connector/J 5.1.34, and `teacode-common.jar` Swing helpers |
-| `out/` | Historical compiled classes and packaged application/dependency JARs; not a reproducible build |
-| `META-INF/`, `src/META-INF/` | Conflicting historical packaging manifests |
-| `files/` | Historical certificate, key, and PKCS#12 files |
-| `crypto_db.sql` | Legacy MySQL schema and account grants |
-| `docs/` | Modernization plan, baseline report, and diagnostic |
+| `src/main/java/com/zpayment/` | Swing application, login, and crypto operations |
+| `src/main/java/com/zpayment/ui/` | Project-owned Swing form/dialog helpers |
+| `src/main/java/database/` | Models and direct JDBC persistence |
+| `src/main/java/external/` | Browser-link UI helpers |
+| `src/main/resources/` | Packaged icons |
+| `src/test/java/` | Focused JUnit 5 compatibility tests |
+| `pom.xml`, `.mvn/`, `mvnw*` | Pinned build and wrapper |
+| `target/` | Ignored build output and resolved runtime JARs |
+| `files/`, `RootKey`, `key.p12` | Historical demonstration key/container material |
+| `docs/` | Modernization plan, baseline, and phase reports |
 
-UI actions call models containing SQL directly. `Security` uses Bouncy Castle for
-certificate creation, key serialization, and PKCS#12 export. Company certificates
-and employee certificates take different paths through the certificate dialog.
-Revocation changes database status and attempts to delete a local certificate;
-it is not a documented CRL/OCSP service.
-
-## Legacy setup and execution
-
-Use an isolated development environment with disposable data. The historical
-baseline is Java 8 bytecode with older Java coding conventions. A JDK, a graphical
-desktop, the four JARs in `lib/`, and MySQL are needed for a full legacy run.
-The SQL dump identifies its original server as MySQL 5.5.25; compatibility with a
-modern server has not been established.
-
-The application connects to `jdbc:mysql://localhost:3306/crypto` with username
-`crypto` and password `crypto`, hardcoded in `src/database/Database.java`.
-Environment variables are **not supported yet**. Start a disposable MySQL server
-on that endpoint before exercising database flows.
-
-Review `crypto_db.sql` before importing it: it starts with `DROP DATABASE crypto`,
-recreates the database, and includes old account-grant syntax. It contains no
-seeded application users. Do not import it into an existing database you need.
-Schema import and initial account creation still require baseline verification.
-
-For legacy IDE setup, mark `src/` as the source root, add all four `lib/*.jar`
-files to the classpath, and use the repository root as the working directory so
-`icon.jpg` and `files/` resolve. The original HTML help pages have been removed;
-menu actions that open them still point to missing files. Use `com.zpayment.MainFrame` as the
-application entry point. The root manifest instead points to `LoginFrame` and
-should not be treated as authoritative.
-
-For diagnostic runs of the **historical binaries**, from PowerShell at the
-repository root with Java on PATH:
-
-```powershell
-java -cp 'out/production/crypto;lib/*' com.zpayment.MainFrame
-```
-
-This does not rebuild source or prove that the checked-in binaries match it.
-A repeatable source build and Java 25 run instructions will be added during the
-build modernization phase. There is currently no supported `mvn test` command;
-classes named `Test` are standalone experiments, not an automated test suite.
+Production dependencies are Bouncy Castle `bcprov-jdk18on` / `bcpkix-jdk18on`
+**1.86** and MySQL Connector/J **26.10.0**. Maven resolves BC utility and Protobuf
+transitives. Tests use JUnit Jupiter **5.14.4**. Versions and build plugins are
+pinned in `pom.xml`. The old `teacode-common.jar` was replaced with standard Swing
+helpers; no application dependency is loaded from a checked-in JAR or `lib/`.
 
 ## Known limitations
 
-The legacy code uses MD5 password hashing, SHA-1/1024-bit DSA signing, and RC2 in
-PKCS#12 export. Password salting is inconsistent. Historical private-key and
-container files are committed; treat them as public demonstration material and
-do not reuse them. This application is not ready for production security use.
+MD5 password hashing, SHA-1/1024-bit DSA signing, RC2-based PKCS#12 protection,
+inconsistent salting, and historical committed private keys remain. This is not
+ready for production security use. Phase 2 updates library APIs and registers BC
+programmatically; it does not modernize those algorithms.
 
-Source inspection also shows a `certificate`/`certificates` table-name mismatch,
-JDK-internal imports, manual resource management, and exceptions that can hide
-failures. The bundled `teacode-common.jar` is actively referenced by the UI.
-These issues remain for later phases; documenting them does not fix them.
+The private-key decoding bug, user
+certificate issuer/signing mismatch, password-dialog cancellation bug, manual
+resource management, and swallowed exceptions remain for tested follow-up work.
+Revocation changes database state and attempts local file deletion; it is not a
+CRL/OCSP service. Help menu links still point to removed HTML files.
 
-The modernization preserves Swing initially and separates build changes,
-behavioral tests, security fixes, and code refactoring. See the plan for scope
-and sequencing.
+The Java cleanup removed the unused plural-table certificate lookup, duplicate
+query execution, abandoned UI alternatives, and unused model/helper APIs. This
+does not establish correctness of the remaining live database flows.
 
-Phase 0 findings and reproducible diagnostic commands are recorded in the
-[baseline report](docs/phase-0-baseline.md). Java 25 source compilation currently
-fails; see the report for confirmed blockers and unverified flows.
+The [Phase 0 report](docs/phase-0-baseline.md) is a historical record. Its old source
+paths and binary diagnostics describe the pre-Maven revision; use that revision
+to reproduce them. Historical build output, bundled JARs, and conflicting
+manifests have now been removed from the working source tree.

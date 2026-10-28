@@ -4,6 +4,10 @@ Repository: `kelly001/crypto`
 Current baseline: Java 8 bytecode (class-file version 52), largely Java 7-era coding style  
 Target: Java 25 LTS
 
+Implementation status: [Phases 1 and 2](phase-1-2-build.md) establish the Java 25
+Maven build, current dependencies, and focused compatibility checks. Remaining
+sections describe future work unless their completion is explicitly recorded.
+
 ## Goals
 
 Modernize the project so it:
@@ -13,12 +17,15 @@ Modernize the project so it:
 - replaces obsolete or insecure cryptographic practices;
 - has automated tests around certificate, key, database, and PKCS#12 behavior;
 - uses modern Java features where they improve clarity and safety;
-- preserves the original application concept and Swing UI initially;
+- preserves the original application concept while replacing Swing with JavaFX after the build and core behavior are stabilized;
 - has a fully English UI and application text, translating existing Russian text incrementally;
 - initializes and upgrades databases through executable, versioned migrations instead of a legacy SQL dump;
 - is easy to run locally and suitable as a portfolio/refresher project.
 
-The first goal is **not** to rewrite the application or replace Swing. The migration should separate build/runtime modernization, security fixes, and code-style refactoring so regressions are easier to identify.
+Preserve Swing during the initial build, dependency, and core-logic modernization.
+The final desktop UI will use JavaFX. Perform that replacement as a separate phase
+after regression tests and UI-independent services exist, keeping build/runtime
+changes, security fixes, and UI migration independently reviewable.
 
 ---
 
@@ -166,7 +173,7 @@ JcaPEMWriter
 Review all imports in:
 
 ```text
-src/com/zpayment/Security.java
+src/main/java/com/zpayment/Security.java
 ```
 
 against the current Bouncy Castle API.
@@ -278,7 +285,7 @@ Test:
 
 ### Existing inconsistencies to cover
 
-There appears to be a naming inconsistency between queries using:
+The historical baseline contained a naming inconsistency between queries using:
 
 ```sql
 certificate
@@ -290,7 +297,8 @@ and:
 certificates
 ```
 
-Add a test before correcting this so the expected database schema is explicit.
+The Java cleanup removed the unused plural-table lookup. Still establish the
+expected schema through migration-backed tests before changing live queries.
 
 ## Verification
 
@@ -915,6 +923,58 @@ Do not make style tooling the focus of the project.
 
 ---
 
+# Phase 15 — Replace Swing with JavaFX
+
+## Prerequisites and architecture
+
+- Complete the reproducible build, core regression tests, security modernization,
+  and persistence/service separation before replacing the production UI.
+- Extract remaining business logic from Swing listeners and dialogs into
+  UI-independent services. Certificate generation and PKCS#12 export must accept
+  explicit inputs rather than opening Swing password dialogs themselves.
+- Retain the domain model, JDBC repositories, versioned database migrations, and
+  tested security behavior. Do not combine the UI replacement with a backend rewrite.
+- Select and pin a supported OpenJFX release compatible with the project's JDK
+  when implementation begins. Resolve JavaFX dependencies and platform-specific
+  runtime artifacts through Maven; do not add checked-in SDKs or JARs.
+- Keep JavaFX controllers focused on presentation and user interaction. Choose
+  FXML/CSS or Java-based views consistently and document that decision.
+
+## Migration scope
+
+1. Inventory supported workflows and define acceptance criteria for each screen.
+2. Add a JavaFX application shell, navigation, shared styles, and reusable form,
+   validation, confirmation, and error components. Use English throughout.
+3. Migrate login/logout, company and employee management, certificate details and
+   generation, revocation, and key/container export in small, reviewable slices.
+4. Run database, file, and cryptographic work off the JavaFX application thread.
+   Define progress, cancellation, failure, and duplicate-submission behavior, and
+   update controls on the UI thread.
+5. Preserve useful workflows while specifying deliberate improvements to legacy
+   defects; do not reproduce known bugs merely for visual or behavioral parity.
+6. Provide keyboard navigation, meaningful labels, focus handling, accessible
+   feedback, and layouts that tolerate resizing and display scaling.
+7. Update launch/packaging commands, the application entry point, resource loading,
+   and deployment documentation. Verify launch on each declared supported OS.
+8. Switch the default entry point to JavaFX after acceptance checks pass, then
+   remove obsolete Swing screens, helpers, launchers, and UI-specific dependencies.
+   Any temporary coexistence must have a clear removal milestone.
+
+## Verification and completion
+
+- Keep service/domain/database tests passing independently of either UI toolkit.
+- Add focused JavaFX controller and UI integration tests for the migrated flows,
+  including invalid input, cancellation, failures, and repeated actions.
+- Configure suitable graphical test execution in CI; distinguish headless service
+  checks from UI checks requiring a display.
+- Manually verify the main workflows, keyboard access, scaling, responsiveness,
+  and packaged application startup against disposable data.
+- Complete the phase only when all supported workflows use the English JavaFX UI,
+  no production flow depends on Swing dialogs or screens, and the packaged build
+  launches without an IDE or separately installed JavaFX SDK.
+
+---
+
 # Suggested Execution Order
 
 ## Milestone 1 — Reproducible Java 25 build
@@ -997,11 +1057,27 @@ and suitable as a portfolio/refresher project.
 
 ---
 
+## Milestone 6 — JavaFX desktop application
+
+1. Extract remaining UI-bound service operations and protect their contracts with tests.
+2. Introduce the JavaFX shell and migrate supported workflows incrementally.
+3. Verify UI behavior, accessibility, responsiveness, and runtime packaging.
+4. Make JavaFX the default and remove obsolete Swing code.
+
+Deliverable:
+
+```text
+The application uses a fully English JavaFX UI backed by tested, UI-independent services.
+```
+
+---
+
 # Things Not to Do Initially
 
 Avoid these until the Java 25 migration is stable:
 
 - rewriting Swing as React;
+- starting the JavaFX replacement before core tests and UI-independent services exist;
 - converting the application to Spring Boot;
 - introducing Hibernate/JPA;
 - splitting it into microservices;
@@ -1056,6 +1132,22 @@ Mitigation:
 
 ---
 
+## JavaFX migration risks
+
+Swing event handlers and crypto helpers currently mix UI, persistence, and file
+operations. Moving screens without separating those responsibilities risks UI
+freezes, changed cancellation behavior, and duplicate writes.
+
+Mitigation:
+
+- test service contracts before moving screens;
+- explicitly handle background work and UI-thread updates;
+- verify workflow behavior rather than requiring pixel-identical Swing layouts;
+- exercise packaged JavaFX runtime dependencies on every supported OS;
+- remove the temporary Swing path once the JavaFX replacement is accepted.
+
+---
+
 # Definition of Done
 
 The modernization is complete when:
@@ -1068,6 +1160,8 @@ The modernization is complete when:
 - database credentials are externalized;
 - versioned database migrations support verified fresh setup and data-preserving upgrades;
 - UI and application text are fully English;
+- all supported desktop workflows run in JavaFX, with obsolete Swing UI code removed;
+- JavaFX UI checks and packaged launch verification pass on declared supported platforms;
 - JDBC/file resources use safe lifecycle management;
 - core domain inputs use typed objects rather than arbitrary string maps;
 - the repository contains no generated build output or private key material;
@@ -1107,5 +1201,11 @@ Records, lambdas, `java.time`, collection cleanup, selected modern syntax.
 ### PR 7 — Repository and CI cleanup
 
 README, GitHub Actions, ignored/generated files, dependency scanning.
+
+### PR 8 onward — JavaFX migration
+
+Separate service extraction, the JavaFX foundation, individual workflow migrations,
+UI tests/packaging, and final Swing removal into reviewable PRs after prerequisites
+are satisfied. See Phase 15 for acceptance criteria.
 
 This order keeps functional changes separated from infrastructure changes and makes regressions much easier to diagnose.
