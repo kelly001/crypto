@@ -186,44 +186,38 @@ class Security {
 
     public static boolean savePemX509Certificate(X509Certificate cert, String name) throws NoSuchAlgorithmException, NoSuchProviderException, CertificateEncodingException, SignatureException, InvalidKeyException, IOException
     {
-        Writer writer = new FileWriter (new File("files/", name));
-        if(cert!=null)
-        {
-            JcaPEMWriter pemWriter = new JcaPEMWriter(writer);
-            pemWriter.writeObject(cert);
-            pemWriter.flush();
-            pemWriter.close();
-            return true;
+        if (cert == null) {
+            return false;
         }
-        return false;
+        try (Writer writer = new FileWriter(new File("files/", name));
+             JcaPEMWriter pemWriter = new JcaPEMWriter(writer)) {
+            pemWriter.writeObject(cert);
+        }
+        return true;
     }
 
     public static boolean savePublicKey(KeyPair key, String name) throws NoSuchAlgorithmException, NoSuchProviderException, CertificateEncodingException, SignatureException, InvalidKeyException, IOException
     {
-        Writer writer = new FileWriter (new File("files/", name));
-        if(key!=null)
-        {
-            JcaPEMWriter pemWriter = new JcaPEMWriter(writer);
-            pemWriter.writeObject(key.getPublic());
-            pemWriter.flush();
-            pemWriter.close();
-            return true;
+        if (key == null) {
+            return false;
         }
-        return false;
+        try (Writer writer = new FileWriter(new File("files/", name));
+             JcaPEMWriter pemWriter = new JcaPEMWriter(writer)) {
+            pemWriter.writeObject(key.getPublic());
+        }
+        return true;
     }
 
     public static boolean savePrivateKey(KeyPair key, String name) throws NoSuchAlgorithmException, NoSuchProviderException, CertificateEncodingException, SignatureException, InvalidKeyException, IOException
     {
-        Writer writer = new FileWriter (new File("files/", name));
-        if(key!=null)
-        {
-            JcaPEMWriter pemWriter = new JcaPEMWriter(writer);
-            pemWriter.writeObject(key.getPrivate());
-            pemWriter.flush();
-            pemWriter.close();
-            return true;
+        if (key == null) {
+            return false;
         }
-        return false;
+        try (Writer writer = new FileWriter(new File("files/", name));
+             JcaPEMWriter pemWriter = new JcaPEMWriter(writer)) {
+            pemWriter.writeObject(key.getPrivate());
+        }
+        return true;
     }
 
     private KeyPair GenKeys () {
@@ -244,9 +238,9 @@ class Security {
         try {
             byte[] key = keys.getPrivate().getEncoded();
 
-            FileOutputStream keyfos = new FileOutputStream(filename + "Key");
-            keyfos.write(key);
-            keyfos.close();
+            try (FileOutputStream keyfos = new FileOutputStream(filename + "Key")) {
+                keyfos.write(key);
+            }
         } catch (Exception e) {
             e.getLocalizedMessage();
         }
@@ -255,11 +249,10 @@ class Security {
     public PrivateKey readPrivateKey(String filename) {
         // Retained for the historical baseline diagnostic; the legacy key-spec defect remains.
         try {
-            FileInputStream keyfis = new FileInputStream(filename);
-
-            key = new byte[keyfis.available()];
-            keyfis.read(key);
-            keyfis.close();
+            try (FileInputStream keyfis = new FileInputStream(filename)) {
+                key = new byte[keyfis.available()];
+                keyfis.read(key);
+            }
             X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(key);
             KeyFactory keyFactory = KeyFactory.getInstance("DSA", "BC");
             return keyFactory.generatePrivate(pubKeySpec);
@@ -272,10 +265,8 @@ class Security {
     }
 
     private void writeFile (String name, byte[] data) {
-        try {
-            FileOutputStream keyfos = new FileOutputStream(name);
+        try (FileOutputStream keyfos = new FileOutputStream(name)) {
             keyfos.write(data);
-            keyfos.close();
         } catch (Exception e) {
             e.getLocalizedMessage();
         }

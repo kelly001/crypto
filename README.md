@@ -74,9 +74,10 @@ verified with the new driver against a running database.
 .\mvnw.cmd '-Djava.awt.headless=false' '-Dtest=DialogCompatibilityTest' test
 ```
 
-The default run is headless: five checks run and three dialog tests are skipped.
+The default run is headless: six checks run and three dialog tests are skipped.
 Tests cover Java 25 bytecode, packaged resource availability, JDBC service
 discovery, BC provider registration, legacy certificate generation/PEM exports,
+and null exports that leave existing files untouched,
 and the replacement form layout. Desktop tests cover modal dialog OK, cancel,
 Escape, and close behavior without displaying application windows.
 

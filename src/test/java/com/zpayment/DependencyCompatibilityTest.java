@@ -86,6 +86,27 @@ class DependencyCompatibilityTest {
         }
     }
 
+    @Test
+    void nullPemExportsDoNotCreateOrTruncateFiles() throws Exception {
+        Path files = Files.createDirectories(Path.of("files"));
+        Path existing = Files.createTempFile(files, "untouched-", ".pem");
+        Path missing = files.resolve(existing.getFileName() + ".missing");
+        try {
+            Files.writeString(existing, "existing contents");
+            for (Path destination : new Path[]{existing, missing}) {
+                String name = destination.getFileName().toString();
+                assertFalse(Security.savePemX509Certificate(null, name));
+                assertFalse(Security.savePublicKey(null, name));
+                assertFalse(Security.savePrivateKey(null, name));
+            }
+            assertEquals("existing contents", Files.readString(existing));
+            assertFalse(Files.exists(missing));
+        } finally {
+            Files.deleteIfExists(existing);
+            Files.deleteIfExists(missing);
+        }
+    }
+
     private Object readPem(Path file) throws Exception {
         try (var parser = new PEMParser(Files.newBufferedReader(file))) {
             return parser.readObject();
