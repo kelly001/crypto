@@ -3,6 +3,8 @@
 Crypto is a Java desktop application for managing companies, employees, X.509
 certificates, keys, and PKCS#12 containers. Originally developed in 2014–2015,
 it retains its Swing UI and direct JDBC persistence while being modernized.
+The planned final UI is JavaFX; Phase 15 replaces Swing after the core services
+and regression tests are established.
 Existing application text is mostly Russian; a fully English application is the
 target, with incremental translation as code is updated.
 

@@ -65,7 +65,9 @@ output belong outside tracked source and must not contain secrets.
 
 ## Modernization boundaries
 
-- Preserve Swing initially and keep plain JDBC. Do not introduce React, Spring
+- Preserve Swing through the initial modernization, then replace it with JavaFX
+  under Phase 15 after core tests and UI-independent services exist. Keep plain JDBC.
+  Do not introduce React, Spring
   Boot, JPA, microservices, or Java modules without a task-specific reason.
 - Establish a reproducible build and meaningful behavior tests before large
   refactoring or changing cryptographic defaults. Follow the plan's sequencing.
